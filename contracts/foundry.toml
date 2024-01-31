@@ -1,6 +1,17 @@
 [profile.default]
-src = "src"
-out = "out"
 libs = ["lib"]
+out = "out"
+src = "src"
+
+[fmt]
+line_length = 100
+
+[rpc_endpoints]
+bsc = "${BINANCE_RPC_URL}"
+bsc-testnet = "${BINANCE_TESTNET_RPC_URL}"
+localhost = "${LOCALHOST}"
+
+[etherscan]
+bscscan = {key = "${BSCSCAN_APY_KEY}"}
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
