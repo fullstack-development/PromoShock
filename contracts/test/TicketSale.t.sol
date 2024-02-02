@@ -2,10 +2,11 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
-import {TicketSale, SaleParams} from "src/TicketSale.sol";
+
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 
+import {TicketSale, SaleParams} from "src/TicketSale.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
 
 contract TicketSaleTest is Test {
