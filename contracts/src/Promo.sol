@@ -8,9 +8,10 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 import {ITicket} from "src/interfaces/ITicket.sol";
 
-struct PromoCompany {
+struct Promotion {
     uint256 startTime;
     uint256 endTime;
+    address promoAddr;
     address[] streams;
     string description;
 }
@@ -19,15 +20,18 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
     string private _contractURI;
     uint256 private _tokenCounter;
 
-    mapping(uint256 tokenId => PromoCompany promo) private _promoCompanies;
+    mapping(uint256 tokenId => Promotion promotion) private _promotions;
 
-    event MintPromo(address indexed owner, uint256 indexed tokenId, PromoCompany promo);
+    event MintPromo(address indexed owner, uint256 indexed tokenId, Promotion promotion);
     event ContractURIChanged(string contractURI);
     event TokenUriChanged(address indexed owner, uint256 indexed tokenId, string tokenUri);
 
     error NotTokenOwner();
 
-    constructor(address promoFactory, string memory contractUri) ERC721("MetaPromo", "MP") Ownable(promoFactory) {
+    constructor(address promoFactory, string memory contractUri)
+        ERC721("MetaPromo", "MP")
+        Ownable(promoFactory)
+    {
         _contractURI = contractUri;
     }
 
@@ -54,7 +58,7 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
 
     // region - Safe Mint
 
-    function safeMint(address to, string calldata uri, PromoCompany calldata promo)
+    function safeMint(address to, string calldata uri, Promotion calldata promotion)
         external
         onlyOwner
     {
@@ -63,9 +67,9 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
 
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
-        _promoCompanies[tokenId] = promo;
+        _promotions[tokenId] = promotion;
 
-        emit MintPromo(to, tokenId, promo);
+        emit MintPromo(to, tokenId, promotion);
     }
 
     // endregion
@@ -103,20 +107,16 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
         return _tokenCounter;
     }
 
-    function getPromoCompany(uint256 tokenId) external view returns (PromoCompany memory) {
-        return _promoCompanies[tokenId];
+    function getPromotion(uint256 tokenId) external view returns (Promotion memory) {
+        return _promotions[tokenId];
     }
 
-    function getTicketsAmount(uint256 tokenId)
-        external
-        view
-        returns (uint256 totalTicketsAmount)
-    {
-        PromoCompany memory promo = _promoCompanies[tokenId];
-        uint256 streamAmount = promo.streams.length;
+    function getTicketsAmount(uint256 tokenId) external view returns (uint256 totalTicketsAmount) {
+        Promotion memory promotion = _promotions[tokenId];
+        uint256 streamAmount = promotion.streams.length;
 
         for (uint256 i; i < streamAmount; i++) {
-            totalTicketsAmount += ITicket(promo.streams[i]).totalSupply();
+            totalTicketsAmount += ITicket(promotion.streams[i]).totalSupply();
         }
     }
 

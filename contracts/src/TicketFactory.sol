@@ -14,6 +14,7 @@ contract TicketFactory is Ownable {
     address private _ticketImplementation;
     uint256 private _maxSalePeriod;
     uint256 private _protocolFee;
+    address private _protocolFeeRecipient;
 
     /// Events
 
@@ -22,6 +23,9 @@ contract TicketFactory is Ownable {
     );
     event MaxSalePeriodSet(uint256 newMaxPeriod);
     event ProtocolFeeSet(uint256 newProtocolFee);
+    event ProtocolFeeRecipientSet(address newRecipient);
+    event TicketSaleImplementationSet(address newImplementation);
+    event TicketImplementationSet(address newImplementation);
 
     /// Errors
 
@@ -33,19 +37,23 @@ contract TicketFactory is Ownable {
     constructor(
         address ticketSaleImplementation,
         address ticketImplementation,
-        uint256 maxSalePeriod,
-        uint256 protocolFee
+        address protocolFeeRecipient,
+        uint256 protocolFee,
+        uint256 maxSalePeriod
     ) Ownable(msg.sender) {
-        if (ticketSaleImplementation == address(0) || ticketImplementation == address(0)) {
+        setTicketSaleImplementation(ticketSaleImplementation);
+        setTicketImplementation(ticketImplementation);
+        setProtocolFeeRecipient(protocolFeeRecipient);
+        setMaxSalePeriod(maxSalePeriod);
+        setProtocolFee(protocolFee);
+    }
+
+    modifier checkAddress(address target) {
+        if (target == address(0)) {
             revert ZeroAddress();
         }
 
-        setMaxSalePeriod(maxSalePeriod);
-        setProtocolFee(protocolFee);
-
-        _ticketSaleImplementation = ticketSaleImplementation;
-        _ticketImplementation = ticketImplementation;
-        _maxSalePeriod = maxSalePeriod;
+        _;
     }
 
     // region - Create Ticket Sale
@@ -60,8 +68,9 @@ contract TicketFactory is Ownable {
 
         ticketSaleAddr = Clones.clone(address(_ticketSaleImplementation));
 
-        ticketAddr =
-            TicketSale(ticketSaleAddr).initialize(_ticketImplementation, msg.sender, sale, ticket);
+        ticketAddr = TicketSale(ticketSaleAddr).initialize(
+            _ticketImplementation, msg.sender, _protocolFee, _protocolFeeRecipient, sale, ticket
+        );
 
         emit TicketSaleCreated(msg.sender, ticketSaleAddr, ticketAddr);
     }
@@ -88,6 +97,36 @@ contract TicketFactory is Ownable {
         _protocolFee = newProtocolFee;
 
         emit ProtocolFeeSet(newProtocolFee);
+    }
+
+    function setProtocolFeeRecipient(address newRecipient)
+        public
+        onlyOwner
+        checkAddress(newRecipient)
+    {
+        _protocolFeeRecipient = newRecipient;
+
+        emit ProtocolFeeRecipientSet(newRecipient);
+    }
+
+    function setTicketSaleImplementation(address newImplementation)
+        public
+        onlyOwner
+        checkAddress(newImplementation)
+    {
+        _ticketSaleImplementation = newImplementation;
+
+        emit TicketSaleImplementationSet(newImplementation);
+    }
+
+    function setTicketImplementation(address newImplementation)
+        public
+        onlyOwner
+        checkAddress(newImplementation)
+    {
+        _ticketImplementation = newImplementation;
+
+        emit TicketImplementationSet(newImplementation);
     }
 
     function getMaxSalePeriod() external view returns (uint256) {

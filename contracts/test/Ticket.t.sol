@@ -2,8 +2,12 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
-import {Ticket, TicketParams} from "src/Ticket.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+
+import {Ticket, TicketParams} from "src/Ticket.sol";
+import {Promotion, Promo} from "src/Promo.sol";
+import {PromoFactory} from "src/PromoFactory.sol";
 
 contract TicketTest is Test {
     Ticket ticket;
@@ -138,6 +142,38 @@ contract TicketTest is Test {
         ticket.setBaseTokenURI(newBaseUri);
 
         assertEq(ticket.tokenURI(TOKEN_ID), string.concat(newBaseUri, "1"));
+    }
+
+    // endregion
+
+    // region - getAvailablePromotions
+
+    function test_getAvailablePromotions() public {
+        address[] memory streams = new address[](1);
+        streams[0] = address(ticket);
+
+        address marketer = makeAddr("marketer");
+        address recipient = makeAddr("recipient");
+
+        ERC20Mock paymentToken = new ERC20Mock();
+        paymentToken.mint(marketer, 1 ether);
+
+        PromoFactory factory = new PromoFactory(address(paymentToken), recipient, 1 ether);
+
+        Promo promo = new Promo(address(factory), CONTRACT_URI);
+
+        Promotion memory promotion = Promotion(
+            block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
+        );
+
+        vm.startPrank(marketer);
+        paymentToken.approve(address(factory), 1 ether);
+        factory.createPromo(promotion, "tokenUri");
+        vm.stopPrank();
+
+        Promotion[] memory promotions = ticket.getAvailablePromotions(address(factory));
+
+        assertEq(promotions[0].promoAddr, address(promo));
     }
 
     // endregion
