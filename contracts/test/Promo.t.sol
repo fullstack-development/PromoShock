@@ -6,7 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import {Promo, PromoCompany} from "src/Promo.sol";
+import {Promo, Promotion} from "src/Promo.sol";
 import {TicketFactory} from "src/TicketFactory.sol";
 import {TicketSale, SaleParams} from "src/TicketSale.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
@@ -29,22 +29,24 @@ contract PromoTest is Test {
     address STREAMER;
     address ALICE;
     address BOB;
+    address PROTOCOL_FEE_RECIPIENT;
 
     function setUp() public {
-        saleImpl = new TicketSale();
-        ticketImpl = new Ticket();
-
-        factory =
-            new TicketFactory(address(saleImpl), address(ticketImpl), MAX_SALE_PERIOD, PROTOCOL_FEE);
-
-        paymentToken = new ERC20Mock();
-
-        promo = new Promo(address(this), CONTRACT_URI);
-
         MARKETER = makeAddr("MARKETER");
         STREAMER = makeAddr("STREAMER");
         ALICE = makeAddr("ALICE");
         BOB = makeAddr("BOB");
+        PROTOCOL_FEE_RECIPIENT = makeAddr("PROTOCOL_FEE_RECIPIENT");
+
+        saleImpl = new TicketSale();
+        ticketImpl = new Ticket();
+
+        factory =
+            new TicketFactory(address(saleImpl), address(ticketImpl), PROTOCOL_FEE_RECIPIENT, PROTOCOL_FEE, MAX_SALE_PERIOD);
+
+        paymentToken = new ERC20Mock();
+
+        promo = new Promo(address(this), CONTRACT_URI);
     }
 
     // region - supportsInterface
@@ -57,11 +59,10 @@ contract PromoTest is Test {
 
     // region - safeMint
 
-    function _beforeMint() private returns (PromoCompany memory promoCompany) {
+    function _beforeMint() private returns (Promotion memory promotion) {
+        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
         SaleParams memory sale =
             SaleParams(block.timestamp, block.timestamp + 1, 1 ether, address(paymentToken));
-
-        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
 
         vm.prank(STREAMER);
         (, address ticketAddr) = factory.createTicketSale(sale, ticket);
@@ -69,13 +70,15 @@ contract PromoTest is Test {
         address[] memory streams = new address[](1);
         streams[0] = ticketAddr;
 
-        promoCompany = PromoCompany(block.timestamp, block.timestamp + 1, streams, "Promo Company");
+        promotion = Promotion(
+            block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
+        );
     }
 
     function test_safeMint() public {
-        PromoCompany memory promoCompany = _beforeMint();
+        Promotion memory promotion = _beforeMint();
 
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.balanceOf(MARKETER), 1);
         assertEq(promo.ownerOf(TOKEN_ID), MARKETER);
@@ -87,15 +90,15 @@ contract PromoTest is Test {
     // region - tokenURI
 
     function test_tokenUri() public {
-        PromoCompany memory promoCompany = _beforeMint();
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        Promotion memory promotion = _beforeMint();
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.tokenURI(TOKEN_ID), TOKEN_URI);
     }
 
     function test_setTokenUri() public {
-        PromoCompany memory promoCompany = _beforeMint();
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        Promotion memory promotion = _beforeMint();
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         string memory newTokenUri = "ipfs://newTokenUri";
 
@@ -106,8 +109,8 @@ contract PromoTest is Test {
     }
 
     function test_setTokenUri_revert_ifNotTokenOwner() public {
-        PromoCompany memory promoCompany = _beforeMint();
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        Promotion memory promotion = _beforeMint();
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         string memory newTokenUri = "ipfs://newTokenUri";
 
@@ -121,15 +124,15 @@ contract PromoTest is Test {
     // region - contractUri
 
     function test_contractUri() public {
-        PromoCompany memory promoCompany = _beforeMint();
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        Promotion memory promotion = _beforeMint();
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.contractURI(), CONTRACT_URI);
     }
 
     function test_setContractUri() public {
-        PromoCompany memory promoCompany = _beforeMint();
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        Promotion memory promotion = _beforeMint();
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.contractURI(), CONTRACT_URI);
 
@@ -177,12 +180,13 @@ contract PromoTest is Test {
     function test_promo_getPromoCompany() public {
         address[] memory streams = _beforePromoCompany();
 
-        PromoCompany memory promoCompany =
-            PromoCompany(block.timestamp, block.timestamp + 1, streams, "Promo Company");
+        Promotion memory promotion = Promotion(
+            block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
+        );
 
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
-        PromoCompany memory promoCompanyAfter = promo.getPromoCompany(TOKEN_ID);
+        Promotion memory promoCompanyAfter = promo.getPromotion(TOKEN_ID);
 
         assertEq(promoCompanyAfter.startTime, promoCompanyAfter.startTime);
         assertEq(promoCompanyAfter.endTime, promoCompanyAfter.endTime);
@@ -196,10 +200,11 @@ contract PromoTest is Test {
         uint256 ticketsAmount = Ticket(streams[0]).totalSupply();
         uint256 ticketsAmount2 = Ticket(streams[1]).totalSupply();
 
-        PromoCompany memory promoCompany =
-            PromoCompany(block.timestamp, block.timestamp + 1, streams, "Promo Company");
+        Promotion memory promotion = Promotion(
+            block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
+        );
 
-        promo.safeMint(MARKETER, TOKEN_URI, promoCompany);
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         uint256 totalTicketsAmount = promo.getTicketsAmount(TOKEN_ID);
         assertEq(totalTicketsAmount, ticketsAmount + ticketsAmount2);

@@ -24,19 +24,21 @@ contract TicketFactoryTest is Test {
     address STREAMER;
     address ALICE;
     address BOB;
+    address PROTOCOL_FEE_RECIPIENT;
 
     function setUp() public {
+        STREAMER = makeAddr("STREAMER");
+        ALICE = makeAddr("ALICE");
+        BOB = makeAddr("BOB");
+        PROTOCOL_FEE_RECIPIENT = makeAddr("PROTOCOL_FEE_RECIPIENT");
+
         saleImpl = new TicketSale();
         ticketImpl = new Ticket();
 
         factory =
-            new TicketFactory(address(saleImpl), address(ticketImpl), MAX_SALE_PERIOD, PROTOCOL_FEE);
+        new TicketFactory(address(saleImpl), address(ticketImpl), PROTOCOL_FEE_RECIPIENT, PROTOCOL_FEE, MAX_SALE_PERIOD);
 
         paymentToken = new ERC20Mock();
-
-        STREAMER = makeAddr("STREAMER");
-        ALICE = makeAddr("ALICE");
-        BOB = makeAddr("BOB");
     }
 
     // region - createTicketSale
@@ -61,7 +63,9 @@ contract TicketFactoryTest is Test {
 
         TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
 
-        vm.expectRevert(abi.encodeWithSelector(TicketFactory.MaxSalePeriodExceeded.selector, MAX_SALE_PERIOD));
+        vm.expectRevert(
+            abi.encodeWithSelector(TicketFactory.MaxSalePeriodExceeded.selector, MAX_SALE_PERIOD)
+        );
 
         factory.createTicketSale(sale, ticket);
     }
@@ -81,11 +85,12 @@ contract TicketFactoryTest is Test {
 
         vm.expectRevert(TicketFactory.ZeroAddress.selector);
 
-        new TicketFactory(address(0), address(ticketImpl), MAX_SALE_PERIOD, PROTOCOL_FEE);
+        new TicketFactory(address(0), address(ticketImpl), PROTOCOL_FEE_RECIPIENT, PROTOCOL_FEE, MAX_SALE_PERIOD);
 
         vm.expectRevert(TicketFactory.ZeroAddress.selector);
 
-        new TicketFactory(address(saleImpl), address(0), MAX_SALE_PERIOD, PROTOCOL_FEE);
+        new TicketFactory(address(saleImpl), address(0), PROTOCOL_FEE_RECIPIENT, PROTOCOL_FEE, MAX_SALE_PERIOD);
+        
     }
 
     // endregion

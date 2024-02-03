@@ -6,6 +6,9 @@ import {ERC721Upgradeable} from
     "@openzeppelin-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
 
+import {IPromoFactory} from "src/interfaces/IPromoFactory.sol";
+import {Promotion} from "src/Promo.sol";
+
 struct TicketParams {
     string name;
     string symbol;
@@ -20,6 +23,7 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     string private _baseTokenURI;
     string private _contractURI;
     uint256 private _tokenCounter;
+    uint256 private _totalSupply;
     address[] private _owners;
 
     event MintNft(address indexed owner, uint256 indexed tokenId);
@@ -53,11 +57,12 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
 
     // region - Mint
 
-    function safeMint(address to) external onlyOwner {
+    function safeMint(address to) external onlyOwner returns (uint256 tokenId) {
         _tokenCounter++;
-        uint256 tokenId = _tokenCounter;
+        _totalSupply++;
+        tokenId = _tokenCounter;
 
-        if (tokenId > CAP) {
+        if (_totalSupply > CAP) {
             revert MaxCollectionSizeExceeded(CAP);
         }
 
@@ -65,6 +70,16 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
         _owners.push(to);
 
         emit MintNft(to, tokenId);
+    }
+
+    // endregion
+
+    // region - Burn
+
+    function burn(address auth, uint256 tokenId) public virtual {
+        _totalSupply--;
+
+        _update(address(0), tokenId, auth);
     }
 
     // endregion
@@ -90,11 +105,19 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     // region - Getters
 
     function totalSupply() external view returns (uint256) {
-        return _tokenCounter;
+        return _totalSupply;
     }
 
     function getAllOwners() external view returns (address[] memory) {
         return _owners;
+    }
+
+    function getAvailablePromotions(address promoFactory)
+        external
+        view
+        returns (Promotion[] memory)
+    {
+        return IPromoFactory(promoFactory).getAvailablePromotions(address(this));
     }
 
     // endregion
@@ -111,7 +134,7 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
         returns (address)
     {
         address from = _ownerOf(tokenId);
-        if (from != address(0)) {
+        if (from != address(0) && to != address(0)) {
             revert TransfersAreNotAllowed();
         }
 
