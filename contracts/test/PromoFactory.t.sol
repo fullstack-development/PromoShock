@@ -5,11 +5,20 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {TransparentUpgradeableProxy} from
+    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import {Promo, Promotion} from "src/Promo.sol";
 import {PromoFactory} from "src/PromoFactory.sol";
 
 contract PromoFactoryTest is Test {
+    ProxyAdmin admin;
+    Promo promoImplementation;
+    PromoFactory promoFactoryImpl;
+    TransparentUpgradeableProxy promoProxy;
+    TransparentUpgradeableProxy promoFactoryProxy;
+
     Promo promo;
     PromoFactory factory;
     ERC20Mock paymentToken;
@@ -26,8 +35,33 @@ contract PromoFactoryTest is Test {
         RECIPIENT = makeAddr("RECIPIENT");
 
         paymentToken = new ERC20Mock();
-        factory = new PromoFactory(address(paymentToken), RECIPIENT, PRICE);
-        promo = new Promo(address(factory), CONTRACT_URI);
+
+        admin = new ProxyAdmin(address(this));
+
+        promoFactoryImpl = new PromoFactory();
+        bytes memory promoFactoryData = abi.encodeWithSignature(
+            "initialize(address,address,uint256)", address(paymentToken), RECIPIENT, PRICE
+        );
+
+        promoFactoryProxy = new TransparentUpgradeableProxy(
+            address(promoFactoryImpl),
+            address(admin),
+            promoFactoryData
+        );
+
+        factory = PromoFactory(address(promoFactoryProxy));
+
+        promoImplementation = new Promo();
+        bytes memory promoData =
+            abi.encodeWithSignature("initialize(address,string)", address(factory), CONTRACT_URI);
+
+        promoProxy = new TransparentUpgradeableProxy(
+            address(promoImplementation),
+            address(admin),
+            promoData
+        );
+
+        promo = Promo(address(promoProxy));
 
         paymentToken.mint(MARKETER, 100 ether);
     }
