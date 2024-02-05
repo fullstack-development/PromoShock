@@ -27,7 +27,11 @@ def test_should_issue_tickets_for_pre_sale():
     pre_sale = PreSale(
         "sale-id", "stream-id", started_at=today, payment_token="payment-token"
     )
-    tickets = [from_ticket("ticket-1"), from_ticket("ticket-2"), from_ticket("ticket-3")]
+    tickets = [
+        from_ticket("ticket-1"),
+        from_ticket("ticket-2"),
+        from_ticket("ticket-3"),
+    ]
     pre_sale.register_tickets(tickets)
 
     assert pre_sale.total_tickets == 3
@@ -56,9 +60,13 @@ def test_pre_sale_should_start():
     pre_sale = PreSale(
         "sale-id", "stream-id", started_at=today, payment_token="payment-token"
     )
-    tickets = [from_ticket("ticket-1"), from_ticket("ticket-2"), from_ticket("ticket-3")]
+    tickets = [
+        from_ticket("ticket-1"),
+        from_ticket("ticket-2"),
+        from_ticket("ticket-3"),
+    ]
     pre_sale.register_tickets(tickets)
-    sale: Sale = start_sale(pre_sale, datetime.now())
+    sale = start_sale(pre_sale, datetime.now())
 
     assert sale.is_active == True
     assert sale.available_tickets == 3
@@ -69,9 +77,13 @@ def test_should_register_viewer_purchase_during_sale():
         "sale-id", "stream-id", started_at=today, payment_token="payment-token"
     )
     viewer = Viewer("viewer-id")
-    tickets = [from_ticket("ticket-1"), from_ticket("ticket-2"), from_ticket("ticket-3")]
+    tickets = [
+        from_ticket("ticket-1"),
+        from_ticket("ticket-2"),
+        from_ticket("ticket-3"),
+    ]
     pre_sale.register_tickets(tickets)
-    sale: Sale = start_sale(pre_sale, datetime.now())
+    sale = start_sale(pre_sale, datetime.now())
 
     sale.register_viewer_purchase(viewer)
 
@@ -84,9 +96,13 @@ def test_should_register_refund_after_purchase():
         "sale-id", "stream-id", started_at=today, payment_token="payment-token"
     )
     viewer = Viewer("viewer-id")
-    tickets = [from_ticket("ticket-1"), from_ticket("ticket-2"), from_ticket("ticket-3")]
+    tickets = [
+        from_ticket("ticket-1"),
+        from_ticket("ticket-2"),
+        from_ticket("ticket-3"),
+    ]
     pre_sale.register_tickets(tickets)
-    sale: Sale = start_sale(pre_sale, datetime.now())
+    sale = start_sale(pre_sale, datetime.now())
 
     sale.register_viewer_purchase(viewer)
     sale.register_viewer_refund(viewer)

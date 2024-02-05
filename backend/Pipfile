@@ -8,6 +8,7 @@ fastapi = "*"
 pytest = "*"
 pymemcache = "*"
 web3 = "*"
+uvicorn = "*"
 
 [dev-packages]
 

@@ -31,10 +31,11 @@ class PreSale:
     ) -> None:
         self._id = pre_sale_id
         self._stream_id = stream_id
-        self._tickets: List[Ticket] = []
-        self._is_closed = False
         self._started_at = started_at
         self._payment_token = payment_token
+
+        self._is_closed = False
+        self._tickets: List[Ticket] = []
 
     @property
     def is_valid(self):
@@ -85,6 +86,7 @@ class Sale:
         self._payment_token = payment_token
         self._started_at = started_at
         self._ends_at = ends_at
+
         self._purchased_viewers: Set[Viewer] = set()
         self._is_closed = False
 
