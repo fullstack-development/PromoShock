@@ -2,12 +2,13 @@
 pragma solidity 0.8.20;
 
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Initializable} from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
 
 import {IPromo} from "src/interfaces/IPromo.sol";
 import {Promotion} from "src/Promo.sol";
 
-contract PromoFactory is Ownable {
+contract PromoFactory is Initializable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
     IERC20 private _paymentToken;
@@ -27,12 +28,8 @@ contract PromoFactory is Ownable {
 
     error ZeroAddress();
 
-    constructor(address paymentToken, address paymentRecipient, uint256 promoCreationPrice)
-        Ownable(msg.sender)
-    {
-        setPaymentToken(paymentToken);
-        setPaymentRecipient(paymentRecipient);
-        setPromoCreationPrice(promoCreationPrice);
+    constructor() {
+        _disableInitializers();
     }
 
     modifier checkAddress(address target) {
@@ -41,6 +38,17 @@ contract PromoFactory is Ownable {
         }
 
         _;
+    }
+
+    function initialize(address paymentToken, address paymentRecipient, uint256 promoCreationPrice)
+        external
+        initializer
+    {
+        __Ownable_init(msg.sender);
+
+        setPaymentToken(paymentToken);
+        setPaymentRecipient(paymentRecipient);
+        setPromoCreationPrice(promoCreationPrice);
     }
 
     function createPromo(Promotion calldata promotion, string calldata uri) external {

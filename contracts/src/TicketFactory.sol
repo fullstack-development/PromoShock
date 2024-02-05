@@ -2,12 +2,13 @@
 pragma solidity 0.8.20;
 
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 import {TicketSale, SaleParams, TicketParams} from "src/TicketSale.sol";
 import {TicketParams} from "src/Ticket.sol";
 
-contract TicketFactory is Ownable {
+contract TicketFactory is Initializable, OwnableUpgradeable {
     uint256 public constant MAX_PROTOCOL_FEE = 1_000; // The maximum team fee is equal to 10%
 
     address private _ticketSaleImplementation;
@@ -34,18 +35,8 @@ contract TicketFactory is Ownable {
     error MaxSalePeriodExceeded(uint256 maxPeriod);
     error ProtocolFeeIsTooHigh(uint256 maxProtocolFee);
 
-    constructor(
-        address ticketSaleImplementation,
-        address ticketImplementation,
-        address protocolFeeRecipient,
-        uint256 protocolFee,
-        uint256 maxSalePeriod
-    ) Ownable(msg.sender) {
-        setTicketSaleImplementation(ticketSaleImplementation);
-        setTicketImplementation(ticketImplementation);
-        setProtocolFeeRecipient(protocolFeeRecipient);
-        setMaxSalePeriod(maxSalePeriod);
-        setProtocolFee(protocolFee);
+    constructor() {
+        _disableInitializers();
     }
 
     modifier checkAddress(address target) {
@@ -54,6 +45,22 @@ contract TicketFactory is Ownable {
         }
 
         _;
+    }
+
+    function initialize(
+        address ticketSaleImplementation,
+        address ticketImplementation,
+        address protocolFeeRecipient,
+        uint256 protocolFee,
+        uint256 maxSalePeriod
+    ) external initializer {
+        __Ownable_init(msg.sender);
+
+        setTicketSaleImplementation(ticketSaleImplementation);
+        setTicketImplementation(ticketImplementation);
+        setProtocolFeeRecipient(protocolFeeRecipient);
+        setMaxSalePeriod(maxSalePeriod);
+        setProtocolFee(protocolFee);
     }
 
     // region - Create Ticket Sale

@@ -5,6 +5,9 @@ import {Test} from "forge-std/Test.sol";
 
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {TransparentUpgradeableProxy} from
+    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import {Promo, Promotion} from "src/Promo.sol";
 import {TicketFactory} from "src/TicketFactory.sol";
@@ -12,6 +15,12 @@ import {TicketSale, SaleParams} from "src/TicketSale.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
 
 contract PromoTest is Test {
+    ProxyAdmin admin;
+    Promo promoImplementation;
+    TicketFactory factoryImplementation;
+    TransparentUpgradeableProxy promoProxy;
+    TransparentUpgradeableProxy factoryProxy;
+
     Promo promo;
     TicketFactory factory;
     TicketSale saleImpl;
@@ -41,12 +50,39 @@ contract PromoTest is Test {
         saleImpl = new TicketSale();
         ticketImpl = new Ticket();
 
-        factory =
-            new TicketFactory(address(saleImpl), address(ticketImpl), PROTOCOL_FEE_RECIPIENT, PROTOCOL_FEE, MAX_SALE_PERIOD);
+        admin = new ProxyAdmin(address(this));
+
+        factoryImplementation = new TicketFactory();
+        bytes memory factoryData = abi.encodeWithSignature(
+            "initialize(address,address,address,uint256,uint256)",
+            address(saleImpl),
+            address(ticketImpl),
+            PROTOCOL_FEE_RECIPIENT,
+            PROTOCOL_FEE,
+            MAX_SALE_PERIOD
+        );
+
+        factoryProxy = new TransparentUpgradeableProxy(
+            address(factoryImplementation),
+            address(admin),
+            factoryData
+        );
+
+        factory = TicketFactory(address(factoryProxy));
 
         paymentToken = new ERC20Mock();
 
-        promo = new Promo(address(this), CONTRACT_URI);
+        promoImplementation = new Promo();
+        bytes memory promoData =
+            abi.encodeWithSignature("initialize(address,string)", address(this), CONTRACT_URI);
+
+        promoProxy = new TransparentUpgradeableProxy(
+            address(promoImplementation),
+            address(admin),
+            promoData
+        );
+
+        promo = Promo(address(promoProxy));
     }
 
     // region - supportsInterface

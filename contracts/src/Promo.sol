@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {ERC721URIStorage} from
-    "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721URIStorageUpgradeable} from
+    "@openzeppelin-upgradeable/contracts/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import {ERC721Upgradeable} from
+    "@openzeppelin-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 
 import {ITicket} from "src/interfaces/ITicket.sol";
 
@@ -16,7 +18,12 @@ struct Promotion {
     string description;
 }
 
-contract Promo is ERC721, ERC721URIStorage, Ownable {
+contract Promo is
+    Initializable,
+    ERC721Upgradeable,
+    ERC721URIStorageUpgradeable,
+    OwnableUpgradeable
+{
     string private _contractURI;
     uint256 private _tokenCounter;
 
@@ -28,11 +35,8 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
 
     error NotTokenOwner();
 
-    constructor(address promoFactory, string memory contractUri)
-        ERC721("MetaPromo", "MP")
-        Ownable(promoFactory)
-    {
-        _contractURI = contractUri;
+    constructor() {
+        _disableInitializers();
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
@@ -43,12 +47,19 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
         _;
     }
 
+    function initialize(address promoFactory, string memory contractUri) external initializer {
+        __ERC721_init("MetaPromo", "MP");
+        __Ownable_init(promoFactory);
+
+        _contractURI = contractUri;
+    }
+
     // region - supportInterface
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -79,7 +90,7 @@ contract Promo is ERC721, ERC721URIStorage, Ownable {
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (string memory)
     {
         return super.tokenURI(tokenId);
