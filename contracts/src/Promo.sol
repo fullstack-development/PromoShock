@@ -47,7 +47,7 @@ contract Promo is
         _;
     }
 
-    function initialize(address promoFactory, string memory contractUri) external initializer {
+    function initialize(address promoFactory, string calldata contractUri) external initializer {
         __ERC721_init("MetaPromo", "MP");
         __Ownable_init(promoFactory);
 

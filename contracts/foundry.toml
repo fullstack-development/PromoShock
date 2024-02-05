@@ -12,6 +12,6 @@ bsc-testnet = "${BINANCE_TESTNET_RPC_URL}"
 localhost = "${LOCALHOST}"
 
 [etherscan]
-bscscan = {key = "${BSCSCAN_APY_KEY}"}
+bsc = {key = "${API_KEY_BSCSCAN}", chain = "97"}
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
