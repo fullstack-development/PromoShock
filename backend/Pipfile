@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 fastapi = "*"
 pytest = "*"
+pymemcache = "*"
+web3 = "*"
 
 [dev-packages]
 

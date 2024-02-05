@@ -2,7 +2,8 @@ from datetime import datetime
 import pytest
 
 from domain.sales import Sale, PreSale, InvalidPreSale, NoTicketsError, start_sale
-from domain.models import Ticket, Viewer
+from domain.models import Viewer
+from domain.ticket import Ticket
 
 
 def test_should_close_pre_sale():

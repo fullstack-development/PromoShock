@@ -1,7 +1,8 @@
 from datetime import date
 from typing import List, Set
 
-from domain.models import Ticket, Viewer
+from domain.models import Viewer
+from domain.ticket import Ticket
 
 
 class NoTicketsError(Exception):
@@ -26,14 +27,14 @@ class ViewerAlreadyPurchased(Exception):
 
 class PreSale:
     def __init__(
-        self,
-        pre_sale_id: str,
-        stream_id: str,
+        self, pre_sale_id: str, stream_id: str, started_at: date, payment_token: str
     ) -> None:
         self._id = pre_sale_id
         self._stream_id = stream_id
         self._tickets: List[Ticket] = []
         self._is_closed = False
+        self._started_at = started_at
+        self._payment_token = payment_token
 
     @property
     def is_valid(self):
@@ -52,25 +53,40 @@ class PreSale:
             self._tickets.append(ticket)
 
 
-def start_sale(pre_sale: PreSale, started_at: date):
+def start_sale(pre_sale: PreSale, ends_at: date):
     if pre_sale.is_valid is not True:
         raise InvalidPreSale("Can't start invalid pre-sale")
 
     if pre_sale.total_tickets <= 0:
         raise NoTicketsError("Can't start a sale without tickets")
-    return Sale(pre_sale._id, pre_sale._stream_id, pre_sale._tickets, started_at)
+    return Sale(
+        pre_sale._id,
+        pre_sale._stream_id,
+        pre_sale._tickets,
+        pre_sale._payment_token,
+        pre_sale._started_at,
+        ends_at,
+    )
 
 
 class Sale:
     def __init__(
-        self, sale_id: str, stream_id: str, tickets: List[Ticket], started_at: date
+        self,
+        sale_id: str,
+        stream_id: str,
+        tickets: List[Ticket],
+        payment_token: str,
+        started_at: date,
+        ends_at: date,
     ) -> None:
         self._id = sale_id
         self._stream_id = stream_id
         self._tickets = tickets
-        self._is_closed = False
-        self._purchased_viewers: Set[Viewer] = set()
+        self._payment_token = payment_token
         self._started_at = started_at
+        self._ends_at = ends_at
+        self._purchased_viewers: Set[Viewer] = set()
+        self._is_closed = False
 
     @property
     def is_active(self):
