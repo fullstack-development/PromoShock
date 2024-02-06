@@ -11,19 +11,19 @@ class AbstractNftRepository(abc.ABC):
 
     @abc.abstractmethod
     def put(self, nft_data: NftData):
-        raise NotImplemented
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get(self, nft_contract_id: str) -> Optional[NftData]:
-        raise NotImplemented
+        raise NotImplementedError
 
     @abc.abstractmethod
     def update(self, nft_contract_id: str, nft_data: NftData):
-        raise NotImplemented
+        raise NotImplementedError
 
     @abc.abstractmethod
     def list_all(self) -> List[NftData]:
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class MemcacheNftRepository(AbstractNftRepository):
@@ -47,15 +47,15 @@ class AbstractWeb3Client(abc.ABC):
 
     @abc.abstractmethod
     def query_nft_data_by_contract(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     @abc.abstractmethod
-    def query_block_height(self):
-        raise NotImplemented
+    def query_block_height(self) -> int:
+        raise NotImplementedError
 
     @abc.abstractmethod
-    def current_network(self):
-        raise NotImplemented
+    def current_network(self) -> str:
+        raise NotImplementedError
 
 
 class NftIndexer:
@@ -66,8 +66,13 @@ class NftIndexer:
         self._web3_client = web3_client
         self._repository = repository
 
-    def index_ticket_nft(self):
-        pass
+    def index_ticket_nft(self, contract_id):
+        if self._repository.get(contract_id):
+            return self._repository.get(contract_id)
+        nft_data = self._web3_client.query_nft_data_by_contract(contract_id)
+        self._repository.put(nft_data)
+
+        return nft_data
 
     def index_ticket_collection(self):
         pass

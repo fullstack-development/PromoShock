@@ -9,6 +9,7 @@ pytest = "*"
 pymemcache = "*"
 web3 = "*"
 uvicorn = "*"
+black = "*"
 
 [dev-packages]
 
