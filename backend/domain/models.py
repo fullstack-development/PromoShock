@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -23,4 +24,18 @@ class NftData:
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, NftData):
             return False
-        return self.contract_id == value.contract_id
+        return self.uri == value.uri
+
+
+@dataclass(frozen=True)
+class NftCollection:
+    contract_id: str
+    uri: str
+    name: str
+    description: str
+    nfts: List[NftData]
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, NftCollection):
+            return False
+        return self.uri == value.uri
