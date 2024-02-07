@@ -136,6 +136,11 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
         emit TicketImplementationSet(newImplementation);
     }
 
+    function getImplementations() external view returns (address sale, address ticket) {
+        sale = _ticketSaleImplementation;
+        ticket = _ticketImplementation;
+    }
+
     function getMaxSalePeriod() external view returns (uint256) {
         return _maxSalePeriod;
     }

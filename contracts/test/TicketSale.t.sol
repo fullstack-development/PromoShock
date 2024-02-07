@@ -61,7 +61,7 @@ contract TicketSaleTest is Test {
         assertEq(ticket.name(), "Test");
         assertEq(ticket.symbol(), "T");
         assertEq(ticket.contractURI(), CONTRACT_URI);
-        assertEq(ticket.owner(), address(ticketSale));
+        assertEq(ticket.owner(), STREAMER);
         assertEq(ticket.CAP(), CAP);
 
         assertEq(ticketSale.owner(), STREAMER);
@@ -157,6 +157,7 @@ contract TicketSaleTest is Test {
 
         TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
 
+        vm.prank(ALICE);
         ticketAddr = ticketSale.initialize(
             address(ticketImpl),
             STREAMER,

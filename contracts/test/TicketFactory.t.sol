@@ -77,7 +77,7 @@ contract TicketFactoryTest is Test {
         (address ticketSaleAddr, address ticketAddr) = factory.createTicketSale(sale, ticket);
 
         assertEq(Ticket(ticketSaleAddr).owner(), STREAMER);
-        assertEq(Ticket(ticketAddr).owner(), ticketSaleAddr);
+        assertEq(Ticket(ticketAddr).owner(), STREAMER);
     }
 
     function test_createTicketSale_revert_ifMaxSalePeriodExceeded() public {
@@ -187,6 +187,17 @@ contract TicketFactoryTest is Test {
         );
 
         factory.setProtocolFee(newProtocolFee);
+    }
+
+    // endregion
+
+    // region - Getters
+
+    function test_getImplementations() public {
+        (address saleImplementation, address ticketImplementations) = factory.getImplementations();
+
+        assertEq(saleImplementation, address(saleImpl));
+        assertEq(ticketImplementations, address(ticketImpl));
     }
 
     // endregion
