@@ -21,6 +21,8 @@ contract TicketTest is Test {
     string constant CONTRACT_URI = "ipfs://testContractUri";
     address ALICE;
     address BOB;
+    address STREAMER;
+    address SALE_CONTRACT;
 
     function setUp() external {
         Ticket implementation = new Ticket();
@@ -28,18 +30,22 @@ contract TicketTest is Test {
 
         ALICE = makeAddr("ALICE");
         BOB = makeAddr("BOB");
+        STREAMER = makeAddr("STREAMER");
+        SALE_CONTRACT = makeAddr("SALE_CONTRACT");
     }
 
     // region - Initialize
 
     function test_initialize() public {
         TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
-        ticket.initialize(ticketParams, address(this));
+
+        vm.prank(SALE_CONTRACT);
+        ticket.initialize(ticketParams, STREAMER);
 
         assertEq(ticket.name(), "Test");
         assertEq(ticket.symbol(), "T");
         assertEq(ticket.contractURI(), CONTRACT_URI);
-        assertEq(ticket.owner(), address(this));
+        assertEq(ticket.owner(), STREAMER);
         assertEq(ticket.CAP(), CAP);
     }
 
@@ -57,13 +63,18 @@ contract TicketTest is Test {
 
     function _beforeMint() private {
         TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
-        ticket.initialize(ticketParams, address(this));
+
+        vm.prank(SALE_CONTRACT);
+        ticket.initialize(ticketParams, STREAMER);
     }
 
     function test_mint() public {
         _beforeMint();
 
+        vm.prank(SALE_CONTRACT);
         ticket.safeMint(ALICE);
+        
+        vm.prank(STREAMER);
         ticket.safeMint(BOB);
 
         address[] memory arr = new address[](2);
@@ -74,6 +85,15 @@ contract TicketTest is Test {
         assertEq(ticket.ownerOf(TOKEN_ID + 1), BOB);
         assertEq(ticket.totalSupply(), 2);
         assertEq(ticket.getAllOwners(), arr);
+    }
+
+    function test_mint_revert_ifNotCreatorOrOwner() public {
+        _beforeMint();
+
+        vm.expectRevert(Ticket.OnlyCreatorOrOwnerCanMint.selector);
+
+        vm.prank(ALICE);
+        ticket.safeMint(ALICE);
     }
 
     // endregion
@@ -100,6 +120,7 @@ contract TicketTest is Test {
     function test_transfer_not_allowed() public {
         _beforeMint();
 
+        vm.prank(SALE_CONTRACT);
         ticket.safeMint(ALICE);
 
         vm.expectRevert(Ticket.TransfersAreNotAllowed.selector);
@@ -125,6 +146,7 @@ contract TicketTest is Test {
 
         string memory newContractUri = "ipfs://newContractUri";
 
+        vm.prank(STREAMER);
         ticket.setContractURI(newContractUri);
 
         assertEq(ticket.contractURI(), newContractUri);
@@ -133,18 +155,20 @@ contract TicketTest is Test {
     function test_tokenUri() public {
         _beforeMint();
 
+        vm.prank(SALE_CONTRACT);
         ticket.safeMint(ALICE);
 
-        assertEq(ticket.tokenURI(TOKEN_ID), string.concat(BASE_URI, "1"));
+        assertEq(ticket.tokenURI(TOKEN_ID), BASE_URI);
     }
 
     function test_setBaseTokenUri() public {
         test_tokenUri();
 
         string memory newBaseUri = "ipfs://newBaseUri/";
+        vm.prank(STREAMER);
         ticket.setBaseTokenURI(newBaseUri);
 
-        assertEq(ticket.tokenURI(TOKEN_ID), string.concat(newBaseUri, "1"));
+        assertEq(ticket.tokenURI(TOKEN_ID), newBaseUri);
     }
 
     // endregion
@@ -169,9 +193,7 @@ contract TicketTest is Test {
         );
 
         TransparentUpgradeableProxy promoFactoryProxy = new TransparentUpgradeableProxy(
-            address(promoFactoryImpl),
-            address(admin),
-            promoFactoryData
+            address(promoFactoryImpl), address(admin), promoFactoryData
         );
 
         PromoFactory factory = PromoFactory(address(promoFactoryProxy));
@@ -179,11 +201,8 @@ contract TicketTest is Test {
         Promo promoImplementation = new Promo();
         bytes memory data =
             abi.encodeWithSignature("initialize(address,string)", address(factory), CONTRACT_URI);
-        TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
-            address(promoImplementation),
-            address(admin),
-            data
-        );
+        TransparentUpgradeableProxy proxy =
+            new TransparentUpgradeableProxy(address(promoImplementation), address(admin), data);
 
         Promo promo = Promo(address(proxy));
 

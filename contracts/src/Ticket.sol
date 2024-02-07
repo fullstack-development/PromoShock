@@ -24,6 +24,7 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     string private _contractURI;
     uint256 private _tokenCounter;
     uint256 private _totalSupply;
+    address private _creator;
     address[] private _owners;
 
     event MintNft(address indexed owner, uint256 indexed tokenId);
@@ -34,6 +35,7 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     error ZeroCap();
     error TransfersAreNotAllowed();
     error MaxCollectionSizeExceeded(uint16 cap);
+    error OnlyCreatorOrOwnerCanMint();
 
     constructor() {
         _disableInitializers();
@@ -41,13 +43,14 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
 
     // region - Initialize
 
-    function initialize(TicketParams calldata ticket, address creator) external initializer {
-        if (creator == address(0)) revert ZeroAddress();
+    function initialize(TicketParams calldata ticket, address streamer) external initializer {
+        if (streamer == address(0)) revert ZeroAddress();
         if (ticket.cap == 0) revert ZeroCap();
 
         __ERC721_init(ticket.name, ticket.symbol);
-        __Ownable_init(creator);
+        __Ownable_init(streamer);
 
+        _creator = msg.sender;
         _contractURI = ticket.contractUri;
         _baseTokenURI = ticket.baseUri;
         CAP = ticket.cap;
@@ -57,7 +60,11 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
 
     // region - Mint
 
-    function safeMint(address to) external onlyOwner returns (uint256 tokenId) {
+    function safeMint(address to) external returns (uint256 tokenId) {
+        if (msg.sender != _creator && msg.sender != owner()) {
+            revert OnlyCreatorOrOwnerCanMint();
+        }
+
         _tokenCounter++;
         _totalSupply++;
         tokenId = _tokenCounter;
@@ -85,6 +92,10 @@ contract Ticket is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     // endregion
 
     // region - URI
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _baseTokenURI;
+    }
 
     function contractURI() external view returns (string memory) {
         return _contractURI;

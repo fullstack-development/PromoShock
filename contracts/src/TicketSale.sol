@@ -97,7 +97,7 @@ contract TicketSale is Initializable, OwnableUpgradeable, ReentrancyGuard {
         _protocolFeeRecipient = protocolFeeRecipient;
 
         _ticket = Ticket(Clones.clone(address(ticketImplementation)));
-        _ticket.initialize(ticketParams, address(this));
+        _ticket.initialize(ticketParams, streamer);
 
         emit SaleAdded(streamer, protocolFee, sale, ticketParams);
 
