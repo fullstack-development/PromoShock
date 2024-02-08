@@ -4,9 +4,7 @@ pragma solidity ^0.8.20;
 import {Test} from "forge-std/Test.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import {TransparentUpgradeableProxy} from
-    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 
 import {Ticket, TicketParams} from "src/Ticket.sol";
 import {Promotion, Promo} from "src/Promo.sol";
@@ -185,15 +183,13 @@ contract TicketTest is Test {
         ERC20Mock paymentToken = new ERC20Mock();
         paymentToken.mint(marketer, 1 ether);
 
-        ProxyAdmin admin = new ProxyAdmin(address(this));
-
         PromoFactory promoFactoryImpl = new PromoFactory();
         bytes memory promoFactoryData = abi.encodeWithSignature(
             "initialize(address,address,uint256)", address(paymentToken), recipient, 1e18
         );
 
-        TransparentUpgradeableProxy promoFactoryProxy = new TransparentUpgradeableProxy(
-            address(promoFactoryImpl), address(admin), promoFactoryData
+        TransparentProxy promoFactoryProxy = new TransparentProxy(
+            address(promoFactoryImpl), address(this), promoFactoryData
         );
 
         PromoFactory factory = PromoFactory(address(promoFactoryProxy));
@@ -201,8 +197,8 @@ contract TicketTest is Test {
         Promo promoImplementation = new Promo();
         bytes memory data =
             abi.encodeWithSignature("initialize(address,string)", address(factory), CONTRACT_URI);
-        TransparentUpgradeableProxy proxy =
-            new TransparentUpgradeableProxy(address(promoImplementation), address(admin), data);
+        TransparentProxy proxy =
+            new TransparentProxy(address(promoImplementation), address(this), data);
 
         Promo promo = Promo(address(proxy));
 

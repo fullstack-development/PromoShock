@@ -5,19 +5,16 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import {TransparentUpgradeableProxy} from
-    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
-import {Promo, Promotion} from "src/Promo.sol";
+import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 import {PromoFactory} from "src/PromoFactory.sol";
+import {Promo, Promotion} from "src/Promo.sol";
 
 contract PromoFactoryTest is Test {
-    ProxyAdmin admin;
     Promo promoImplementation;
     PromoFactory promoFactoryImpl;
-    TransparentUpgradeableProxy promoProxy;
-    TransparentUpgradeableProxy promoFactoryProxy;
+    TransparentProxy promoProxy;
+    TransparentProxy promoFactoryProxy;
 
     Promo promo;
     PromoFactory factory;
@@ -36,16 +33,14 @@ contract PromoFactoryTest is Test {
 
         paymentToken = new ERC20Mock();
 
-        admin = new ProxyAdmin(address(this));
-
         promoFactoryImpl = new PromoFactory();
         bytes memory promoFactoryData = abi.encodeWithSignature(
             "initialize(address,address,uint256)", address(paymentToken), RECIPIENT, PRICE
         );
 
-        promoFactoryProxy = new TransparentUpgradeableProxy(
+        promoFactoryProxy = new TransparentProxy(
             address(promoFactoryImpl),
-            address(admin),
+            address(this),
             promoFactoryData
         );
 
@@ -55,9 +50,9 @@ contract PromoFactoryTest is Test {
         bytes memory promoData =
             abi.encodeWithSignature("initialize(address,string)", address(factory), CONTRACT_URI);
 
-        promoProxy = new TransparentUpgradeableProxy(
+        promoProxy = new TransparentProxy(
             address(promoImplementation),
-            address(admin),
+            address(this),
             promoData
         );
 
