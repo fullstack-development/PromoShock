@@ -4,18 +4,15 @@ pragma solidity ^0.8.20;
 import {Test} from "forge-std/Test.sol";
 
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import {TransparentUpgradeableProxy} from
-    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 
 import {TicketFactory} from "src/TicketFactory.sol";
 import {TicketSale, SaleParams} from "src/TicketSale.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
 
 contract TicketFactoryTest is Test {
-    ProxyAdmin admin;
     TicketFactory factoryImplementation;
-    TransparentUpgradeableProxy factoryProxy;
+    TransparentProxy factoryProxy;
 
     TicketFactory factory;
     TicketSale saleImpl;
@@ -42,8 +39,6 @@ contract TicketFactoryTest is Test {
         saleImpl = new TicketSale();
         ticketImpl = new Ticket();
 
-        admin = new ProxyAdmin(address(this));
-
         factoryImplementation = new TicketFactory();
         bytes memory factoryData = abi.encodeWithSignature(
             "initialize(address,address,address,uint256,uint256)",
@@ -54,16 +49,56 @@ contract TicketFactoryTest is Test {
             MAX_SALE_PERIOD
         );
 
-        factoryProxy = new TransparentUpgradeableProxy(
-            address(factoryImplementation),
-            address(admin),
-            factoryData
-        );
+        factoryProxy = new TransparentProxy(address(factoryImplementation), address(this), factoryData);
 
         factory = TicketFactory(address(factoryProxy));
 
         paymentToken = new ERC20Mock();
     }
+
+    // region - Initialize
+
+    function test_initialize() public {
+        assertEq(factory.owner(), address(this));
+        assertEq(factory.MAX_PROTOCOL_FEE(), 1000);
+        assertEq(factory.getMaxSalePeriod(), MAX_SALE_PERIOD);
+        assertEq(factoryProxy.getImplementation(), address(factoryImplementation));
+    }
+
+    function test_initialize_revert_ifZeroAddress() public {
+        ticketImpl = new Ticket();
+
+        // Case 1. saleImpl == zero address
+        bytes memory factoryData = abi.encodeWithSignature(
+            "initialize(address,address,address,uint256,uint256)",
+            address(0),
+            address(ticketImpl),
+            PROTOCOL_FEE_RECIPIENT,
+            PROTOCOL_FEE,
+            MAX_SALE_PERIOD
+        );
+
+        vm.expectRevert(TicketFactory.ZeroAddress.selector);
+
+        factoryProxy = new TransparentProxy(address(factoryImplementation), address(this), factoryData);
+
+        // Case 2. ticketImpl == zero address
+
+        factoryData = abi.encodeWithSignature(
+            "initialize(address,address,address,uint256,uint256)",
+            address(saleImpl),
+            address(0),
+            PROTOCOL_FEE_RECIPIENT,
+            PROTOCOL_FEE,
+            MAX_SALE_PERIOD
+        );
+
+        vm.expectRevert(TicketFactory.ZeroAddress.selector);
+
+        factoryProxy = new TransparentProxy(address(factoryImplementation), address(this), factoryData);
+    }
+
+    // endregion
 
     // region - createTicketSale
 
@@ -92,57 +127,6 @@ contract TicketFactoryTest is Test {
         );
 
         factory.createTicketSale(sale, ticket);
-    }
-
-    // endregion
-
-    // region - Initialize
-
-    function test_initialize() public {
-        assertEq(factory.owner(), address(this));
-        assertEq(factory.MAX_PROTOCOL_FEE(), 1000);
-        assertEq(factory.getMaxSalePeriod(), MAX_SALE_PERIOD);
-    }
-
-    function test_initialize_revert_ifZeroAddress() public {
-        ticketImpl = new Ticket();
-
-        // Case 1. saleImpl == zero address
-        bytes memory factoryData = abi.encodeWithSignature(
-            "initialize(address,address,address,uint256,uint256)",
-            address(0),
-            address(ticketImpl),
-            PROTOCOL_FEE_RECIPIENT,
-            PROTOCOL_FEE,
-            MAX_SALE_PERIOD
-        );
-
-        vm.expectRevert(TicketFactory.ZeroAddress.selector);
-
-        factoryProxy = new TransparentUpgradeableProxy(
-            address(factoryImplementation),
-            address(admin),
-            factoryData
-        );
-
-        // Case 2. ticketImpl == zero address
-
-        factoryData = abi.encodeWithSignature(
-            "initialize(address,address,address,uint256,uint256)",
-            address(saleImpl),
-            address(0),
-            PROTOCOL_FEE_RECIPIENT,
-            PROTOCOL_FEE,
-            MAX_SALE_PERIOD
-        );
-
-        vm.expectRevert(TicketFactory.ZeroAddress.selector);
-
-        factoryProxy = new TransparentUpgradeableProxy(
-            address(factoryImplementation),
-            address(admin),
-            factoryData
-        );
     }
 
     // endregion

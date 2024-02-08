@@ -5,21 +5,18 @@ import {Test} from "forge-std/Test.sol";
 
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {TransparentUpgradeableProxy} from
-    "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
+import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 import {Promo, Promotion} from "src/Promo.sol";
 import {TicketFactory} from "src/TicketFactory.sol";
 import {TicketSale, SaleParams} from "src/TicketSale.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
 
 contract PromoTest is Test {
-    ProxyAdmin admin;
     Promo promoImplementation;
     TicketFactory factoryImplementation;
-    TransparentUpgradeableProxy promoProxy;
-    TransparentUpgradeableProxy factoryProxy;
+    TransparentProxy promoProxy;
+    TransparentProxy factoryProxy;
 
     Promo promo;
     TicketFactory factory;
@@ -50,8 +47,6 @@ contract PromoTest is Test {
         saleImpl = new TicketSale();
         ticketImpl = new Ticket();
 
-        admin = new ProxyAdmin(address(this));
-
         factoryImplementation = new TicketFactory();
         bytes memory factoryData = abi.encodeWithSignature(
             "initialize(address,address,address,uint256,uint256)",
@@ -62,10 +57,8 @@ contract PromoTest is Test {
             MAX_SALE_PERIOD
         );
 
-        factoryProxy = new TransparentUpgradeableProxy(
-            address(factoryImplementation),
-            address(admin),
-            factoryData
+        factoryProxy = new TransparentProxy(
+            address(factoryImplementation), address(this), factoryData
         );
 
         factory = TicketFactory(address(factoryProxy));
@@ -76,11 +69,8 @@ contract PromoTest is Test {
         bytes memory promoData =
             abi.encodeWithSignature("initialize(address,string)", address(this), CONTRACT_URI);
 
-        promoProxy = new TransparentUpgradeableProxy(
-            address(promoImplementation),
-            address(admin),
-            promoData
-        );
+        promoProxy =
+            new TransparentProxy(address(promoImplementation), address(this), promoData);
 
         promo = Promo(address(promoProxy));
     }

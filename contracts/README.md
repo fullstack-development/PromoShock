@@ -38,13 +38,16 @@ _Important!_ You may need to add the `0x` prefix to the private key (in `.env` f
 
 _Note!_ If you want to add an RPC for the blockchain, you need to add the rpc address to `.env` and to the `foundry.toml` settings.
 
-#### Deploy order
+#### Deploy scripts order
 
-1. Ticket.sol
-2. TicketSale.sol
-3. TicketFactory.sol (with Ticket and TicketSale implementation addresses), ProxyAdmin
-4. PromoFactory.sol
-5. Promo.sol (with PromoFactory address)
+1. Ticket.s.sol
+2. TicketSale.s.sol
+3. TicketFactory.s.sol
+4. TicketFactoryProxy.s.sol (with Ticket, TicketSale and TicketFactory implementation addresses)
+5. Promo.s.sol
+6. PromoFactory.s.sol
+7. PromoFactoryProxy.s.sol
+8. PromoProxy.s.sol (with PromoFactoryProxy address)
 
 ---
 
@@ -60,7 +63,7 @@ $ forge script script/Ticket.s.sol \
 --broadcast \
 --verify \
 -vv
-```                                                 |
+```
 
 **For example**
 
@@ -104,16 +107,43 @@ $ forge script script/TicketSale.s.sol \
 
 Deploy contracts:
 
--   TicketFactory.sol (proxy)
 -   TicketFactory.sol (implementation)
 
 ````shell
 $ forge script script/TicketFactory.s.sol \
 --rpc-url <rpc_url> \
---sig "run(address,address,address,address,uint256,uint256)" \
-<proxy_admin_owner_address> \
+--broadcast \
+--verify \
+-vv
+```
+
+**For example**
+
+```shell
+$ forge script script/TicketFactory.s.sol \
+--rpc-url localhost \
+--broadcast \
+--verify \
+-vv
+````
+
+---
+
+#### TicketFactoryProxy
+
+Deploy contracts:
+
+-   ProxyAdmin.sol
+-   TransparentUpgradeableProxy.sol (TicketFactory)
+
+````shell
+$ forge script script/proxy/TicketFactoryProxy.s.sol \
+--rpc-url <rpc_url> \
+--sig "run(address,address,address,address,address,uint256,uint256)" \
+<initial_owner_address>  \
 <ticket_sale_implementation_address> \
 <ticket_implementation_address> \
+<ticket_factory_implementation_address> \
 <protocol_fee_recipient_address> \
 <protocol_fee_amount> \
 <max_sale_period> \
@@ -125,52 +155,16 @@ $ forge script script/TicketFactory.s.sol \
 **For example**
 
 ```shell
-$ forge script script/TicketFactory.s.sol \
+$ forge script script/proxy/TicketFactoryProxy.s.sol \
 --rpc-url localhost \
---sig "run(address,address,address,address,uint256,uint256)" \
+--sig "run(address,address,address,address,address,uint256,uint256)" \
 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC \
+0xe7f1725e7734ce288f8367e1bb143e90bb3f0512 \
 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
 1000 \
 2592000 \
---broadcast \
---verify \
--vv
-````
-
----
-
-#### PromoFactory
-
-Deploy contracts:
-
--   PromoFactory.sol (proxy)
--   PromoFactory.sol (implementation)
-
-````shell
-$ forge script script/PromoFactory.s.sol \
---rpc-url <rpc_url> \
---sig "run(address,address,address,uint256)" \
-<proxy_admin_owner_address> \
-<payment_token_address> \
-<payment_recipient_address> \
-<promo_creation_price_amount> \
---broadcast \
---verify \
--vv
-```                                                 |
-
-**For example**
-
-```shell
-$ forge script script/PromoFactory.s.sol \
---rpc-url localhost \
---sig "run(address,address,address,uint256)" \
-0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
-0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-1000000000000000000 \
 --broadcast \
 --verify \
 -vv
@@ -182,14 +176,106 @@ $ forge script script/PromoFactory.s.sol \
 
 Deploy contracts:
 
--   Promo.sol (proxy)
 -   Promo.sol (implementation)
 
 ````shell
 $ forge script script/Promo.s.sol \
 --rpc-url <rpc_url> \
---sig "run(address,address,string)" \
-<proxy_admin_address> \
+--broadcast \
+--verify \
+-vv
+```
+
+**For example**
+
+```shell
+$ forge script script/Promo.s.sol \
+--rpc-url localhost \
+--broadcast \
+--verify \
+-vv
+````
+
+---
+
+#### PromoFactory
+
+Deploy contracts:
+
+-   PromoFactory.sol (implementation)
+
+````shell
+$ forge script script/PromoFactory.s.sol \
+--rpc-url <rpc_url> \
+--broadcast \
+--verify \
+-vv
+```
+
+**For example**
+
+```shell
+$ forge script script/PromoFactory.s.sol \
+--rpc-url localhost \
+--broadcast \
+--verify \
+-vv
+````
+
+---
+
+#### PromoFactoryProxy
+
+Deploy contracts:
+
+-   ProxyAdmin.sol
+-   TransparentUpgradeableProxy.sol (PromoFactory)
+
+````shell
+$ forge script script/proxy/PromoFactoryProxy.s.sol \
+--rpc-url <rpc_url> \
+--sig "run(address,address,address,address,uint256)" \
+<initial_owner_address> \
+<promo_factory_implementation_address> \
+<payment_token_address> \
+<payment_recipient_address> \
+<promo_creation_price_amount> \
+--broadcast \
+--verify \
+-vv
+```                                                 |
+
+**For example**
+
+```shell
+$ forge script script/proxy/PromoFactoryProxy.s.sol \
+--rpc-url localhost \
+--sig "run(address,address,address,address,uint256)" \
+0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+0x90F79bf6EB2c4f870365E785982E1f101E93b906 \
+0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
+0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+1000000000000000000 \
+--broadcast \
+--verify \
+-vv
+````
+
+---
+
+#### PromoProxy
+
+Deploy contracts:
+
+-   ProxyAdmin.sol
+-   TransparentUpgradeableProxy.sol (Promo)
+
+````shell
+$ forge script script/proxy/PromoProxy.s.sol \
+--rpc-url <rpc_url> \
+--sig "run(address,address,address,string)" \
+<initial_owner_address> \
+<promo_implementation_address> \
 <promo_factory_address> \
 "<contract_uri>" \
 --broadcast \
@@ -200,10 +286,11 @@ $ forge script script/Promo.s.sol \
 **For example**
 
 ```shell
-$ forge script script/Promo.s.sol \
+$ forge script script/proxy/PromoProxy.s.sol \
 --rpc-url localhost \
---sig "run(address,address,string)" \
+--sig "run(address,address,address,string)" \
 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+0x90F79bf6EB2c4f870365E785982E1f101E93b906 \
 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 \
 "ipfs://contractUri" \
 --broadcast \
