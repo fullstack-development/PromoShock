@@ -46,7 +46,7 @@ contract TicketSaleTest is Test {
         SaleParams memory saleParams =
             SaleParams(block.timestamp, block.timestamp + 1, PRICE, address(paymentToken));
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         address ticketAddr = ticketSale.initialize(
             address(ticketImpl),
@@ -60,7 +60,6 @@ contract TicketSaleTest is Test {
 
         assertEq(ticket.name(), "Test");
         assertEq(ticket.symbol(), "T");
-        assertEq(ticket.contractURI(), CONTRACT_URI);
         assertEq(ticket.owner(), STREAMER);
         assertEq(ticket.CAP(), CAP);
 
@@ -78,7 +77,7 @@ contract TicketSaleTest is Test {
         SaleParams memory saleParams =
             SaleParams(block.timestamp, block.timestamp + 1, PRICE, address(0));
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.expectRevert(TicketSale.ZeroAddress.selector);
 
@@ -96,7 +95,7 @@ contract TicketSaleTest is Test {
         SaleParams memory saleParams =
             SaleParams(block.timestamp, block.timestamp + 1, PRICE, address(paymentToken));
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         // Case 1. startTime < block.timestamp
 
@@ -155,9 +154,9 @@ contract TicketSaleTest is Test {
         SaleParams memory saleParams =
             SaleParams(block.timestamp, block.timestamp + 1, PRICE, address(paymentToken));
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
-        vm.prank(ALICE);
+        vm.prank(STREAMER);
         ticketAddr = ticketSale.initialize(
             address(ticketImpl),
             STREAMER,
@@ -187,11 +186,11 @@ contract TicketSaleTest is Test {
         assertEq(ticketSale.getTotalRaised(), PRICE);
     }
 
-    function test_buy_revert_ifSaleShouldBeActive() public {
+    function test_buy_revert_ifSalesShouldBeActive() public {
         SaleParams memory saleParams =
             SaleParams(block.timestamp + 1, block.timestamp + 2, PRICE, address(paymentToken));
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         ticketSale.initialize(
             address(ticketImpl),
@@ -202,14 +201,14 @@ contract TicketSaleTest is Test {
             ticketParams
         );
 
-        vm.expectRevert(TicketSale.SaleShouldBeActive.selector);
+        vm.expectRevert(TicketSale.SalesShouldBeActive.selector);
 
         vm.prank(ALICE);
         ticketSale.buy();
 
         vm.warp(block.timestamp + 3);
 
-        vm.expectRevert(TicketSale.SaleShouldBeActive.selector);
+        vm.expectRevert(TicketSale.SalesShouldBeActive.selector);
 
         vm.prank(ALICE);
         ticketSale.buy();
@@ -271,7 +270,7 @@ contract TicketSaleTest is Test {
         ticketSale.refund(TOKEN_ID);
     }
 
-    function test_refund_revert_ifSaleEnded() public {
+    function test_refund_revert_ifSaleNotActive() public {
         _beforePurchase();
 
         vm.prank(ALICE);
@@ -280,7 +279,7 @@ contract TicketSaleTest is Test {
         vm.warp(block.timestamp + 2);
 
         vm.prank(ALICE);
-        vm.expectRevert(TicketSale.SaleIsEnded.selector);
+        vm.expectRevert(TicketSale.SalesShouldBeActive.selector);
         ticketSale.refund(TOKEN_ID);
     }
 
@@ -320,10 +319,99 @@ contract TicketSaleTest is Test {
     function test_withdraw_revert_ifSaleNotEnd() public {
         _beforeWithdraw();
 
-        vm.expectRevert(TicketSale.SaleShouldEnd.selector);
+        vm.expectRevert(TicketSale.SalesShouldEnd.selector);
 
         vm.prank(STREAMER);
         ticketSale.withdraw();
+    }
+
+    // endregion
+
+    // region - setTimeSettings
+
+    function test_setTimeSettings() public {
+        uint256 initialStartTime = block.timestamp + 1 days;
+        uint256 initialEndTime = initialStartTime + 30 days;
+
+        SaleParams memory saleParams =
+            SaleParams(initialStartTime, initialEndTime, PRICE, address(paymentToken));
+
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
+
+        vm.prank(STREAMER);
+        ticketSale.initialize(
+            address(ticketImpl),
+            STREAMER,
+            PROTOCOL_FEE,
+            PROTOCOL_FEE_RECIPIENT,
+            saleParams,
+            ticketParams
+        );
+
+        uint256 newStartTime = block.timestamp;
+        uint256 newEndTime = initialStartTime + 1 days;
+
+        vm.prank(STREAMER);
+        ticketSale.setTimeSettings(newStartTime, newEndTime);
+
+        SaleParams memory sale = ticketSale.getSaleParams();
+
+        assertEq(sale.startTime, newStartTime);
+        assertEq(sale.endTime, newEndTime);
+    }
+
+    function test_setTimeSettings_revert_ifNotOwner() public {
+        vm.expectRevert(
+            abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", address(this))
+        );
+
+        ticketSale.setTimeSettings(block.timestamp, block.timestamp);
+    }
+
+    function test_setTimeSettings_revert_ifSalesAlreadyStarted() public {
+        SaleParams memory saleParams =
+            SaleParams(block.timestamp, block.timestamp + 1, PRICE, address(paymentToken));
+
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
+
+        vm.prank(STREAMER);
+        ticketSale.initialize(
+            address(ticketImpl),
+            STREAMER,
+            PROTOCOL_FEE,
+            PROTOCOL_FEE_RECIPIENT,
+            saleParams,
+            ticketParams
+        );
+
+        vm.expectRevert(TicketSale.SalesAlreadyStarted.selector);
+
+        vm.prank(STREAMER);
+        ticketSale.setTimeSettings(block.timestamp, block.timestamp);
+    }
+
+    function test_setTimeSettings_revert_ifInvalidTimeSettings() public {
+        SaleParams memory saleParams =
+            SaleParams(block.timestamp + 2, block.timestamp + 3, PRICE, address(paymentToken));
+
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
+
+        vm.prank(STREAMER);
+        ticketSale.initialize(
+            address(ticketImpl),
+            STREAMER,
+            PROTOCOL_FEE,
+            PROTOCOL_FEE_RECIPIENT,
+            saleParams,
+            ticketParams
+        );
+
+        vm.warp(block.timestamp + 1);
+
+        vm.expectRevert(TicketSale.InvalidTimeSettings.selector);
+
+        vm.prank(STREAMER);
+        ticketSale.setTimeSettings(block.timestamp - 1, block.timestamp);
     }
 
     // endregion

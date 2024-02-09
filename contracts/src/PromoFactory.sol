@@ -8,6 +8,18 @@ import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/Own
 import {IPromo} from "src/interfaces/IPromo.sol";
 import {Promotion} from "src/Promo.sol";
 
+/**
+ * @title PromoFactory contract
+ * @notice A contract that creates promotions using the Promo collection.
+ * Every promotion is a nft (ERC721).
+ *
+ * The contract is managed by Owner role.
+ *
+ * The owner can set on a smart contract:
+ * - the price of creating a promotional share
+ * - payment token
+ * - payee
+ */
 contract PromoFactory is Initializable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
@@ -19,19 +31,18 @@ contract PromoFactory is Initializable, OwnableUpgradeable {
 
     /// Events
 
-    event PromotionCreated(address indexed marketer, Promotion promotion);
+    event PaymentRecipientSet(address indexed recipient);
     event PaymentTokenSet(address token);
-    event PaymentRecipientSet(address recipient);
+    event PromotionCreated(address indexed marketer, Promotion promotion);
     event PromoCreationPriceSet(uint256 price);
 
     /// Errors
 
     error ZeroAddress();
 
-    constructor() {
-        _disableInitializers();
-    }
+    /// Modifiers
 
+    /// @notice Checks that the address is not zero address
     modifier checkAddress(address target) {
         if (target == address(0)) {
             revert ZeroAddress();
@@ -40,6 +51,18 @@ contract PromoFactory is Initializable, OwnableUpgradeable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
+    // region - Initialize
+
+    /**
+     * @notice Initializes the PromoFactory contract
+     * @param paymentToken The address of the token used for payments
+     * @param paymentRecipient The address that will receive payments
+     * @param promoCreationPrice The price (in paymentToken units) for creating a new promo
+     */
     function initialize(address paymentToken, address paymentRecipient, uint256 promoCreationPrice)
         external
         initializer
@@ -51,6 +74,18 @@ contract PromoFactory is Initializable, OwnableUpgradeable {
         setPromoCreationPrice(promoCreationPrice);
     }
 
+    // endregion
+
+    // region - Create promo
+
+    /**
+     * @notice Creates a new promo with specified promotion details and URI
+     * @param promotion A `Promotion` struct containing the details of the promotion
+     * @param uri The URI for the promo metadata
+     * @dev This function calculates the price for creating a promo based
+     * on the number of streams specified in the `promotion` struct,
+     * multiplied by the `_promoCreationPrice`
+     */
     function createPromo(Promotion calldata promotion, string calldata uri) external {
         uint256 streamAmount = promotion.streams.length;
         uint256 price = _promoCreationPrice * streamAmount;
@@ -64,6 +99,8 @@ contract PromoFactory is Initializable, OwnableUpgradeable {
 
         emit PromotionCreated(msg.sender, promotion);
     }
+
+    // endregion
 
     // region - Setters
 

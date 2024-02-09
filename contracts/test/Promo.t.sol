@@ -31,6 +31,10 @@ contract PromoTest is Test {
     string constant BASE_URI = "ipfs://testBaseUri/";
     string constant TOKEN_URI = "ipfs://testTokenUri/";
     string constant CONTRACT_URI = "ipfs://testContractUri";
+
+    bytes32 constant DEFAULT_ADMIN_ROLE = 0x00;
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
     address MARKETER;
     address STREAMER;
     address ALICE;
@@ -57,9 +61,8 @@ contract PromoTest is Test {
             MAX_SALE_PERIOD
         );
 
-        factoryProxy = new TransparentProxy(
-            address(factoryImplementation), address(this), factoryData
-        );
+        factoryProxy =
+            new TransparentProxy(address(factoryImplementation), address(this), factoryData);
 
         factory = TicketFactory(address(factoryProxy));
 
@@ -67,13 +70,21 @@ contract PromoTest is Test {
 
         promoImplementation = new Promo();
         bytes memory promoData =
-            abi.encodeWithSignature("initialize(address,string)", address(this), CONTRACT_URI);
+            abi.encodeWithSignature("initialize(address,string)", address(factory), CONTRACT_URI);
 
-        promoProxy =
-            new TransparentProxy(address(promoImplementation), address(this), promoData);
+        promoProxy = new TransparentProxy(address(promoImplementation), address(this), promoData);
 
         promo = Promo(address(promoProxy));
     }
+
+    // region - initialize
+
+    function test_initialize() public {
+        assertTrue(promo.hasRole(DEFAULT_ADMIN_ROLE, address(this)));
+        assertTrue(promo.hasRole(MINTER_ROLE, address(factory)));
+    }
+
+    // endregion
 
     // region - supportsInterface
 
@@ -86,7 +97,7 @@ contract PromoTest is Test {
     // region - safeMint
 
     function _beforeMint() private returns (Promotion memory promotion) {
-        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CAP);
         SaleParams memory sale =
             SaleParams(block.timestamp, block.timestamp + 1, 1 ether, address(paymentToken));
 
@@ -104,11 +115,60 @@ contract PromoTest is Test {
     function test_safeMint() public {
         Promotion memory promotion = _beforeMint();
 
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.balanceOf(MARKETER), 1);
         assertEq(promo.ownerOf(TOKEN_ID), MARKETER);
         assertEq(promo.totalSupply(), 1);
+    }
+
+    function test_safeMint_revert_ifInvalidTimeSettings() public {
+        Promotion memory promotion = _beforeMint();
+
+        // Case 1. endTime == startTime (2 == 2)
+        promotion.startTime += 1;
+        vm.expectRevert(Promo.InvalidTimeSettings.selector);
+        vm.prank(address(factory));
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
+
+        // Case 2. endTime < startTime (1 < 2)
+        promotion.endTime -= 1;
+        vm.expectRevert(Promo.InvalidTimeSettings.selector);
+        vm.prank(address(factory));
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
+
+        // Case 3. startTime < block.timestamp (1 < 2)
+        vm.warp(block.timestamp + 1);
+        vm.expectRevert(Promo.InvalidTimeSettings.selector);
+        vm.prank(address(factory));
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
+    }
+
+    function test_safeMint_revert_ifZeroAddress() public {
+        Promotion memory promotion = _beforeMint();
+
+        promotion.promoAddr = address(0);
+        vm.expectRevert(Promo.ZeroAddress.selector);
+        vm.prank(address(factory));
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
+    }
+
+    function test_safeMint_revert_ifIncorrectStreamAddress() public {
+        Promotion memory promotion = _beforeMint();
+
+        address[] memory newStreams = new address[](2);
+        newStreams[0] = promotion.streams[0];
+        newStreams[1] = makeAddr("zeroCodeAddress");
+
+        promotion.streams = newStreams;
+
+        vm.expectRevert(
+            abi.encodeWithSelector(Promo.IncorrectStreamAddress.selector, newStreams[1])
+        );
+
+        vm.prank(address(factory));
+        promo.safeMint(MARKETER, TOKEN_URI, promotion);
     }
 
     // endregion
@@ -117,6 +177,7 @@ contract PromoTest is Test {
 
     function test_tokenUri() public {
         Promotion memory promotion = _beforeMint();
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.tokenURI(TOKEN_ID), TOKEN_URI);
@@ -124,6 +185,7 @@ contract PromoTest is Test {
 
     function test_setTokenUri() public {
         Promotion memory promotion = _beforeMint();
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         string memory newTokenUri = "ipfs://newTokenUri";
@@ -136,6 +198,7 @@ contract PromoTest is Test {
 
     function test_setTokenUri_revert_ifNotTokenOwner() public {
         Promotion memory promotion = _beforeMint();
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         string memory newTokenUri = "ipfs://newTokenUri";
@@ -151,6 +214,7 @@ contract PromoTest is Test {
 
     function test_contractUri() public {
         Promotion memory promotion = _beforeMint();
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.contractURI(), CONTRACT_URI);
@@ -158,6 +222,7 @@ contract PromoTest is Test {
 
     function test_setContractUri() public {
         Promotion memory promotion = _beforeMint();
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         assertEq(promo.contractURI(), CONTRACT_URI);
@@ -176,7 +241,7 @@ contract PromoTest is Test {
         SaleParams memory sale =
             SaleParams(block.timestamp, block.timestamp + 1, 1 ether, address(paymentToken));
 
-        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.prank(STREAMER);
         (address ticketSaleAddr, address ticketAddr) = factory.createTicketSale(sale, ticket);
@@ -210,6 +275,7 @@ contract PromoTest is Test {
             block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
         );
 
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         Promotion memory promoCompanyAfter = promo.getPromotion(TOKEN_ID);
@@ -230,6 +296,7 @@ contract PromoTest is Test {
             block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"
         );
 
+        vm.prank(address(factory));
         promo.safeMint(MARKETER, TOKEN_URI, promotion);
 
         uint256 totalTicketsAmount = promo.getTicketsAmount(TOKEN_ID);

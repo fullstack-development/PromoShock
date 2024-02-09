@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 
+import {ITicket} from "src/interfaces/ITicket.sol";
 import {Ticket, TicketParams} from "src/Ticket.sol";
 import {Promotion, Promo} from "src/Promo.sol";
 import {PromoFactory} from "src/PromoFactory.sol";
@@ -16,7 +17,7 @@ contract TicketTest is Test {
     uint16 constant CAP = 100;
     uint256 constant TOKEN_ID = 1;
     string constant BASE_URI = "ipfs://testTokenUri/";
-    string constant CONTRACT_URI = "ipfs://testContractUri";
+    string constant CONTRACT_URI = "ipfs://testContractUri/";
     address ALICE;
     address BOB;
     address STREAMER;
@@ -35,24 +36,32 @@ contract TicketTest is Test {
     // region - Initialize
 
     function test_initialize() public {
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.prank(SALE_CONTRACT);
         ticket.initialize(ticketParams, STREAMER);
 
         assertEq(ticket.name(), "Test");
         assertEq(ticket.symbol(), "T");
-        assertEq(ticket.contractURI(), CONTRACT_URI);
         assertEq(ticket.owner(), STREAMER);
         assertEq(ticket.CAP(), CAP);
+        assertTrue(ticket.supportsInterface(type(ITicket).interfaceId));
     }
 
     function test_initialize_revert_ifZeroAddress() public {
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.expectRevert(Ticket.ZeroAddress.selector);
 
         ticket.initialize(ticketParams, address(0));
+    }
+
+    function test_initialize_revert_ifZeroCap() public {
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, 0);
+
+        vm.expectRevert(Ticket.ZeroCap.selector);
+
+        ticket.initialize(ticketParams, address(this));
     }
 
     // endregion
@@ -60,7 +69,7 @@ contract TicketTest is Test {
     // region - safeMint
 
     function _beforeMint() private {
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.prank(SALE_CONTRACT);
         ticket.initialize(ticketParams, STREAMER);
@@ -71,7 +80,7 @@ contract TicketTest is Test {
 
         vm.prank(SALE_CONTRACT);
         ticket.safeMint(ALICE);
-        
+
         vm.prank(STREAMER);
         ticket.safeMint(BOB);
 
@@ -96,12 +105,56 @@ contract TicketTest is Test {
 
     // endregion
 
+    // region - burn
+
+    function test_burn() public {
+        _beforeMint();
+
+        vm.prank(STREAMER);
+        ticket.safeMint(ALICE);
+
+        assertEq(ticket.totalSupply(), 1);
+        assertEq(ticket.getAllOwners().length, 1);
+
+        vm.prank(SALE_CONTRACT);
+        ticket.burn(ALICE, TOKEN_ID);
+
+        assertEq(ticket.totalSupply(), ticket.getAllOwners().length); // 0
+
+        vm.prank(STREAMER);
+        ticket.safeMint(BOB);
+
+        assertEq(ticket.totalSupply(), ticket.getAllOwners().length); // 1
+
+        vm.prank(STREAMER);
+        ticket.safeMint(ALICE);
+
+        assertEq(ticket.totalSupply(), ticket.getAllOwners().length);
+
+        vm.prank(SALE_CONTRACT);
+        ticket.burn(BOB, TOKEN_ID + 1);
+    }
+
+    function test_burn_revert_ifNotCreator() public {
+        _beforeMint();
+
+        vm.prank(STREAMER);
+        ticket.safeMint(ALICE);
+
+        vm.expectRevert(Ticket.OnlyCreatorCanBurn.selector);
+
+        vm.prank(ALICE);
+        ticket.burn(ALICE, TOKEN_ID);
+    }
+
+    // endregion
+
     // region - Cap
 
     function test_cap() public {
         uint16 cap = 1;
 
-        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, cap);
+        TicketParams memory ticketParams = TicketParams("Test", "T", BASE_URI, cap);
         ticket.initialize(ticketParams, address(this));
 
         ticket.safeMint(ALICE);
@@ -130,25 +183,6 @@ contract TicketTest is Test {
     // endregion
 
     // region - URI
-
-    function test_contractUri() public {
-        _beforeMint();
-
-        assertEq(ticket.contractURI(), CONTRACT_URI);
-    }
-
-    function test_setContractUri() public {
-        _beforeMint();
-
-        assertEq(ticket.contractURI(), CONTRACT_URI);
-
-        string memory newContractUri = "ipfs://newContractUri";
-
-        vm.prank(STREAMER);
-        ticket.setContractURI(newContractUri);
-
-        assertEq(ticket.contractURI(), newContractUri);
-    }
 
     function test_tokenUri() public {
         _beforeMint();
@@ -188,9 +222,8 @@ contract TicketTest is Test {
             "initialize(address,address,uint256)", address(paymentToken), recipient, 1e18
         );
 
-        TransparentProxy promoFactoryProxy = new TransparentProxy(
-            address(promoFactoryImpl), address(this), promoFactoryData
-        );
+        TransparentProxy promoFactoryProxy =
+            new TransparentProxy(address(promoFactoryImpl), address(this), promoFactoryData);
 
         PromoFactory factory = PromoFactory(address(promoFactoryProxy));
 
