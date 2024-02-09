@@ -106,7 +106,7 @@ contract TicketFactoryTest is Test {
         SaleParams memory sale =
             SaleParams(block.timestamp, block.timestamp + 1, 1 ether, address(paymentToken));
 
-        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.prank(STREAMER);
         (address ticketSaleAddr, address ticketAddr) = factory.createTicketSale(sale, ticket);
@@ -120,7 +120,7 @@ contract TicketFactoryTest is Test {
             block.timestamp, block.timestamp + MAX_SALE_PERIOD + 1, 1 ether, address(paymentToken)
         );
 
-        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CONTRACT_URI, CAP);
+        TicketParams memory ticket = TicketParams("Test", "T", BASE_URI, CAP);
 
         vm.expectRevert(
             abi.encodeWithSelector(TicketFactory.MaxSalePeriodExceeded.selector, MAX_SALE_PERIOD)

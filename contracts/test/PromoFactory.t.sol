@@ -9,6 +9,7 @@ import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {TransparentProxy} from "src/proxy/TransparentProxy.sol";
 import {PromoFactory} from "src/PromoFactory.sol";
 import {Promo, Promotion} from "src/Promo.sol";
+import {Ticket} from "src/Ticket.sol";
 
 contract PromoFactoryTest is Test {
     Promo promoImplementation;
@@ -75,8 +76,8 @@ contract PromoFactoryTest is Test {
 
     function test_createPromo() public {
         address[] memory streams = new address[](2);
-        streams[0] = makeAddr("stream");
-        streams[1] = makeAddr("stream1");
+        streams[0] = address(new Ticket());
+        streams[1] = address(new Ticket());
 
         Promotion memory promotion = Promotion(
             block.timestamp, block.timestamp + 1, address(promo), streams, "MetaLamp development"

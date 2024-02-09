@@ -1,13 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 import {TicketSale, SaleParams, TicketParams} from "src/TicketSale.sol";
 import {TicketParams} from "src/Ticket.sol";
 
+/**
+ * @title TicketFactory contract
+ * @notice A contract that creates tickets (ERC721 collection) and ticket sales.
+ *
+ * The contract is managed by Owner role.
+ *
+ * The owner can set on a smart contract:
+ * - maximum sales period
+ * - protocol fee on ticket sales
+ * - fee recipient
+ * - implementation of the TicketSale smart contract
+ * - implementation of the Ticket smart contract
+ */
 contract TicketFactory is Initializable, OwnableUpgradeable {
     uint256 public constant MAX_PROTOCOL_FEE = 1_000; // The maximum team fee is equal to 10%
 
@@ -19,26 +32,25 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
 
     /// Events
 
+    event MaxSalePeriodSet(uint256 newMaxPeriod);
+    event ProtocolFeeRecipientSet(address newRecipient);
+    event ProtocolFeeSet(uint256 newProtocolFee);
+    event TicketImplementationSet(address newImplementation);
     event TicketSaleCreated(
         address indexed creator, address indexed ticketSaleAddr, address indexed ticketAddr
     );
-    event MaxSalePeriodSet(uint256 newMaxPeriod);
-    event ProtocolFeeSet(uint256 newProtocolFee);
-    event ProtocolFeeRecipientSet(address newRecipient);
     event TicketSaleImplementationSet(address newImplementation);
-    event TicketImplementationSet(address newImplementation);
 
     /// Errors
 
-    error ZeroAddress();
-    error MaxSalePeriodIsTooLow();
     error MaxSalePeriodExceeded(uint256 maxPeriod);
+    error MaxSalePeriodIsTooLow();
     error ProtocolFeeIsTooHigh(uint256 maxProtocolFee);
+    error ZeroAddress();
 
-    constructor() {
-        _disableInitializers();
-    }
+    /// Modifiers
 
+    /// @notice Checks that the address is not zero address
     modifier checkAddress(address target) {
         if (target == address(0)) {
             revert ZeroAddress();
@@ -47,6 +59,18 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * @notice Initializes the TicketFactory contract
+     * @param ticketSaleImplementation The address of the ticket sale implementation contract
+     * @param ticketImplementation The address of the ticket implementation contract
+     * @param protocolFeeRecipient The address that will receive collected protocol fees
+     * @param protocolFee The fee percentage (in basis points) that the protocol charges on sales
+     * @param maxSalePeriod The maximum duration (in seconds) that a ticket sale can last.
+     */
     function initialize(
         address ticketSaleImplementation,
         address ticketImplementation,
@@ -65,6 +89,14 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
 
     // region - Create Ticket Sale
 
+    /**
+     * @notice Creates a new ticket sale with specified sale and ticket parameters
+     * @param sale A `SaleParams` struct containing parameters for the sale
+     * @param ticket A `TicketParams` struct containing parameters for the tickets being sold
+     * @return ticketSaleAddr The address of the newly created ticket sale contract
+     * @return ticketAddr The address of the ticket contract associated with the ticket sale
+     * @dev This function creates a collection of tickets and a smart contract to sell those tickets
+     */
     function createTicketSale(SaleParams calldata sale, TicketParams calldata ticket)
         external
         returns (address ticketSaleAddr, address ticketAddr)
@@ -84,7 +116,7 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
 
     // endregion
 
-    // region - Setters and Getters
+    // region - Setters
 
     function setMaxSalePeriod(uint256 newMaxPeriod) public onlyOwner {
         if (newMaxPeriod < 1 days) {
@@ -135,6 +167,10 @@ contract TicketFactory is Initializable, OwnableUpgradeable {
 
         emit TicketImplementationSet(newImplementation);
     }
+
+    // endregion
+
+    // region - Getters
 
     function getImplementations() external view returns (address sale, address ticket) {
         sale = _ticketSaleImplementation;
