@@ -10,6 +10,7 @@ pymemcache = "*"
 web3 = "*"
 uvicorn = "*"
 black = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 
