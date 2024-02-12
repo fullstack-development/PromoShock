@@ -1,10 +1,143 @@
 ## MetaStream smart-contracts
 
-| Contract      | Address                                    | ABI                                               |
-| ------------- | ------------------------------------------ | ------------------------------------------------- |
-| TicketFactory | 0x2b771816c5FeF22f4553e1614A3bA0DfA1D24440 | [ABI](./abi/TicketFactory.sol/TicketFactory.json) |
-| PromoFactory  | 0xf300c9bf1A045844f17B093a6D56BC33685e5D05 | [ABI](./abi/PromoFactory.sol/PromoFactory.json)   |
-| Promo (NFT)   | 0xd409ffeb2f2e9dB0A75483a6417776CD6D7Ce774 | [ABI](./abi/Promo.sol/Promo.json)                 |
+| Contract                | Address                                    | ABI                                               |
+| ----------------------- | ------------------------------------------ | ------------------------------------------------- |
+| TicketFactory           | 0x42C593A0F50321EA473b5fAe6a4b76c212a26F54 | [ABI](./abi/TicketFactory.sol/TicketFactory.json) |
+| TicketSale              |                                            | [ABI](./abi/TicketSale.sol/TicketSale.json)       |
+| Ticket (NFT Collection) |                                            | [ABI](./abi/Ticket.sol/Ticket.json)               |
+| PromoFactory            | 0x3d3E2D37151a812418FB075190f959a6C90C3A38 | [ABI](./abi/PromoFactory.sol/PromoFactory.json)   |
+| Promo (NFT Collection)  | 0x0D790354b7887791df6dB035808ED8Fe4b41BE47 | [ABI](./abi/Promo.sol/Promo.json)                 |
+
+## Description
+
+### TicketFactory
+
+#### Structs
+
+##### SaleParams
+
+```solidity
+struct SaleParams {
+    uint256 startTime;
+    uint256 endTime;
+    uint256 price;
+    address paymentToken;
+}
+```
+
+##### TicketParams
+
+```solidity
+struct TicketParams {
+    string name;
+    string symbol;
+    string baseUri;
+    uint16 cap;
+}
+```
+
+#### Functions
+
+##### createTicketSale
+
+Creates a new ticket sale with specified sale and ticket parameters
+
+_This function creates a collection of tickets and a smart contract to sell those tickets_
+
+```solidity
+function createTicketSale(SaleParams calldata sale, TicketParams calldata ticket)
+    external
+    returns (address ticketSaleAddr, address ticketAddr);
+```
+
+**Parameters**
+
+| Name     | Type           | Description                                                              |
+| -------- | -------------- | ------------------------------------------------------------------------ |
+| `sale`   | `SaleParams`   | A `SaleParams` struct containing parameters for the sale                 |
+| `ticket` | `TicketParams` | A `TicketParams` struct containing parameters for the tickets being sold |
+
+**Returns**
+
+| Name             | Type      | Description                                                        |
+| ---------------- | --------- | ------------------------------------------------------------------ |
+| `ticketSaleAddr` | `address` | The address of the newly created ticket sale contract              |
+| `ticketAddr`     | `address` | The address of the ticket contract associated with the ticket sale |
+
+#### Events
+
+##### TicketSaleCreated
+
+```solidity
+event TicketSaleCreated(
+    address indexed creator, address indexed ticketSaleAddr, address indexed ticketAddr
+);
+```
+
+##### Sold
+
+```solidity
+event Sold(
+    address indexed buyer, address indexed ticket, uint256 tokenId, uint256 price, uint256 timestamp
+);
+```
+
+##### MintTicket
+
+```solidity
+event MintTicket(address indexed owner, uint256 tokenId);
+```
+
+### PromoFactory
+
+#### Structs
+
+##### Promotion
+
+```solidity
+struct Promotion {
+    uint256 startTime;
+    uint256 endTime;
+    address promoAddr;
+    address[] streams;
+    string description;
+}
+```
+
+#### Functions
+
+##### createPromo
+
+Creates a new promo with specified promotion details and URI
+
+_This function calculates the price for creating a promo based
+on the number of streams specified in the `promotion` struct,
+multiplied by the `_promoCreationPrice`_
+
+```solidity
+function createPromo(Promotion calldata promotion, string calldata uri) external;
+```
+
+**Parameters**
+
+| Name        | Type        | Description                                                  |
+| ----------- | ----------- | ------------------------------------------------------------ |
+| `promotion` | `Promotion` | A `Promotion` struct containing the details of the promotion |
+| `uri`       | `string`    | The URI for the promo metadata                               |
+
+#### Events
+
+##### PromotionCreated
+
+```solidity
+event PromotionCreated(address indexed marketer, Promotion promotion);
+```
+
+##### MintPromo
+
+```solidity
+event MintPromo(address indexed owner, uint256 tokenId, Promotion promotion);
+```
 
 ## Usage
 
@@ -26,7 +159,7 @@ $ forge test
 $ anvil
 ```
 
-### Deploy
+## Deploy
 
 Common script
 
@@ -300,13 +433,13 @@ $ forge script script/proxy/PromoProxy.s.sol \
 
 ---
 
-### Cast
+## Cast
 
 ```shell
 $ cast <subcommand>
 ```
 
-### Help
+## Help
 
 ```shell
 $ forge --help
