@@ -3,12 +3,18 @@ import { Breadcrumb as AntdBreadcrumb } from "antd";
 import type { FC } from "react";
 
 type Props = {
-  root: string;
   paths: Array<{ href: string; title: string }>;
+  includeRoot?: boolean;
 };
 
-const Breadcrumb: FC<Props> = ({ root, paths }) => {
-  return <AntdBreadcrumb items={[{ title: root }, ...paths]} />;
+const Breadcrumb: FC<Props> = ({ paths, includeRoot }) => {
+  const [root, ...rest] = paths;
+
+  return (
+    <AntdBreadcrumb
+      items={includeRoot ? [root, ...rest] : [{ title: root.title }, ...rest]}
+    />
+  );
 };
 
 export { Breadcrumb };

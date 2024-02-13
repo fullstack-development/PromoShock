@@ -1,11 +1,13 @@
-import type { FC, PropsWithChildren } from "react";
+import type { ComponentProps, FC, PropsWithChildren } from "react";
 
 import { AutoBreadcrumb } from "./auto-breadcrumb";
 
-const WithBreadcrumb: FC<PropsWithChildren> = ({ children }) => {
+const WithBreadcrumb: FC<
+  PropsWithChildren<ComponentProps<typeof AutoBreadcrumb>>
+> = ({ children, includeRoot }) => {
   return (
     <div>
-      <AutoBreadcrumb />
+      <AutoBreadcrumb includeRoot={includeRoot} />
       {children}
     </div>
   );
