@@ -17,7 +17,7 @@ async def index_ticket_sale():
     contract_abi = get_ticket_factory_abi()
     repo = MemcacheNftRepository(memcache_client)
     indexer = NftIndexer(web3, repo, contract_address, contract_abi)
-    indexer.index_ticket_sale()
+    indexer.start_index(from_block=37552774)
 
     return []
 

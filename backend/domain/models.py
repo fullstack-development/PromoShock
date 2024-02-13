@@ -14,7 +14,10 @@ class Viewer:
 
 @dataclass(frozen=True)
 class NftData:
-    contract_id: str
+    transaction_hash: str
+    transaction_index: int
+    block_hash: str
+    block_nmb: int
     owner: str
     uri: str
     name: str
