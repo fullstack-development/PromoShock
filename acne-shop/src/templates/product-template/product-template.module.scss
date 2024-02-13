@@ -1,0 +1,59 @@
+.root {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-template-rows: repeat(3, max-content) 1fr;
+  column-gap: 24px;
+  row-gap: 24px;
+}
+
+.image {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1/5;
+  width: 100%;
+  aspect-ratio: 3/2;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.title {
+  grid-column: 1;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.description {
+  grid-column: 1;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.priceBlock {
+  grid-column: 1;
+  display: grid;
+}
+
+.price {
+  grid-column: 1;
+  font-size: 24px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 0;
+}
+
+.oldPrice {
+  grid-column: 1;
+  font-size: 18px;
+  line-height: 1.5;
+  text-decoration: line-through;
+  color: #666;
+  margin: 0;
+}
+
+.action {
+  grid-column: 1;
+  align-self: end;
+}
