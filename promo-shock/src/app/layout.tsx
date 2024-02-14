@@ -12,7 +12,7 @@ import { RootProvider } from "./provider";
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 const metadata: Metadata = {
-  title: "AcneShop",
+  title: "PromoShock",
 };
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => {

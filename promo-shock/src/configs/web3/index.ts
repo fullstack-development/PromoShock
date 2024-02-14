@@ -8,7 +8,7 @@ const bscChains = {
 } as const;
 
 const web3Config = getDefaultConfig({
-  appName: "AcneShop",
+  appName: "PromoShock",
   projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
   chains: [bscChains[process.env.NEXT_PUBLIC_BSC_CHAIN_ID]],
   transports: {
