@@ -11,6 +11,8 @@ web3 = "*"
 uvicorn = "*"
 black = "*"
 sqlalchemy = "*"
+pycryptodome = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 

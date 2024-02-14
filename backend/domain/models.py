@@ -27,7 +27,10 @@ class NftData:
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, NftData):
             return False
-        return self.uri == value.uri
+        return (
+            self.transaction_hash == value.transaction_hash
+            and self.transaction_index == value.transaction_index
+        )
 
 
 @dataclass(frozen=True)
