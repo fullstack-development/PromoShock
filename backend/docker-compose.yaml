@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  backend: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on: 
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PASSWORD=pass
+      - TICKET_FACTORY_ADDR=0x42C593A0F50321EA473b5fAe6a4b76c212a26F54
+    volumes:
+      - ./:/code
+      - ../contracts/abi:/contracts/abi
+    ports:
+      - "5005:80"
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=metastream
+      - POSTGRES_PASSWORD=pass
+    ports:
+      - "54321:5432"
