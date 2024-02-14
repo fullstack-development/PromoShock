@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@promo-shock/*": ["./src/*"],
-      "@public/*": ["./public/*"]
+      "@public/*": ["./public/*"],
+      "@generated/*": ["./generated/*"]
     }
   },
   "include": [
