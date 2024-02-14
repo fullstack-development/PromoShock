@@ -9,6 +9,9 @@ type Props = {
   value?: UploadFile;
   defaultValue?: UploadFile;
   placeholder?: string;
+  maxSize?: number;
+  width?: number;
+  height?: number;
   onChange?(value: UploadFile): void;
 };
 
