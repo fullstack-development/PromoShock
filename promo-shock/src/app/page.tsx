@@ -1,7 +1,9 @@
 import type { FC } from "react";
 
+import { Landing } from "@promo-shock/components";
+
 const RootPage: FC = () => {
-  return <>Home</>;
+  return <Landing />;
 };
 
 export default RootPage;

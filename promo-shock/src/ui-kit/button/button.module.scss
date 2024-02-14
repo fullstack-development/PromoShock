@@ -1,0 +1,48 @@
+@import 'src/shared/styles/vars.scss';
+
+.button {
+  color: $textSecondary !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: min-content !important;
+  min-height: auto !important;
+  line-height: 1 !important;
+  font-family: inherit !important;
+  transition: 300ms opacity !important;
+
+  border: none !important;
+  &:hover {
+    border: none !important;
+    opacity: 0.7;
+  }
+}
+
+.theme {
+  &_primary {
+    background: $mainPink !important;
+  }
+  
+  &_secondary {
+    background: $mainCyan !important;
+  }
+}
+
+.size {
+  &_default {
+    font-size: 20px !important;
+    padding: 8px 24px !important;
+  }
+
+  &_large {
+    font-size: 32px !important;
+    padding: 24px !important;
+  }
+
+  &_largeWide {
+    font-size: 32px !important;
+    padding: 24px !important;
+    min-width: 480px;
+  }
+}

@@ -8,7 +8,7 @@ import { useIsMounted } from "@promo-shock/shared/hooks";
 import { trim } from "@promo-shock/shared/utils";
 import { Button } from "@promo-shock/ui-kit";
 
-type Props = Pick<ComponentProps<typeof Button>, "size">;
+type Props = Pick<ComponentProps<typeof Button>, "size" | "theme">;
 
 const Component: FC<Props> = (props) => {
   const authStore = useAuthStore();
@@ -40,7 +40,7 @@ const Component: FC<Props> = (props) => {
 const WalletButton: FC<Props> = (props) => {
   const isMounted = useIsMounted();
 
-  return isMounted && <Component {...props} />;
+  return isMounted && <Component theme="primary" size="medium" {...props} />;
 };
 
 export { WalletButton };

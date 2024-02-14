@@ -1,7 +1,9 @@
 import type { FC } from "react";
 
+import { Header } from "./header";
+
 const Footer: FC = () => {
-  return <div>Footer</div>;
+  return <Header isMirror />;
 };
 
 export { Footer };
