@@ -27,6 +27,12 @@
   &_secondary {
     background: $mainCyan !important;
   }
+
+  &_tertiary {
+    color: $goldenPurple !important;
+    border: 2px solid $goldenPurple !important;
+    background: $fadedPurple !important;
+  }
 }
 
 .size {

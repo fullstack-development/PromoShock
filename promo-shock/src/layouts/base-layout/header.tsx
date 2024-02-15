@@ -8,11 +8,18 @@ import styles from "./base-layout.module.scss";
 
 type Props = {
   isMirror?: boolean;
+  gutterBottom?: boolean;
 };
 
-const Header: FC<Props> = ({ isMirror }) => {
+const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
   return (
-    <div className={cn(styles.header, { [styles.headerMirror]: isMirror })}>
+    <div
+      className={cn(
+        styles.header,
+        { [styles.mirror]: isMirror },
+        { [styles.gutterBottom]: gutterBottom },
+      )}
+    >
       <Logo />
       <WalletButton />
     </div>

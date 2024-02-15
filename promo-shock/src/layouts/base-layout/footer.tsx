@@ -2,8 +2,12 @@ import type { FC } from "react";
 
 import { Header } from "./header";
 
-const Footer: FC = () => {
-  return <Header isMirror />;
+type Props = {
+  gutterBottom?: boolean;
+};
+
+const Footer: FC<Props> = ({ gutterBottom }) => {
+  return <Header gutterBottom={gutterBottom} isMirror />;
 };
 
 export { Footer };

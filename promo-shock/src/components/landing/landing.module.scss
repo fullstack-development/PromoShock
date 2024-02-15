@@ -1,12 +1,12 @@
 @import 'src/shared/styles/mixins.scss';
 
 .root {
-  min-height: 1500px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 80px;
   position: relative;
+  overflow-x: hidden;
 }
 
 .backgroundIcons {
@@ -60,8 +60,17 @@
   width: 100%;
   padding: 56px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
+  margin-top: 180px;
+}
+
+.seeAllShowsLink {
+  font-size: 24px;
+  margin-bottom: 40px;
+  margin-left: auto;
 }
 
 .previewsContainer {
@@ -70,4 +79,26 @@
   align-items: center;
   max-width: 1200px;
   width: 100%;
+}
+
+.ticker {
+  position: absolute;
+  color: $textSunriseYellow;
+  background: linear-gradient(180deg, #FFADD2 0%, #9254DE 100%);
+  width: 100%;
+  top: -80px;
+  left: -10px;
+  font-size: 64px;
+  white-space: nowrap;
+  width: 200%;
+  font-family: var(--font-bowlby-one-sc);
+  transform: rotate(-2deg);
+}
+
+.tickerLine {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  transform: translate3d(-400px, 0, 0);
 }

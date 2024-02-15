@@ -26,6 +26,9 @@ export const StreamCard: FC<Props> = ({
   ticketsTotal,
   ticketsLeft,
 }) => {
+  const ticketsAreOut = ticketsLeft < 1 && date.isAfter(dayjs());
+  const streamHasFinished = date.isBefore(dayjs());
+
   return (
     <div className={styles.root}>
       <Image
@@ -45,13 +48,13 @@ export const StreamCard: FC<Props> = ({
           </span>
         )}
 
-        {ticketsLeft < 1 && date.isAfter(dayjs()) && (
+        {ticketsAreOut && (
           <span className={cn(styles.subtitle, styles.error)}>
             💔 No tickets left
           </span>
         )}
 
-        {date.isBefore(dayjs()) && (
+        {streamHasFinished && (
           <span className={cn(styles.subtitle, styles.error)}>
             🚫 Stream has finished
           </span>
@@ -64,8 +67,18 @@ export const StreamCard: FC<Props> = ({
       </div>
 
       <div className={styles.row}>
-        <span className={styles.cost}>{cost} USDT</span>
-        <Button text="Buy access" theme="primary" size="medium" />
+        <span
+          className={cn(styles.cost, {
+            [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
+          })}
+        >
+          {cost} USDT
+        </span>
+        {ticketsAreOut || streamHasFinished ? (
+          <Button text="Buy access" theme="primary" size="medium" />
+        ) : (
+          <Button text="See promos" theme="tertiary" size="medium" />
+        )}
       </div>
     </div>
   );

@@ -26,10 +26,15 @@
   }
 }
 
-.headerMirror {
+.mirror {
+  padding-top: 120px;
   &::after {
     bottom: 99%;
     top: unset;
     transform: rotate(180deg);
   }
+}
+
+.gutterBottom {
+  margin-top: -50px;
 }

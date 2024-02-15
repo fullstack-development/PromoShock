@@ -4,10 +4,11 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
 
-import { Button, StreamCard, useTabs } from "@promo-shock/ui-kit";
+import { Button, Link, StreamCard, useTabs } from "@promo-shock/ui-kit";
 
-import { DoubleTriangle } from "./DoubleTriangle";
+import { DoubleTriangle } from "./img/DoubleTriangle";
 import backgroundIcons from "./img/icons.svg";
+import { Star } from "./img/Star";
 import streamPreview from "./img/stream-preview.png";
 import styles from "./landing.module.scss";
 
@@ -98,6 +99,24 @@ export const Landing: FC = () => {
       </div>
 
       <div className={styles.upcoming}>
+        <div className={styles.ticker}>
+          <div className={styles.tickerLine}>
+            <Star />
+            Upcoming Shows
+            <Star />
+            Upcoming Shows
+            <Star />
+            Upcoming Shows
+            <Star />
+          </div>
+        </div>
+
+        <div className={styles.previewsContainer}>
+          <Link underline href="/CHANGE_ME" className={styles.seeAllShowsLink}>
+            See all shows
+          </Link>
+        </div>
+
         <div className={styles.previewsContainer}>
           {streamsPreviews.map((options) => (
             <StreamCard
@@ -106,6 +125,35 @@ export const Landing: FC = () => {
             />
           ))}
         </div>
+
+        <div className={styles.ticker} style={{ top: "calc(100% - 80px)" }}>
+          <div className={styles.tickerLine}>
+            <Star />
+            Upcoming Shows
+            <Star />
+            Upcoming Shows
+            <Star />
+            Upcoming Shows
+            <Star />
+          </div>
+        </div>
+      </div>
+
+      <h2 className={styles.title} style={{ paddingTop: 96 }}>
+        Start easily
+      </h2>
+
+      <div className={styles.tabs}>
+        <div className={styles.panels}>
+          <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
+          <DoubleTriangle />
+          <span className={styles.middlePanel}>
+            {promoTabs[selected].panel[1]}
+          </span>
+          <DoubleTriangle />
+          <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
+        </div>
+        <Button theme="secondary" size="largeWide" text="I wanna try" />
       </div>
     </main>
   );
