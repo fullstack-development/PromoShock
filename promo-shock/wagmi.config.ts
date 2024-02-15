@@ -1,7 +1,9 @@
 import { defineConfig, loadEnv } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
-import { etherscan } from "@wagmi/cli/plugins";
+import ticketFactoryAbi from './abis/ticket-factory.json';
+import promoFactoryAbi from './abis/promo-factory.json';
 
+// @ts-expect-error Abis imported from JSON files
 export default defineConfig(() => {
   const env = loadEnv({
     mode: process.env.NODE_ENV,
@@ -10,28 +12,20 @@ export default defineConfig(() => {
 
   return ({
     out: "generated/wagmi.ts",
+    contracts: [
+      {
+        name: "TicketFactory",
+        address: env.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS,
+        abi: ticketFactoryAbi
+      },
+      {
+        name: "PromoFactory",
+        address: env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS,
+        abi: promoFactoryAbi
+      },
+    ],
     plugins: [
       react(),
-      etherscan({
-        apiKey: env.NEXT_PUBLIC_ETHERSCAN_API_KEY,
-        chainId: env.NEXT_PUBLIC_BSC_CHAIN_ID as any,
-        contracts: [
-          {
-            name: "TicketFactory",
-            address: {
-              [env.NEXT_PUBLIC_BSC_CHAIN_ID as any]:
-                env.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS as any,
-            },
-          },
-          {
-            name: "PromoFactory",
-            address: {
-              [env.NEXT_PUBLIC_BSC_CHAIN_ID as any]:
-                env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS as any,
-            },
-          },
-        ],
-      }),
     ],
   });
 });

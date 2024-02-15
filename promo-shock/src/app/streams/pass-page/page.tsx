@@ -1,7 +1,9 @@
 import type { FC } from "react";
 
+import { NewStreamPass } from "@promo-shock/templates";
+
 const StreamsPassPage: FC = () => {
-  return <div>StreamsPassPage</div>;
+  return <NewStreamPass />;
 };
 
 export default StreamsPassPage;
