@@ -5,16 +5,6 @@ const nextConfig = {
     return config;
   },
   sassOptions: {},
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com",
-        port: "",
-        pathname: "/*",
-      },
-    ],
-  },
 };
 
 module.exports = nextConfig;

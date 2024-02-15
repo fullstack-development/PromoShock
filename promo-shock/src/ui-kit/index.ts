@@ -1,5 +1,5 @@
 export * from "./button";
-export * from "./field";
+export * from "./fields";
 export * from "./link";
 export * from "./marquee";
 export * from "./segmented";
@@ -8,3 +8,4 @@ export * from "./card";
 export * from "./logo";
 export * from "./tabs";
 export * from "./stream-card";
+export * from "./uploaders";

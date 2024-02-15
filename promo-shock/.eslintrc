@@ -177,6 +177,11 @@
         "pathGroups": [
           {
             "group": "parent",
+            "pattern": "@generated/**",
+            "position": "before"
+          },
+          {
+            "group": "parent",
             "pattern": "@promo-shock/**",
             "position": "before"
           }

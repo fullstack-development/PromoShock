@@ -1,3 +1,4 @@
+"use client";
 import type { ComponentProps, FC, PropsWithChildren } from "react";
 
 import { AutoBreadcrumb } from "./auto-breadcrumb";
