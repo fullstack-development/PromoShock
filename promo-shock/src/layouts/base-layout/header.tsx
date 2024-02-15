@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import cn from "classnames";
 import type { FC } from "react";
