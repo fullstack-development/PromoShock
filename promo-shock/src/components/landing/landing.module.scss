@@ -1,17 +1,73 @@
 @import 'src/shared/styles/mixins.scss';
 
 .root {
-  min-height: 600px;
+  min-height: 1500px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 80px
+  gap: 80px;
+  position: relative;
+}
+
+.backgroundIcons {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 132px;
 }
 
 .title {
   @include h1;
 
-  padding-top: 80px;
+  padding-top: 132px;
   max-width: 900px;
   text-align: center;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  z-index: 1;
+}
+
+.panels {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: nowrap;
+  font-weight: 700;
+  font-size: 24px;
+  font-family: var(--font-georama);
+}
+
+.middlePanel {
+  min-width: 300px;
+  text-align: center;
+}
+
+.panel {
+  min-width: 350px;
+  text-align: center;
+}
+
+.upcoming {
+  background: $mainCyan;
+  min-height: 865px;
+  width: 100%;
+  padding: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.previewsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
 }

@@ -22,7 +22,7 @@ const bowlbyOneSC = Bowlby_One_SC({
   variable: "--font-bowlby-one-sc",
 });
 const georama = Georama({
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-georama",
 });
