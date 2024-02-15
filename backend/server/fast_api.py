@@ -15,12 +15,15 @@ start_mappers()
 
 
 @app.post("/index/ticket_sale")
-async def index_ticket_sale():
-    contract_address = get_ticket_factory_address()
-    contract_abi = get_ticket_factory_abi()
+def index_ticket_sale():
     session = get_session()
-    repo = SqlAlchemyRepository(session)
-    indexer = NftIndexer(web3, repo, contract_address, contract_abi)
-    indexer.start_index(from_block=37552774)
+    indexer = NftIndexer(
+        web3,
+        SqlAlchemyRepository(session),
+        get_ticket_factory_address(),
+        get_ticket_factory_abi(),
+    )
+
+    indexer.start_index(from_block="finalized")
 
     return []

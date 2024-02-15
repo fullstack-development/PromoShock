@@ -1,4 +1,5 @@
 import abc
+import logging
 from typing import Any, List, Optional
 from ens.ens import HexBytes
 from eth_typing import Address
@@ -6,9 +7,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from web3 import Web3
 from web3.types import BlockParams, FilterParams
+
 from contracts.abi import get_ticket_abi, get_ticket_sale_abi
 
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractRepository(abc.ABC):
@@ -146,6 +150,9 @@ class NftIndexer:
     def start_index(
         self, from_block: BlockParams = "earliest", to_block: BlockParams = "latest"
     ):
+        logger.info(
+            f"Start indexing TicketSale and PromoSale from block '{from_block}' to block '{to_block}'"
+        )
         logs = self._web3.eth.get_logs(
             filter_params=FilterParams(
                 address=self._contract.address, fromBlock=from_block, toBlock=to_block
@@ -164,6 +171,7 @@ class NftIndexer:
                 )
                 self._index_ticket_sale(ticket_sale_event.ticket_sale_addr)
                 self._index_ticket(ticket_sale_event.ticket_addr)
+        logger.info("Index complete")
 
     def decode_data(self, pattern, topic):
         return self._web3.codec.decode(pattern, topic)

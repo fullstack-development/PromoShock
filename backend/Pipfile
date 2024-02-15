@@ -13,6 +13,7 @@ black = "*"
 sqlalchemy = "*"
 pycryptodome = "*"
 psycopg2-binary = "*"
+pyyaml = "*"
 
 [dev-packages]
 

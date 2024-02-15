@@ -37,4 +37,3 @@ class TicketSaleCreatedEvent:
     block_hash: str
     transaction_hash: str
     transaction_index: int
-
