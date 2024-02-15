@@ -15,12 +15,16 @@ export default defineConfig(() => {
     contracts: [
       {
         name: "TicketFactory",
-        address: env.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS,
+        address: {
+          [env.NEXT_PUBLIC_BSC_CHAIN_ID]: env.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS
+        },
         abi: ticketFactoryAbi
       },
       {
         name: "PromoFactory",
-        address: env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS,
+        address: {
+          [env.NEXT_PUBLIC_BSC_CHAIN_ID]: env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS
+        },
         abi: promoFactoryAbi
       },
     ],

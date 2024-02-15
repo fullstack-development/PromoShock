@@ -149,7 +149,13 @@ const NewStreamPass: FC = () => {
           )}
         />
 
-        <div className={classNames(classes.date_row, classes.contents)}>
+        <div
+          className={classNames(
+            classes.date_row,
+            classes.contents,
+            classes.with_separator,
+          )}
+        >
           <Controller<FormData, "stream_date">
             name="stream_date"
             control={control}
@@ -176,7 +182,13 @@ const NewStreamPass: FC = () => {
             )}
           />
         </div>
-        <div className={classNames(classes.price_row, classes.contents)}>
+        <div
+          className={classNames(
+            classes.price_row,
+            classes.contents,
+            classes.with_separator,
+          )}
+        >
           <Controller<FormData, "stream_cap">
             name="stream_cap"
             control={control}
