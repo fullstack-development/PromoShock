@@ -12,4 +12,23 @@ const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
-export { calculatePercent, trim, stopPropagation };
+const readFileAsDataURL = (file: File) => {
+  const reader = new FileReader();
+
+  const dataURL = new Promise<string>((res, rej) => {
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        res(reader.result);
+      } else {
+        rej("result is not base64 string");
+      }
+    };
+    reader.onerror = () => rej(reader.error);
+  });
+
+  reader.readAsDataURL(file);
+
+  return dataURL;
+};
+
+export { calculatePercent, trim, stopPropagation, readFileAsDataURL };
