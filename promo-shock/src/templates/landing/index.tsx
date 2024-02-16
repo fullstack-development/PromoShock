@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type FC } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import type { FC } from "react";
 
 import {
   Button,
@@ -33,6 +35,7 @@ const promoTabs = [
       "Spread it to your watchers",
       "Score a wave of new fans",
     ],
+    href: "/streams/pass-page",
   },
   {
     label: "brands",
@@ -41,11 +44,20 @@ const promoTabs = [
       "Whip up a promo",
       "Watch the sales go bananas!",
     ],
+    href: "/promos/new-promo",
   },
 ];
 
 export const Landing: FC = () => {
   const [selected, setSelected] = useState(0);
+  const router = useRouter();
+
+  const handleTryClick = () => {
+    const { href } = promoTabs[selected];
+    if (href) {
+      router.push(href);
+    }
+  };
 
   return (
     <main className={styles.root}>
@@ -59,7 +71,11 @@ export const Landing: FC = () => {
       <h1 className={styles.title}>Streams with benefits for...</h1>
 
       <div className={styles.tabs}>
-        <TabList selected={selected} setSelected={setSelected} tabList={promoTabs} />
+        <TabList
+          selected={selected}
+          setSelected={setSelected}
+          tabList={promoTabs}
+        />
         <div className={styles.panels}>
           <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
           <DoubleTriangle />
@@ -69,7 +85,12 @@ export const Landing: FC = () => {
           <DoubleTriangle />
           <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
         </div>
-        <Button theme="secondary" size="largeWide" text="I wanna try" />
+        <Button
+          theme="secondary"
+          size="largeWide"
+          text="I wanna try"
+          onClick={handleTryClick}
+        />
       </div>
 
       <div className={styles.upcoming}>
@@ -90,7 +111,12 @@ export const Landing: FC = () => {
         </div>
 
         <div className={styles.previewsContainer}>
-          <TextLink title="See all shows" underline href="/CHANGE_ME" className={styles.seeAllShowsLink} />
+          <TextLink
+            title="See all shows"
+            underline
+            href="/CHANGE_ME"
+            className={styles.seeAllShowsLink}
+          />
         </div>
 
         <div className={styles.previewsContainer}>
@@ -133,7 +159,12 @@ export const Landing: FC = () => {
           <DoubleTriangle />
           <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
         </div>
-        <Button theme="secondary" size="largeWide" text="I wanna try" />
+        <Button
+          theme="secondary"
+          size="largeWide"
+          text="I wanna try"
+          onClick={handleTryClick}
+        />
       </div>
     </main>
   );

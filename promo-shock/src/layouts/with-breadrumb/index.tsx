@@ -1,14 +1,15 @@
 "use client";
-import type { ComponentProps, FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 
 import { AutoBreadcrumb } from "./auto-breadcrumb";
+import classes from "./with-breadcrumb.module.scss";
 
-const WithBreadcrumb: FC<
-  PropsWithChildren<ComponentProps<typeof AutoBreadcrumb>>
-> = ({ children, includeRoot }) => {
+const WithBreadcrumb: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div>
-      <AutoBreadcrumb includeRoot={includeRoot} />
+    <div className={classes.root}>
+      <div className={classes.breadcrumb}>
+        <AutoBreadcrumb />
+      </div>
       {children}
     </div>
   );

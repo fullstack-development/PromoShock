@@ -10,8 +10,8 @@ import { forwardRef } from "react";
 import { useReadFileAsDataURL } from "@promo-shock/shared/hooks";
 import type { PropsWithClassName } from "@promo-shock/shared/types";
 
+import { IconPlus } from "./icons";
 import classes from "./uploader.module.scss";
-import { IconPlus } from "../icons";
 
 type Props = {
   value?: UploadFile;

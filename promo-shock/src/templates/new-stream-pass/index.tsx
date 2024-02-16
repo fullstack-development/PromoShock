@@ -287,6 +287,7 @@ const NewStreamPass: FC = () => {
             type="submit"
             size="large"
             text="Drop the pass"
+            theme="secondary"
             disabled={!account.address}
           />
         )}
