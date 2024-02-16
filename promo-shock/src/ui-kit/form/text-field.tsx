@@ -13,6 +13,7 @@ import { LabelWrapper } from "./label-wrapper";
 type Props = {
   value?: string;
   label?: string;
+  labelPosition?: "top" | "left";
   defaultValue?: string;
   placeholder?: string;
   prefix?: string;
@@ -22,13 +23,20 @@ type Props = {
 };
 
 const TextField: FC<PropsWithClassName<Props>> = forwardRef(
-  ({ onChange, label, error, className, ...rest }, ref?: Ref<InputRef>) => {
+  (
+    { onChange, label, labelPosition = "left", error, className, ...rest },
+    ref?: Ref<InputRef>,
+  ) => {
     const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
       onChange?.(event.target.value);
     };
 
     return (
-      <LabelWrapper label={label} className={className}>
+      <LabelWrapper
+        label={label}
+        labelPosition={labelPosition}
+        className={className}
+      >
         <ErrorWrapper message={error}>
           <Input
             ref={ref}

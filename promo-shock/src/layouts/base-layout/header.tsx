@@ -25,7 +25,7 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
       )}
     >
       <div className={styles.container}>
-        <Link href="/">
+        <Link href="/" className={styles.logo}>
           <Logo />
         </Link>
 

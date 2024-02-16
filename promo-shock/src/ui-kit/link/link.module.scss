@@ -3,6 +3,7 @@
 .textLink {
   transition: 300ms color;
   position: relative;
+  cursor: pointer;
 
   &_underline {
     &::after {
@@ -34,6 +35,7 @@
   padding: 8px 24px;
   border-radius: 16px;
   transition: 300ms color;
+  cursor: pointer;
 
   &:hover {
     color: $mainPink;

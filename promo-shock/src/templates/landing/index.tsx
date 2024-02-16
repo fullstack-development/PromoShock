@@ -59,6 +59,13 @@ export const Landing: FC = () => {
     }
   };
 
+  const handleSelect = (index: number) => {
+    const { href } = promoTabs[index];
+    if (href) router.prefetch(href);
+
+    setSelected(index);
+  };
+
   return (
     <main className={styles.root}>
       <Image
@@ -73,7 +80,7 @@ export const Landing: FC = () => {
       <div className={styles.tabs}>
         <TabList
           selected={selected}
-          setSelected={setSelected}
+          setSelected={handleSelect}
           tabList={promoTabs}
         />
         <div className={styles.panels}>

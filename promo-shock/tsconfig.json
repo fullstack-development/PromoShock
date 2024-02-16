@@ -31,7 +31,7 @@
     ".next/types/**/*.ts",
     ".env.d.ts",
     "src/ui-kit/input/file-input",
-    "src/ui-kit/uploaders/index.tsx"
+    "src/ui-kit/form/uploader.tsx"
   ],
   "exclude": ["node_modules"]
 }

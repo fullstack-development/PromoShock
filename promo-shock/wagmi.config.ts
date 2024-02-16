@@ -1,5 +1,5 @@
 import { defineConfig, loadEnv } from "@wagmi/cli";
-import { react } from "@wagmi/cli/plugins";
+import { actions, react } from "@wagmi/cli/plugins";
 import ticketFactoryAbi from './abis/ticket-factory.json';
 import promoFactoryAbi from './abis/promo-factory.json';
 
@@ -26,6 +26,7 @@ export default defineConfig(() => {
     ],
     plugins: [
       react(),
+      actions()
     ],
   });
 });

@@ -7,18 +7,24 @@ import classes from "./field.module.scss";
 
 type Props = {
   label?: string;
+  labelPosition?: "top" | "left";
 };
 
 const LabelWrapper: FC<PropsWithClassName<PropsWithChildren<Props>>> = ({
   children,
   label,
+  labelPosition = "left",
   className,
 }) => {
   return (
-    <label className={classNames(className, classes.label_wrap)}>
+    <div
+      className={classNames(className, classes.label_wrap, {
+        [classes.label_top]: labelPosition === "top",
+      })}
+    >
       {label && <span className={classes.label_text}>{label}</span>}
       {children}
-    </label>
+    </div>
   );
 };
 

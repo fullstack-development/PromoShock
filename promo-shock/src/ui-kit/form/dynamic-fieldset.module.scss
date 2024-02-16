@@ -1,0 +1,15 @@
+.root {
+  display: grid;
+  row-gap: 24px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  column-gap: 16px;
+}
+
+.remove {
+  display: grid;
+  cursor: pointer;
+}

@@ -1,5 +1,5 @@
 export * from "./button";
-export * from "./fields";
+export * from "./form";
 export * from "./link";
 export * from "./marquee";
 export * from "./segmented";
@@ -8,5 +8,5 @@ export * from "./card";
 export * from "./logo";
 export * from "./tabs";
 export * from "./stream-card";
-export * from "./uploaders";
 export * from "./tooltips";
+export * from "./popconfirm";

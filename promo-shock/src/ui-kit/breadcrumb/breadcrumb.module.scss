@@ -9,7 +9,7 @@
 }
 
 .item {
-  display: inline-block;
+  display: inline-block !important;
   font-family: inherit !important;
   font-size: 20px;
   font-weight: 400;
@@ -17,7 +17,8 @@
   letter-spacing: 0em;
   text-align: left;
 
-  &::first-letter {
+  &::first-letter,
+  > *::first-letter {
     text-transform: capitalize;
   }
 }
@@ -28,4 +29,8 @@
 
 .link {
   color: $goldenPurple !important;
+
+  > * {
+    cursor: pointer;
+  }
 }

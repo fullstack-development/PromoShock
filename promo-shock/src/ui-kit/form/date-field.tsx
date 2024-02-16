@@ -13,6 +13,7 @@ import { LabelWrapper } from "./label-wrapper";
 type Props = {
   value?: Dayjs;
   label?: string;
+  labelPosition?: "top" | "left";
   defaultValue?: Dayjs;
   placeholder?: string;
   error?: string;
@@ -21,7 +22,7 @@ type Props = {
 
 const DateField: FC<PropsWithClassName<Props>> = forwardRef(
   (
-    { label, className, error, ...rest },
+    { label, labelPosition = "left", className, error, ...rest },
     ref?: Ref<{
       nativeElement: HTMLInputElement;
       focus: () => void;
@@ -29,7 +30,11 @@ const DateField: FC<PropsWithClassName<Props>> = forwardRef(
     }>,
   ) => {
     return (
-      <LabelWrapper label={label} className={className}>
+      <LabelWrapper
+        label={label}
+        labelPosition={labelPosition}
+        className={className}
+      >
         <ErrorWrapper message={error}>
           <DatePicker
             ref={ref}

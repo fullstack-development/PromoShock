@@ -13,6 +13,7 @@
 
 .title {
   @include h1;
+  text-align: center;
 }
 
 .grid {
@@ -24,9 +25,6 @@
 
 .contents {
   display: contents;
-  > *:first-child {
-    margin-left: auto;
-  }
 }
 
 .col_1 {
@@ -123,16 +121,13 @@
   }
 }
 
-.first_row {
-  > * {
+.column {
+  > *:first-child > * {
     margin-bottom: 56px;
   }
-}
-
-.last_row {
-  > * {
+  > *:last-child > * {
     margin-bottom: 0;
-  }
+  } 
 }
 
 .action {

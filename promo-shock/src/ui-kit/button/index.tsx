@@ -13,6 +13,7 @@ type Props = {
   loading?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   theme?: "primary" | "secondary" | "tertiary";
+  error?: boolean;
   className?: string;
 };
 
@@ -23,14 +24,14 @@ const Button: FC<Props> = ({
   loading,
   onClick,
   className,
+  error,
   theme = "primary",
   size = "medium",
 }) => {
   return (
     <AntdButton
       htmlType={type}
-      loading={loading}
-      disabled={disabled}
+      disabled={disabled || loading || error}
       onClick={onClick}
       className={cn(className, styles.button, {
         [styles.theme_primary]: theme === "primary",
@@ -39,6 +40,8 @@ const Button: FC<Props> = ({
         [styles.size_default]: size === "medium",
         [styles.size_large]: size === "large",
         [styles.size_largeWide]: size === "largeWide",
+        [styles.loading]: loading,
+        [styles.error]: error,
       })}
     >
       {text}
