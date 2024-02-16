@@ -26,7 +26,7 @@ const georama = Georama({
   subsets: ["latin"],
   variable: "--font-georama",
 });
-const W95FA = localFont({ src: "./W95FA.otf" });
+const W95FA = localFont({ src: "../../public/fonts/W95FA.otf" });
 
 const metadata: Metadata = {
   title: "PromoShock",

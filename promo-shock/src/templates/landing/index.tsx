@@ -1,16 +1,21 @@
 "use client";
 
-import dayjs from "dayjs";
 import Image from "next/image";
-import type { FC } from "react";
+import { useState, type FC } from "react";
 
-import { Button, Link, StreamCard, useTabs } from "@promo-shock/ui-kit";
+import {
+  Button,
+  Marquee,
+  StreamCard,
+  TabList,
+  TextLink,
+} from "@promo-shock/ui-kit";
 
 import { DoubleTriangle } from "./img/DoubleTriangle";
 import backgroundIcons from "./img/icons.svg";
 import { Star } from "./img/Star";
-import streamPreview from "./img/stream-preview.png";
 import styles from "./landing.module.scss";
+import { STREAMS_PREVIEWS_MOCK } from "./mocks/fixtures";
 
 const promoTabs = [
   {
@@ -39,40 +44,9 @@ const promoTabs = [
   },
 ];
 
-const streamsPreviews = [
-  {
-    preview: streamPreview.src,
-    cost: 99,
-    date: dayjs("15-07-2025", "DD-MM-YYYY"),
-    title: "Study with the HARVARD STUDY",
-    description: "For the first time in three years, Felix ‘xQc’ Lengye.",
-    ticketsTotal: 50,
-    ticketsLeft: 1,
-  },
-  {
-    preview: streamPreview.src,
-    cost: 999999,
-    date: dayjs("15-07-2025", "DD-MM-YYYY"),
-    title: "Study with the HARVARD STUDY",
-    description:
-      "For the first time in three years, Felix ‘xQc’ Lengyel is not the most-watched streamer on Twitch.",
-    ticketsTotal: 50,
-    ticketsLeft: 0,
-  },
-  {
-    preview: streamPreview.src,
-    cost: 10,
-    date: dayjs("15-07-1999", "DD-MM-YYYY"),
-    title: "Study with the HARVARD STUDY",
-    description:
-      "For the first time in three years, Felix ‘xQc’ Lengyel is not the most-watched streamer on Twitch, as new streamers rise up to the top of the pile.",
-    ticketsTotal: 50,
-    ticketsLeft: 49,
-  },
-];
-
 export const Landing: FC = () => {
-  const { selected, TabList } = useTabs(promoTabs);
+  const [selected, setSelected] = useState(0);
+
   return (
     <main className={styles.root}>
       <Image
@@ -85,7 +59,7 @@ export const Landing: FC = () => {
       <h1 className={styles.title}>Streams with benefits for...</h1>
 
       <div className={styles.tabs}>
-        <TabList />
+        <TabList selected={selected} setSelected={setSelected} tabList={promoTabs} />
         <div className={styles.panels}>
           <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
           <DoubleTriangle />
@@ -101,24 +75,26 @@ export const Landing: FC = () => {
       <div className={styles.upcoming}>
         <div className={styles.ticker}>
           <div className={styles.tickerLine}>
-            <Star />
-            Upcoming Shows
-            <Star />
-            Upcoming Shows
-            <Star />
-            Upcoming Shows
-            <Star />
+            <Marquee
+              direction="left"
+              text={
+                <>
+                  <Star />
+                  Upcoming Shows
+                  <Star />
+                  Upcoming Shows
+                </>
+              }
+            />
           </div>
         </div>
 
         <div className={styles.previewsContainer}>
-          <Link underline href="/CHANGE_ME" className={styles.seeAllShowsLink}>
-            See all shows
-          </Link>
+          <TextLink title="See all shows" underline href="/CHANGE_ME" className={styles.seeAllShowsLink} />
         </div>
 
         <div className={styles.previewsContainer}>
-          {streamsPreviews.map((options) => (
+          {STREAMS_PREVIEWS_MOCK.map((options) => (
             <StreamCard
               key={`${options.title}${options.description}`}
               {...options}
@@ -128,13 +104,17 @@ export const Landing: FC = () => {
 
         <div className={styles.ticker} style={{ top: "calc(100% - 80px)" }}>
           <div className={styles.tickerLine}>
-            <Star />
-            Upcoming Shows
-            <Star />
-            Upcoming Shows
-            <Star />
-            Upcoming Shows
-            <Star />
+            <Marquee
+              direction="right"
+              text={
+                <>
+                  <Star />
+                  Upcoming Shows
+                  <Star />
+                  Upcoming Shows
+                </>
+              }
+            />
           </div>
         </div>
       </div>

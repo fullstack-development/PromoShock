@@ -75,9 +75,9 @@ export const StreamCard: FC<Props> = ({
           {cost} USDT
         </span>
         {ticketsAreOut || streamHasFinished ? (
-          <Button text="Buy access" theme="primary" size="medium" />
-        ) : (
           <Button text="See promos" theme="tertiary" size="medium" />
+        ) : (
+          <Button text="Buy access" theme="primary" size="medium" />
         )}
       </div>
     </div>

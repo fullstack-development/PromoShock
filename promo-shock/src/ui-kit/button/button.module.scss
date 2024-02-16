@@ -10,28 +10,37 @@
   min-height: auto !important;
   line-height: 1 !important;
   font-family: inherit !important;
-  transition: 300ms opacity !important;
+  transition: 300ms background-color !important;
 
   border: none !important;
   &:hover {
     border: none !important;
-    opacity: 0.7;
   }
 }
 
 .theme {
   &_primary {
-    background: $mainPink !important;
+    background-color: $mainPink !important;
+    &:hover {
+      background-color: $boldPink !important;
+    }
   }
   
   &_secondary {
-    background: $mainCyan !important;
+    background-color: $mainCyan !important;
+    &:hover {
+      background-color: $boldCyan !important;
+    }
   }
 
   &_tertiary {
     color: $goldenPurple !important;
     border: 2px solid $goldenPurple !important;
-    background: $fadedPurple !important;
+    background-color: $fadedPurple !important;
+    &:hover {
+      background-color: $fadedBoldPurple !important;
+      border: 2px solid $goldenPurple !important;
+    }
   }
 }
 

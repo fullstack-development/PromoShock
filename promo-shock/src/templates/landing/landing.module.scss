@@ -57,20 +57,22 @@
 .upcoming {
   background: $mainCyan;
   min-height: 865px;
-  width: 100%;
-  padding: 56px;
+  width: 120%;
+  padding: 56px 0 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
   margin-top: 180px;
+  transform: rotate(-2deg);
 }
 
 .seeAllShowsLink {
   font-size: 24px;
   margin-bottom: 40px;
   margin-left: auto;
+  transform: rotate(2deg);
 }
 
 .previewsContainer {
@@ -79,6 +81,7 @@
   align-items: center;
   max-width: 1200px;
   width: 100%;
+  transform: rotate(2deg);
 }
 
 .ticker {
@@ -92,7 +95,6 @@
   white-space: nowrap;
   width: 200%;
   font-family: var(--font-bowlby-one-sc);
-  transform: rotate(-2deg);
 }
 
 .tickerLine {

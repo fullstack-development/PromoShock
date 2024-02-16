@@ -1,6 +1,6 @@
 @import 'src/shared/styles/vars.scss';
 
-.link {
+.textLink {
   transition: 300ms color;
   position: relative;
 
@@ -27,5 +27,20 @@
         height: 9.5px;
       }
     }
+  }
+}
+
+.tabLink {
+  padding: 8px 24px;
+  border-radius: 16px;
+  transition: 300ms color;
+
+  &:hover {
+    color: $mainPink;
+  }
+
+  &_active {
+    color: $mainPink;
+    background-color: $dustRed;
   }
 }
