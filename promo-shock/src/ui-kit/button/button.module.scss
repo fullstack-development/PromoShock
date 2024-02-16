@@ -12,9 +12,9 @@
   font-family: inherit !important;
   transition: 300ms background-color !important;
 
-  border: none !important;
+  border: 2px solid transparent !important;
   &:hover {
-    border: none !important;
+    border: 2px solid transparent !important;
   }
 }
 
@@ -47,17 +47,17 @@
 .size {
   &_default {
     font-size: 20px !important;
-    padding: 8px 24px !important;
+    padding: 6px 24px !important;
   }
 
   &_large {
     font-size: 32px !important;
-    padding: 24px !important;
+    padding: 22px 24px !important;
   }
 
   &_largeWide {
     font-size: 32px !important;
-    padding: 24px !important;
+    padding: 22px 24px !important;
     min-width: 480px;
   }
 }
