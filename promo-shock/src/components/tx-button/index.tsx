@@ -143,7 +143,10 @@ const TxButton: FC<Props> = ({
           {isInsufficientBalance
             ? "You need some BNB in your wallet to send a transaction."
             : isInsufficientTokenBalance
-            ? `You need some ${tokenSymbol?.result} in your wallet to send a transaction.`
+            ? `You need ${formatUnits(
+                tokenAmount!,
+                tokenDecimals!.result!,
+              )} ${tokenSymbol?.result} in your wallet to send a transaction.`
             : ""}
           <br />
           {process.env.NEXT_PUBLIC_IS_TESTNET === "true" ? (
