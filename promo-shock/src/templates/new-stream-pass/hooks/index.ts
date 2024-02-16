@@ -1,8 +1,8 @@
-import { dagJson } from "@helia/dag-json";
 import { useMutation } from "@tanstack/react-query";
-import { createHelia } from "helia";
 
 import { useWriteTicketFactoryCreateTicketSale } from "@generated/wagmi";
+
+import { pinFIleToIPFS, pinJSONToIPFS } from "@promo-shock/shared/utils/ipfs";
 
 import type { Metadata } from "../types";
 
@@ -13,18 +13,28 @@ const useCreateStream = () => {
 const useWriteMetadata = () => {
   return useMutation({
     mutationFn: async (metadata: Metadata) => {
-      const node = await createHelia();
-      const d = dagJson(node);
-      const image = await d.add(metadata.image);
-      const banner = await d.add(metadata.banner);
-      const cid = await d.add({
-        ...metadata,
-        image: image,
-        banner: banner,
-        external_link: process.env.NEXT_PUBLIC_METADATA_EXTERNAL_LINK,
-      });
+      const imageCID = await pinFIleToIPFS(
+        metadata.image,
+        { cidVersion: 1 },
+        { name: `ticket-image.${metadata.image.type}` },
+      );
+      const bannerCID = await pinFIleToIPFS(
+        metadata.banner,
+        { cidVersion: 1 },
+        { name: `ticket-banner.${metadata.banner.type}` },
+      );
+      const metadataCID = await pinJSONToIPFS(
+        {
+          ...metadata,
+          image: `https://ipfs.io/ipfs/${imageCID}`,
+          banner: `https://ipfs.io/ipfs/${bannerCID}`,
+          external_link: process.env.NEXT_PUBLIC_METADATA_EXTERNAL_LINK,
+        },
+        { cidVersion: 1 },
+        { name: "ticket-metadata.json" },
+      );
 
-      return cid;
+      return metadataCID;
     },
   });
 };

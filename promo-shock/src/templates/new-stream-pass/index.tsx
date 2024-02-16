@@ -7,7 +7,6 @@ import { Controller, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 
 import { useIsMounted } from "@promo-shock/shared/hooks";
-import { readFileAsDataURL } from "@promo-shock/shared/utils";
 import {
   Button,
   DateField,
@@ -43,14 +42,8 @@ const NewStreamPass: FC = () => {
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
-    const [image, banner] = await Promise.all([
-      readFileAsDataURL(data.stream_image.originFileObj!),
-      readFileAsDataURL(data.stream_banner.originFileObj!),
-    ]);
     try {
-      const cid = await metadata.mutateAsync({
-        image,
-        banner,
+      const tokenUri = await metadata.mutateAsync({
         name: data.stream_name,
         description: data.stream_description,
         start_time: data.stream_date
@@ -60,6 +53,8 @@ const NewStreamPass: FC = () => {
           .unix(),
         stream_link: data.stream_link,
         streamer_link: data.streamer_link,
+        image: data.stream_image.originFileObj!,
+        banner: data.stream_banner.originFileObj!,
       });
       await createStream.writeContractAsync({
         args: [
@@ -72,7 +67,7 @@ const NewStreamPass: FC = () => {
           {
             name: data.stream_name,
             symbol: data.stream_symbol,
-            baseUri: `ipfs://${cid.toString()}`,
+            baseUri: tokenUri,
             cap: data.stream_cap,
           },
         ],

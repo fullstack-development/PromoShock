@@ -16,8 +16,8 @@ type CreateTicketData = {
 type Metadata = {
   name: string;
   description: string;
-  image: string;
-  banner: string;
+  image: File;
+  banner: File;
   start_time: number;
   stream_link: string;
   streamer_link: string;
