@@ -12,19 +12,19 @@ type Props = {
 
 const Link: FC<PropsWithClassName<PropsWithChildren<Props>>> = ({
   children,
-  className,
   href,
   external,
   passHref,
   legacyBehavior,
+  ...rest
 }) => {
   return (
     <NextLink
       href={href}
       passHref={passHref}
-      className={className}
       legacyBehavior={legacyBehavior}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      {...rest}
     >
       {children}
     </NextLink>

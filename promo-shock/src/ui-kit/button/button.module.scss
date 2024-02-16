@@ -1,0 +1,63 @@
+@import 'src/shared/styles/vars.scss';
+
+.button {
+  color: $textSecondary !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: min-content !important;
+  min-height: auto !important;
+  line-height: 1 !important;
+  font-family: inherit !important;
+  transition: 300ms background-color !important;
+
+  border: 2px solid transparent !important;
+  &:hover {
+    border: 2px solid transparent !important;
+  }
+}
+
+.theme {
+  &_primary {
+    background-color: $mainPink !important;
+    &:hover {
+      background-color: $boldPink !important;
+    }
+  }
+  
+  &_secondary {
+    background-color: $mainCyan !important;
+    &:hover {
+      background-color: $boldCyan !important;
+    }
+  }
+
+  &_tertiary {
+    color: $goldenPurple !important;
+    border: 2px solid $goldenPurple !important;
+    background-color: $fadedPurple !important;
+    &:hover {
+      background-color: $fadedBoldPurple !important;
+      border: 2px solid $goldenPurple !important;
+    }
+  }
+}
+
+.size {
+  &_default {
+    font-size: 20px !important;
+    padding: 6px 24px !important;
+  }
+
+  &_large {
+    font-size: 32px !important;
+    padding: 22px 24px !important;
+  }
+
+  &_largeWide {
+    font-size: 32px !important;
+    padding: 22px 24px !important;
+    min-width: 480px;
+  }
+}

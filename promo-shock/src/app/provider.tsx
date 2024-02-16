@@ -16,7 +16,7 @@ const RootProvider: FC<PropsWithChildren> = ({ children }) => {
     <WagmiProvider config={web3Config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider modalSize="compact">
-          <AntdRegistry>{children}/</AntdRegistry>
+          <AntdRegistry>{children}</AntdRegistry>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

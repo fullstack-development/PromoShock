@@ -1,0 +1,61 @@
+@import 'src/shared/styles/vars.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #FFF;
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 360px;
+  padding-bottom: 24px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.subtitle {
+  color: $textSubtitle;
+  font-size: 14px;
+  font-family: var(--font-georama);
+}
+
+.error {
+  color: $mainError;
+}
+
+.fire {
+  color: #FFF;
+}
+
+.description {
+  font-family: var(--font-georama);
+  line-height: 24px;
+  font-size: 16px;
+  height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 24px;
+}
+
+.title {
+  color: $goldenPurple;
+  font-weight: 500;
+}
+
+.cost {
+  font-size: 24px;
+
+  &_lineThrough {
+    text-decoration: line-through;
+    color: $gray7;
+  }
+}

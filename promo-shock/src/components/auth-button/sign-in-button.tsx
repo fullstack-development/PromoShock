@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { useAuthStore } from "@promo-shock/services";
 import { Button } from "@promo-shock/ui-kit";
 
-type Props = Pick<ComponentProps<typeof Button>, "size">;
+type Props = Pick<ComponentProps<typeof Button>, "size" | "theme">;
 
 const SignInButton: FC<Props> = (props) => {
   const { address } = useAccount();

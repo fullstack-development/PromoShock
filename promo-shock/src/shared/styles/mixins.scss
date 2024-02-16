@@ -1,0 +1,8 @@
+@import 'src/shared/styles/vars.scss';
+
+@mixin h1 {
+  font-size: 104px;
+  color: $mainPink;
+  font-family: var(--font-bowlby-one);
+  line-height: 93.6px;
+}

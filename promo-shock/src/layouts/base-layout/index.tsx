@@ -9,7 +9,7 @@ const BaseLayout: FC<PropsWithChildren> = ({ children }) => {
     <div className={classes.root}>
       <Header />
       {children}
-      <Footer />
+      <Footer gutterBottom />
     </div>
   );
 };

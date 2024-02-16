@@ -1,0 +1,58 @@
+@import 'src/shared/styles/vars.scss';
+
+.root {
+  background-image: url('./img/layout-background.png');
+  background-repeat: repeat;
+  background-color: $mainBackground;
+}
+
+.header {
+  padding: 16px 60px;
+  background: white;
+  position: relative;
+
+  &::after {
+    content: "";
+    height: 36px;
+    width: 100%;
+    background-image: url('./img/header-scrap.svg');
+    background-position: bottom center;
+    position: absolute;
+    top: 99%;
+    left: 0;
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.mirror {
+  padding-top: 120px;
+  &::after {
+    bottom: 99%;
+    top: unset;
+    transform: rotate(180deg);
+  }
+}
+
+.gutterBottom {
+  margin-top: -50px;
+}
+
+.rightPart {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

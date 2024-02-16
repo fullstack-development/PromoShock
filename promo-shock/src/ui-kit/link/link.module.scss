@@ -1,0 +1,46 @@
+@import 'src/shared/styles/vars.scss';
+
+.textLink {
+  transition: 300ms color;
+  position: relative;
+
+  &_underline {
+    &::after {
+      width: 100%;
+      height: 5px;
+      border-radius: 5px;
+      content: "";
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: $mainPink;
+      transform: rotate(-2deg);
+      transition: 300ms height;
+    }
+  }
+
+  &:hover {
+    color: $mainPink;
+
+    &.link_underline {
+      &::after {
+        height: 9.5px;
+      }
+    }
+  }
+}
+
+.tabLink {
+  padding: 8px 24px;
+  border-radius: 16px;
+  transition: 300ms color;
+
+  &:hover {
+    color: $mainPink;
+  }
+
+  &_active {
+    color: $mainPink;
+    background-color: $dustRed;
+  }
+}
