@@ -43,7 +43,7 @@ const NewStreamPass: FC = () => {
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     try {
-      const tokenUri = await metadata.mutateAsync({
+      const metadataCid = await metadata.mutateAsync({
         name: data.stream_name,
         description: data.stream_description,
         start_time: data.stream_date
@@ -67,7 +67,7 @@ const NewStreamPass: FC = () => {
           {
             name: data.stream_name,
             symbol: data.stream_symbol,
-            baseUri: tokenUri,
+            baseUri: `https://ipfs.io/ipfs/${metadataCid}`,
             cap: data.stream_cap,
           },
         ],
