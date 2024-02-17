@@ -7,4 +7,3 @@ const StreamsPage: FC = () => {
 };
 
 export default StreamsPage;
-
