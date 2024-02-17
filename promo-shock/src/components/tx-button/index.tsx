@@ -11,7 +11,6 @@ import {
 } from "wagmi";
 
 import { ONCHAIN_VARS_STALE_TIME } from "@promo-shock/shared/constants";
-import { useIsMounted } from "@promo-shock/shared/hooks";
 import { Button } from "@promo-shock/ui-kit";
 
 import classes from "./tx-button.module.scss";
@@ -36,7 +35,6 @@ const TxButton: FC<Props> = ({
   ...rest
 }) => {
   const estimatedGasFee = useEstimateFeesPerGas();
-  const isMounted = useIsMounted();
   const account = useAccount();
   const balance = useBalance({ address: account.address });
   const contract = useWriteContract();
@@ -121,22 +119,25 @@ const TxButton: FC<Props> = ({
     } catch (error) {}
   };
 
-  if (!(account.address && isMounted)) return null;
+  const isLoading =
+    loading ||
+    tokenInfo.isLoading ||
+    tokenAllowanceData.isLoading ||
+    balance.isLoading ||
+    contract.isPending;
+
+  const isSufficientBalances = !(
+    isInsufficientBalance || isInsufficientTokenBalance
+  );
 
   return (
     <div className={classes.error_wrap}>
       <Button
         {...rest}
         type={isInsufficientAllowance ? "button" : type}
-        loading={
-          (loading ||
-            tokenInfo.isLoading ||
-            tokenAllowanceData.isLoading ||
-            contract.isPending) &&
-          !(isInsufficientBalance || isInsufficientTokenBalance)
-        }
+        loading={isLoading && isSufficientBalances}
         text={
-          loading && !(isInsufficientBalance || isInsufficientTokenBalance)
+          isLoading && isSufficientBalances
             ? "Blockchain magic happening"
             : isInsufficientAllowance
             ? `Approve ${formatUnits(
@@ -145,12 +146,13 @@ const TxButton: FC<Props> = ({
               )} ${tokenSymbol?.result}`
             : text
         }
+        disabled={!account.address}
         size="large"
         theme="secondary"
         onClick={handleClick}
-        error={isInsufficientBalance || isInsufficientTokenBalance}
+        error={!isSufficientBalances}
       />
-      {(isInsufficientBalance || isInsufficientTokenBalance) && (
+      {!isSufficientBalances && (
         <span className={classes.error_message}>
           {isInsufficientBalance
             ? "You need some BNB in your wallet to send a transaction."

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
 
@@ -50,19 +49,8 @@ const promoTabs = [
 
 export const Landing: FC = () => {
   const [selected, setSelected] = useState(0);
-  const router = useRouter();
-
-  const handleTryClick = () => {
-    const { href } = promoTabs[selected];
-    if (href) {
-      router.push(href);
-    }
-  };
 
   const handleSelect = (index: number) => {
-    const { href } = promoTabs[index];
-    if (href) router.prefetch(href);
-
     setSelected(index);
   };
 
@@ -96,7 +84,7 @@ export const Landing: FC = () => {
           theme="secondary"
           size="largeWide"
           text="I wanna try"
-          onClick={handleTryClick}
+          href={promoTabs[selected].href}
         />
       </div>
 
@@ -170,7 +158,7 @@ export const Landing: FC = () => {
           theme="secondary"
           size="largeWide"
           text="I wanna try"
-          onClick={handleTryClick}
+          href={promoTabs[selected].href}
         />
       </div>
     </main>

@@ -1,3 +1,4 @@
+"use client";
 import type { ReactElement } from "react";
 import type {
   FieldArrayPath,
@@ -25,6 +26,7 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   label?: string;
   labelPosition?: "top" | "left";
   errors?: Array<string | undefined>;
+  disabled?: boolean;
   placeholder?: string;
 };
 
@@ -35,6 +37,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   placeholder,
   errors,
   labelPosition = "left",
+  disabled,
   className,
 }: PropsWithClassName<Props<T, K>>): ReactElement => {
   const fieldset = useFieldArray({ control, name });
@@ -66,6 +69,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                       <TextField
                         placeholder={placeholder}
                         labelPosition="top"
+                        disabled={disabled}
                         {...field}
                       />
                     </ErrorWrapper>
@@ -73,6 +77,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                       text="Add more"
                       theme="tertiary"
                       onClick={handleAppend}
+                      disabled={disabled}
                     />
                   </>
                 ) : (
@@ -81,6 +86,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                       <TextField
                         placeholder={placeholder}
                         labelPosition="top"
+                        disabled={disabled}
                         {...field}
                       />
                     </ErrorWrapper>
@@ -88,6 +94,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                       type="button"
                       onClick={mkHandleRemove(index)}
                       className={classes.remove}
+                      disabled={disabled}
                     >
                       <IconDelete />
                     </button>

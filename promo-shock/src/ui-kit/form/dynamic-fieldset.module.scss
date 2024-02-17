@@ -12,4 +12,7 @@
 .remove {
   display: grid;
   cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+  }
 }

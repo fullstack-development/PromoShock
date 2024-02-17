@@ -4,13 +4,12 @@ import type { ComponentProps, FC } from "react";
 import { useAccount, useAccountEffect } from "wagmi";
 
 import { useAuthStore } from "@promo-shock/services";
-import { useIsMounted } from "@promo-shock/shared/hooks";
 import { trim } from "@promo-shock/shared/utils";
 import { Button } from "@promo-shock/ui-kit";
 
 type Props = Pick<ComponentProps<typeof Button>, "size" | "theme">;
 
-const Component: FC<Props> = (props) => {
+const WalletButton: FC<Props> = (props) => {
   const authStore = useAuthStore();
   const { address } = useAccount();
   const { openConnectModal = () => void 0 } = useConnectModal();
@@ -32,15 +31,11 @@ const Component: FC<Props> = (props) => {
     <Button
       text={address ? trim(address, 5, 5) : "Connect"}
       onClick={handleOpen}
+      theme="primary"
+      size="medium"
       {...props}
     />
   );
-};
-
-const WalletButton: FC<Props> = (props) => {
-  const isMounted = useIsMounted();
-
-  return isMounted && <Component theme="primary" size="medium" {...props} />;
 };
 
 export { WalletButton };

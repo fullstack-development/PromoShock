@@ -10,7 +10,12 @@ export const Streams: FC = () => {
     <main className={styles.root}>
       <h1 className={styles.title}>Streams</h1>
 
-      <Button theme="quaternary" size="big" text="Add my own stream here" />
+      <Button
+        theme="quaternary"
+        size="big"
+        text="Add my own stream here"
+        href="/streams/pass-page"
+      />
 
       <CardList>
         {[STREAMS_PREVIEWS_MOCK, STREAMS_PREVIEWS_MOCK, STREAMS_PREVIEWS_MOCK]

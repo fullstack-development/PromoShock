@@ -5,8 +5,11 @@ import cn from "classnames";
 import type { Metadata } from "next";
 import { Bowlby_One, Bowlby_One_SC, Georama } from "next/font/google";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
 import type { FC, PropsWithChildren } from "react";
+import { cookieToInitialState } from "wagmi";
 
+import { web3Config } from "@promo-shock/configs/web3";
 import { BaseLayout } from "@promo-shock/layouts";
 
 import { RootProvider } from "./provider";
@@ -33,6 +36,10 @@ const metadata: Metadata = {
 };
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => {
+  const web3InitialState = cookieToInitialState(
+    web3Config,
+    headers().get("cookie"),
+  );
   return (
     <html lang="en">
       <body
@@ -43,7 +50,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           georama.variable,
         )}
       >
-        <RootProvider>
+        <RootProvider web3InitialState={web3InitialState}>
           <BaseLayout>{children}</BaseLayout>
         </RootProvider>
       </body>

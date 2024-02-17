@@ -12,7 +12,12 @@ export const Promos: FC = () => {
     <main className={styles.root}>
       <h1 className={styles.title}>Streams</h1>
 
-      <Button theme="quaternary" size="big" text="Add my own stream here" />
+      <Button
+        theme="quaternary"
+        size="big"
+        text="Add my own stream here"
+        href="/promos/new-promo"
+      />
 
       <CardList>
         {PROMOS_LIST_MOCK.map((options) => (

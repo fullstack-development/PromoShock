@@ -24,6 +24,7 @@ type Props = {
   max?: number;
   width?: number;
   height?: number;
+  disabled?: boolean;
   onChange?(value: UploadFile): void;
 };
 
@@ -37,6 +38,7 @@ const ImageUploader: FC<PropsWithClassName<Props>> = forwardRef(
       defaultValue,
       placeholder,
       className,
+      disabled,
       onChange,
     },
     ref?: Ref<UploadRef>,
@@ -62,6 +64,7 @@ const ImageUploader: FC<PropsWithClassName<Props>> = forwardRef(
             defaultFileList={defaultValue && [defaultValue]}
             onChange={handleChange}
             rootClassName={classes.input}
+            disabled={disabled}
           >
             {imageDataUrl ? (
               <Image
