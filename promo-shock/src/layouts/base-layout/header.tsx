@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { FC } from "react";
 
 import { WalletButton } from "@promo-shock/components";
-import { Link, Logo, TabLink } from "@promo-shock/ui-kit";
+import { Link, Logo, TabLink, TextLink } from "@promo-shock/ui-kit";
 
 import styles from "./base-layout.module.scss";
 
@@ -25,9 +25,23 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
       )}
     >
       <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          <Logo />
-        </Link>
+        <div className={styles.rightPart}>
+          <Link href="/" className={styles.logo}>
+            <Logo />
+          </Link>
+
+          {isMirror && (
+            <span>
+              Delivered by{" "}
+              <TextLink
+                title="MetaLamp team"
+                href="https://metalamp.io/"
+                external
+                underline
+              />
+            </span>
+          )}
+        </div>
 
         <div className={styles.rightPart}>
           <nav className={styles.nav}>
@@ -41,6 +55,20 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
               href="/promos"
               text="Promo"
             />
+            {isMirror && (
+              <>
+                <TabLink
+                  active={pathname.includes("about")}
+                  href="/about"
+                  text="About"
+                />
+                <TabLink
+                  active={pathname.includes("roadmap")}
+                  href="/roadmap"
+                  text="Roadmap"
+                />
+              </>
+            )}
           </nav>
           <WalletButton />
         </div>

@@ -3,13 +3,13 @@
 import { useRouter } from "next/navigation";
 import type { FC } from "react";
 
-import type { Promo } from "@promo-shock/shared/types";
-import { CardList, PromoCard, TabList } from "@promo-shock/ui-kit";
+import type { Stream } from "@promo-shock/shared/types";
+import { CardList, StreamCard, TabList } from "@promo-shock/ui-kit";
 
-import styles from "./my-promos.module.scss";
+import styles from "./my-streams.module.scss";
 
 type Props = {
-  data: Promo[];
+  data: Stream[];
 };
 
 const tabs = [
@@ -17,11 +17,11 @@ const tabs = [
   { label: "My promos", url: "/profile/my-promos" },
 ];
 
-export const MyPromos: FC<Props> = ({ data }) => {
+export const MyStreams: FC<Props> = ({ data }) => {
   const router = useRouter();
 
-  const selected = 1;
-  const opposite = 0;
+  const selected = 0;
+  const opposite = 1;
 
   const handleSelect = () => {
     router.push(tabs[opposite].url);
@@ -29,15 +29,16 @@ export const MyPromos: FC<Props> = ({ data }) => {
 
   return (
     <main className={styles.root}>
-      <h1 className={styles.title}>My promos</h1>
+      <h1 className={styles.title}>My streams</h1>
 
       <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
 
       <CardList>
         {data.map((options) => (
-          <PromoCard
+          <StreamCard
             key={`${options.title}${options.description}`}
             {...options}
+            onlyWatch
           />
         ))}
       </CardList>

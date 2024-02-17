@@ -17,6 +17,7 @@ type Props = {
   theme?: "primary" | "secondary" | "tertiary" | "quaternary";
   error?: boolean;
   className?: string;
+  fullwidth?: boolean;
 };
 
 const Button: FC<Props> = ({
@@ -30,6 +31,7 @@ const Button: FC<Props> = ({
   error,
   theme = "primary",
   size = "medium",
+  fullwidth,
 }) => {
   const button = (
     <AntdButton
@@ -46,6 +48,7 @@ const Button: FC<Props> = ({
         [styles.size_large]: size === "large",
         [styles.size_largeWide]: size === "largeWide",
         [styles.size_big]: size === "big",
+        [styles.fullwidth]: fullwidth,
         [styles.disabled]: disabled || error,
         [styles.loading]: loading,
         [styles.error]: error,

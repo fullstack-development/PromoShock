@@ -14,6 +14,7 @@ type Props = {
   description: string;
   ticketsTotal: number;
   ticketsLeft: number;
+  onlyWatch?: boolean;
 };
 
 export const StreamCard: FC<Props> = ({
@@ -24,6 +25,7 @@ export const StreamCard: FC<Props> = ({
   description,
   ticketsTotal,
   ticketsLeft,
+  onlyWatch,
 }) => {
   const date = dayjs(dateTimestamp);
   const ticketsAreOut = ticketsLeft < 1 && date.isAfter(dayjs());
@@ -67,17 +69,24 @@ export const StreamCard: FC<Props> = ({
       </div>
 
       <div className={cn(styles.row, styles.bottomDivider)}>
-        <span
-          className={cn(styles.cost, {
-            [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
-          })}
-        >
-          {cost} USDT
-        </span>
-        {ticketsAreOut || streamHasFinished ? (
-          <Button text="See promos" theme="tertiary" size="medium" />
-        ) : (
-          <Button text="Buy access" theme="primary" size="medium" />
+        {!onlyWatch && (
+          <>
+            <span
+              className={cn(styles.cost, {
+                [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
+              })}
+            >
+              {cost} USDT
+            </span>
+            {ticketsAreOut || streamHasFinished ? (
+              <Button text="See promos" theme="tertiary" size="medium" />
+            ) : (
+              <Button text="Buy access" theme="primary" size="medium" />
+            )}
+          </>
+        )}
+        {onlyWatch && (
+          <Button theme="quaternary" size="big" fullwidth text="Watch stream" />
         )}
       </div>
     </div>
