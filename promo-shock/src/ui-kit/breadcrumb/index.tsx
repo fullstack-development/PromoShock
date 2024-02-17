@@ -17,14 +17,25 @@ const Breadcrumb: FC<Props> = ({ paths }) => {
       items={paths.map((path, i) => ({
         title:
           i === paths.length - 1 ? (
-            <span>{path.title}</span>
+            <span
+              className={classNames(classes.item, {
+                [classes.current]: i === paths.length - 1,
+                [classes.link]: i !== paths.length - 1,
+              })}
+            >
+              {path.title}
+            </span>
           ) : (
-            <Link href={path.href}>{path.title}</Link>
+            <Link
+              href={path.href}
+              className={classNames(classes.item, {
+                [classes.current]: i === paths.length - 1,
+                [classes.link]: i !== paths.length - 1,
+              })}
+            >
+              {path.title}
+            </Link>
           ),
-        className: classNames(classes.item, {
-          [classes.current]: i === paths.length - 1,
-          [classes.link]: i !== paths.length - 1,
-        }),
       }))}
     />
   );

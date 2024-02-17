@@ -3,7 +3,7 @@
 .root {
   font-family: inherit !important;
 
-  & :global(a.ant-breadcrumb-link:hover) {
+  & *:hover {
     background: none !important;
   }
 }
@@ -29,8 +29,5 @@
 
 .link {
   color: $goldenPurple !important;
-
-  > * {
-    cursor: pointer;
-  }
+  cursor: pointer;
 }
