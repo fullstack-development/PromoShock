@@ -19,6 +19,7 @@ type Props = {
   placeholder?: string;
   min?: Dayjs;
   error?: string;
+  disabled?: boolean;
   onChange?(value: Dayjs): void;
 };
 

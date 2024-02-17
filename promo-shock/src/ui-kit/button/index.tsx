@@ -4,10 +4,12 @@ import cn from "classnames";
 import type { FC, MouseEventHandler } from "react";
 
 import styles from "./button.module.scss";
+import { Link } from "../link";
 
 type Props = {
   text: string;
   type?: "button" | "submit";
+  href?: string;
   size?: "medium" | "big" | "large" | "largeWide";
   disabled?: boolean;
   loading?: boolean;
@@ -21,6 +23,7 @@ const Button: FC<Props> = ({
   text,
   type = "button",
   disabled,
+  href,
   loading,
   onClick,
   className,
@@ -28,10 +31,11 @@ const Button: FC<Props> = ({
   theme = "primary",
   size = "medium",
 }) => {
-  return (
+  const button = (
     <AntdButton
       htmlType={type}
       disabled={disabled || loading || error}
+      href={href}
       onClick={onClick}
       className={cn(className, styles.button, {
         [styles.theme_primary]: theme === "primary",
@@ -42,13 +46,21 @@ const Button: FC<Props> = ({
         [styles.size_large]: size === "large",
         [styles.size_largeWide]: size === "largeWide",
         [styles.size_big]: size === "big",
-        [styles.disabled]: disabled,
+        [styles.disabled]: disabled || error,
         [styles.loading]: loading,
         [styles.error]: error,
       })}
     >
       {text}
     </AntdButton>
+  );
+
+  return href ? (
+    <Link href={href} passHref legacyBehavior>
+      {button}
+    </Link>
+  ) : (
+    button
   );
 };
 

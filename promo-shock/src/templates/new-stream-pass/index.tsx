@@ -6,7 +6,7 @@ import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig, useWaitForTransactionReceipt } from "wagmi";
+import { useClient, useConfig } from "wagmi";
 
 import { simulateTicketFactoryCreateTicketSale } from "@generated/wagmi";
 
@@ -41,9 +41,6 @@ const NewStreamPass: FC = () => {
   const client = useClient();
   const metadata = useWriteMetadata();
   const createStream = useCreateStream();
-  const transactionReceipt = useWaitForTransactionReceipt({
-    hash: createStream.data,
-  });
   const [estimatedGasForCreateStream, setEstimatedGasForCreateStream] =
     useState<bigint>();
 
@@ -100,6 +97,10 @@ const NewStreamPass: FC = () => {
     }
   };
 
+  const isPending = createStream.isPending || metadata.isPending;
+
+  const isLoading = isPending;
+
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
       <h1 className={classes.title}>New stream pass</h1>
@@ -113,6 +114,7 @@ const NewStreamPass: FC = () => {
                 <div />
                 <ImageUploader
                   {...field}
+                  disabled={isPending}
                   aspectRatio="416/307"
                   placeholder="Upload banner"
                   accept="image/jpeg, image/png"
@@ -126,6 +128,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <TextField
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Stream name:"
                 placeholder="Study with the HARVARD STUDY"
@@ -139,6 +142,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <TextArea
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="More about:"
                 placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
@@ -153,6 +157,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <TextField
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Link to watch stream:"
                 placeholder="heretowatch.com"
@@ -175,6 +180,7 @@ const NewStreamPass: FC = () => {
               render={({ field }) => (
                 <DateField
                   {...field}
+                  disabled={isPending}
                   className={classes.contents}
                   label="Date to watch:"
                   placeholder="13.12.2024"
@@ -188,6 +194,7 @@ const NewStreamPass: FC = () => {
               render={({ field }) => (
                 <TimeField
                   {...field}
+                  disabled={isPending}
                   label="Time to watch:"
                   placeholder="15:00:00"
                   error={errors.stream_time?.message}
@@ -208,6 +215,7 @@ const NewStreamPass: FC = () => {
               render={({ field }) => (
                 <NumberField
                   {...field}
+                  disabled={isPending}
                   className={classes.contents}
                   label="Passes amount:"
                   placeholder="100"
@@ -222,6 +230,7 @@ const NewStreamPass: FC = () => {
               render={({ field }) => (
                 <NumberField
                   {...field}
+                  disabled={isPending}
                   label="Price for each pass:"
                   placeholder="100"
                   suffix="USDT"
@@ -237,6 +246,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <RangeDateField
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Selling passes period:"
                 placeholder={["13.12.2024", "14.12.2024"]}
@@ -250,6 +260,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <TextField
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Link to follow you:"
                 placeholder="heretowatch.com"
@@ -269,6 +280,7 @@ const NewStreamPass: FC = () => {
                 <div />
                 <ImageUploader
                   {...field}
+                  disabled={isPending}
                   aspectRatio="416/307"
                   placeholder="Upload NFT image"
                   accept="image/jpeg, image/png"
@@ -282,6 +294,7 @@ const NewStreamPass: FC = () => {
             render={({ field }) => (
               <TextField
                 {...field}
+                disabled={isPending}
                 className={classNames(classes.col_2, classes.contents)}
                 label="NFT name:"
                 placeholder="Study with the HARVARD STUDY"
@@ -296,11 +309,7 @@ const NewStreamPass: FC = () => {
         <TxButton
           type="submit"
           text={"Drop the pass"}
-          loading={
-            createStream.isPending ||
-            metadata.isPending ||
-            transactionReceipt.isFetching
-          }
+          loading={isLoading}
           estimatedGas={estimatedGasForCreateStream}
         />
       </div>

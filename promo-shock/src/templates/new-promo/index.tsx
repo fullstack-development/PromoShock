@@ -8,7 +8,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { formatUnits } from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig, useWaitForTransactionReceipt } from "wagmi";
+import { useClient, useConfig } from "wagmi";
 
 import { simulatePromoFactoryCreatePromo } from "@generated/wagmi";
 
@@ -49,9 +49,6 @@ const NewPromo: FC = () => {
   const streamAddresses = useWatch({
     control,
     name: "promo_stream_addresses",
-  });
-  const transactionReceipt = useWaitForTransactionReceipt({
-    hash: createPromo.data,
   });
   const [creationPrice, tokenInfo, tokenAddress] = usePaymentInfo();
 
@@ -112,6 +109,14 @@ const NewPromo: FC = () => {
         }`
       : undefined;
 
+  const isPending = createPromo.isPending || writeMetadata.isPending;
+
+  const isLoading =
+    isPending ||
+    tokenInfo.isLoading ||
+    creationPrice.isLoading ||
+    tokenAddress.isLoading;
+
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
       <h1 className={classes.title}>New Promo</h1>
@@ -127,6 +132,7 @@ const NewPromo: FC = () => {
                   aspectRatio="416/307"
                   placeholder="Upload promo cover"
                   error={errors.promo_cover?.message}
+                  disabled={isPending}
                   {...field}
                 />
               </div>
@@ -141,6 +147,7 @@ const NewPromo: FC = () => {
                 placeholder="Study with the HARVARD STUDY"
                 className={classNames(classes.col_1, classes.contents)}
                 error={errors.promo_name?.message}
+                disabled={isPending}
                 {...field}
               />
             )}
@@ -155,6 +162,7 @@ const NewPromo: FC = () => {
                 placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
                 maxLength={100}
                 error={errors.promo_description?.message}
+                disabled={isPending}
                 {...field}
               />
             )}
@@ -168,6 +176,7 @@ const NewPromo: FC = () => {
                 className={classNames(classes.col_1, classes.contents)}
                 placeholder={["13.12.2024", "24.12.2042"]}
                 error={errors.promo_sale_time?.message}
+                disabled={isPending}
                 {...field}
               />
             )}
@@ -190,6 +199,7 @@ const NewPromo: FC = () => {
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
+              disabled={isPending}
             />
           </div>
         </div>
@@ -199,14 +209,7 @@ const NewPromo: FC = () => {
         <TxButton
           type="submit"
           text={`Pay ${creationPriceSumString} and create promo`}
-          loading={
-            createPromo.isPending ||
-            writeMetadata.isPending ||
-            transactionReceipt.isFetching ||
-            tokenInfo.isLoading ||
-            creationPrice.isLoading ||
-            tokenAddress.isLoading
-          }
+          loading={isLoading}
           estimatedGas={estimatedGasForCreatePromo}
           tokenAddress={tokenAddress.data}
           tokenAmount={creationPriceSum}

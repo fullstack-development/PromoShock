@@ -20,6 +20,7 @@ type Props = {
   prefix?: string;
   suffix?: string;
   error?: string;
+  disabled?: boolean;
   onChange?(value: number | null): void;
 };
 

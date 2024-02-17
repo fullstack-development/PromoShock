@@ -18,6 +18,7 @@ type Props = {
   placeholder?: string;
   maxLength?: number;
   error?: string;
+  disabled?: boolean;
   onChange?(value: string): void;
 };
 

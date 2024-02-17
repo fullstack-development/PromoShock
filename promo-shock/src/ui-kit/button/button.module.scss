@@ -81,6 +81,10 @@
   &_medium {
     font-size: 20px !important;
     padding: 6px 24px !important;
+
+    &.loading > *::after {
+      --size: 1.5;
+    }
   }
 
   &_large {
@@ -88,8 +92,7 @@
     padding: 22px 24px !important;
 
     &.loading > *::after {
-      width: 5px;
-      height: 5px;
+      --size: 2.5;
     }
   }
 
@@ -97,16 +100,20 @@
     font-size: 32px !important;
     padding: 22px 24px !important;
     min-width: 480px;
+
+    &.loading > *::after {
+      --size: 2.5;
+    }
   }
 
   &_big {
     padding: 13px 32px !important;
     font-size: 28px !important;
-  }
-}
 
-.disabled {
-  pointer-events: none; 
+    &.loading > *::after {
+      --size: 2;
+    }
+  }
 }
 
 .loading > * {
@@ -116,6 +123,8 @@
 
   &::after {
     content: '';  
+      width: calc(2px * var(--size));
+      height: calc(2px * var(--size));
     margin-left: 2px;
     background: currentColor;
     box-sizing: border-box;
@@ -123,18 +132,22 @@
   }
 }
 
-.error {
-  border: 2px solid #FF4D4F !important;
-}
-
 @keyframes animloader {
   0% {
-    box-shadow: 10px 0 rgba(255, 255, 255, 0), 20px 0 rgba(255, 255, 255, 0);
+    box-shadow: calc(4px * var(--size)) 0 rgba(255, 255, 255, 0), calc(8px * var(--size)) 0 rgba(255, 255, 255, 0);
   }
   50% {
-    box-shadow: 10px 0 white, 20px 0 rgba(255, 255, 255, 0);
+    box-shadow: calc(4px * var(--size)) 0 currentColor, calc(8px * var(--size)) 0 rgba(255, 255, 255, 0);
   }
   100% {
-    box-shadow: 10px 0 white, 20px 0 white;
+    box-shadow: calc(4px * var(--size)) 0 currentColor, calc(8px * var(--size)) 0 currentColor;
+  }
+}
+
+.error {
+  border: 2px solid #FF4D4F !important;
+
+  &:hover {
+    border: 2px solid #FF4D4F !important;
   }
 }
