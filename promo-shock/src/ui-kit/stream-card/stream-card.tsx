@@ -1,5 +1,4 @@
 import cn from "classnames";
-import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
@@ -10,7 +9,7 @@ import { Button } from "../button";
 type Props = {
   preview: string;
   cost: number;
-  date: Dayjs;
+  date: number;
   title: string;
   description: string;
   ticketsTotal: number;
@@ -20,12 +19,13 @@ type Props = {
 export const StreamCard: FC<Props> = ({
   preview,
   cost,
-  date,
+  date: dateTimestamp,
   title,
   description,
   ticketsTotal,
   ticketsLeft,
 }) => {
+  const date = dayjs(dateTimestamp);
   const ticketsAreOut = ticketsLeft < 1 && date.isAfter(dayjs());
   const streamHasFinished = date.isBefore(dayjs());
 
@@ -66,7 +66,7 @@ export const StreamCard: FC<Props> = ({
         <p>{description}</p>
       </div>
 
-      <div className={styles.row}>
+      <div className={cn(styles.row, styles.bottomDivider)}>
         <span
           className={cn(styles.cost, {
             [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,

@@ -6,3 +6,10 @@
   font-family: var(--font-bowlby-one);
   line-height: 93.6px;
 }
+
+@mixin h3 {
+  font-size: 64px;
+  color: $goldenPurple;
+  font-family: var(--font-bowlby-one);
+  line-height: 57.6px;
+}

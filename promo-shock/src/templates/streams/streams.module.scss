@@ -1,0 +1,18 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  position: relative;
+  overflow-x: hidden;
+  z-index: 1;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  text-align: center;
+}

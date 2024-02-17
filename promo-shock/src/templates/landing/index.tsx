@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type FC } from "react";
+import { useState } from "react";
+import type { FC } from "react";
 
 import {
   Button,
@@ -59,7 +60,11 @@ export const Landing: FC = () => {
       <h1 className={styles.title}>Streams with benefits for...</h1>
 
       <div className={styles.tabs}>
-        <TabList selected={selected} setSelected={setSelected} tabList={promoTabs} />
+        <TabList
+          selected={selected}
+          setSelected={setSelected}
+          tabList={promoTabs}
+        />
         <div className={styles.panels}>
           <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
           <DoubleTriangle />
@@ -90,7 +95,12 @@ export const Landing: FC = () => {
         </div>
 
         <div className={styles.previewsContainer}>
-          <TextLink title="See all shows" underline href="/CHANGE_ME" className={styles.seeAllShowsLink} />
+          <TextLink
+            title="See all shows"
+            underline
+            href="/CHANGE_ME"
+            className={styles.seeAllShowsLink}
+          />
         </div>
 
         <div className={styles.previewsContainer}>
