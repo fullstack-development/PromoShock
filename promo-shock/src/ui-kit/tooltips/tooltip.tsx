@@ -1,8 +1,10 @@
 import { Tooltip as AntdTooltip } from "antd";
 import type { FC, PropsWithChildren } from "react";
 
+import type { TooltipPlacement } from "../types";
+
 type Props = {
-  placement: "top" | "bottom" | "left" | "right";
+  placement: TooltipPlacement;
   title: string;
 };
 

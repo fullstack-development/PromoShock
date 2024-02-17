@@ -4,7 +4,7 @@ import type { ComponentProps, FC } from "react";
 import { Link } from "./link";
 import styles from "./link.module.scss";
 
-type Props = { text: string; active?: boolean } & Omit<
+type Props = { text: string; active?: boolean; onClick?: () => void } & Omit<
   ComponentProps<typeof Link>,
   "children"
 >;

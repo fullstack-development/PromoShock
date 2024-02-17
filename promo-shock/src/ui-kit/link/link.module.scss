@@ -32,8 +32,15 @@
 }
 
 .tabLink {
+  width: max-content;
   padding: 8px 24px;
   border-radius: 16px;
+  font-family: inherit !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+  letter-spacing: 0em !important;
+  text-align: center !important;
   transition: 300ms color;
   cursor: pointer;
 

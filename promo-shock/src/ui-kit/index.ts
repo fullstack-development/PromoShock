@@ -10,3 +10,4 @@ export * from "./tabs";
 export * from "./card-list";
 export * from "./tooltips";
 export * from "./popconfirm";
+export * from "./popover";

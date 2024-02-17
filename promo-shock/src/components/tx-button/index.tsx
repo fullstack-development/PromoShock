@@ -1,3 +1,4 @@
+"use client";
 import type { ComponentProps, FC, MouseEventHandler } from "react";
 import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";

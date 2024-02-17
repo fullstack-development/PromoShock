@@ -15,7 +15,7 @@ export const Promos: FC = () => {
       <Button
         theme="quaternary"
         size="big"
-        text="Add my own stream here"
+        text="Add my own promo here"
         href="/promos/new-promo"
       />
 

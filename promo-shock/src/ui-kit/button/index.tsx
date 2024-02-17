@@ -1,7 +1,8 @@
 "use client";
 import { Button as AntdButton } from "antd";
 import cn from "classnames";
-import type { FC, MouseEventHandler } from "react";
+import { forwardRef } from "react";
+import type { MouseEventHandler } from "react";
 
 import styles from "./button.module.scss";
 import { Link } from "../link";
@@ -20,51 +21,57 @@ type Props = {
   fullwidth?: boolean;
 };
 
-const Button: FC<Props> = ({
-  text,
-  type = "button",
-  disabled,
-  href,
-  loading,
-  onClick,
-  className,
-  error,
-  theme = "primary",
-  size = "medium",
-  fullwidth,
-}) => {
-  const button = (
-    <AntdButton
-      htmlType={type}
-      disabled={disabled || loading || error}
-      href={href}
-      onClick={onClick}
-      className={cn(className, styles.button, {
-        [styles.theme_primary]: theme === "primary",
-        [styles.theme_secondary]: theme === "secondary",
-        [styles.theme_tertiary]: theme === "tertiary",
-        [styles.theme_quaternary]: theme === "quaternary",
-        [styles.size_medium]: size === "medium",
-        [styles.size_large]: size === "large",
-        [styles.size_largeWide]: size === "largeWide",
-        [styles.size_big]: size === "big",
-        [styles.fullwidth]: fullwidth,
-        [styles.disabled]: disabled || error,
-        [styles.loading]: loading,
-        [styles.error]: error,
-      })}
-    >
-      {text}
-    </AntdButton>
-  );
+const Button = forwardRef<HTMLButtonElement, Props>(
+  (
+    {
+      text,
+      type = "button",
+      disabled,
+      href,
+      loading,
+      onClick,
+      className,
+      error,
+      theme = "primary",
+      size = "medium",
+      fullwidth,
+    },
+    ref,
+  ) => {
+    const button = (
+      <AntdButton
+        ref={ref}
+        htmlType={type}
+        disabled={disabled || loading || error}
+        href={href}
+        onClick={onClick}
+        className={cn(className, styles.button, {
+          [styles.theme_primary]: theme === "primary",
+          [styles.theme_secondary]: theme === "secondary",
+          [styles.theme_tertiary]: theme === "tertiary",
+          [styles.theme_quaternary]: theme === "quaternary",
+          [styles.size_medium]: size === "medium",
+          [styles.size_large]: size === "large",
+          [styles.size_largeWide]: size === "largeWide",
+          [styles.size_big]: size === "big",
+          [styles.fullwidth]: fullwidth,
+          [styles.disabled]: disabled || error,
+          [styles.loading]: loading,
+          [styles.error]: error,
+        })}
+      >
+        {text}
+      </AntdButton>
+    );
 
-  return href ? (
-    <Link href={href} passHref legacyBehavior>
-      {button}
-    </Link>
-  ) : (
-    button
-  );
-};
+    return href ? (
+      <Link href={href} passHref legacyBehavior>
+        {button}
+      </Link>
+    ) : (
+      button
+    );
+  },
+);
 
 export { Button };

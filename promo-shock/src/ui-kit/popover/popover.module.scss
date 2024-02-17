@@ -1,0 +1,16 @@
+.root {
+  font-family: unset !important;
+
+  & :global(.ant-popover-inner) {
+    border-radius: 16px !important;
+    background-color: #262626 !important;
+    padding: 0 !important;
+  }
+
+  & :global(.ant-popover-arrow) {
+    &::after,
+    &::before {
+      content: none !important;
+    }
+  }
+}
