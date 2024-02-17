@@ -8,6 +8,7 @@ import {
   useWritePromoFactoryCreatePromo,
 } from "@generated/wagmi";
 
+import { ONCHAIN_VARS_STALE_TIME } from "@promo-shock/shared/constants";
 import { pinFIleToIPFS, pinJSONToIPFS } from "@promo-shock/shared/utils/ipfs";
 
 import type { Metadata } from "../types";
@@ -17,9 +18,20 @@ const useCreatePromo = () => {
 };
 
 const usePaymentInfo = () => {
-  const creationPrice = useReadPromoFactoryGetPromoCreationPrice();
-  const tokenAddress = useReadPromoFactoryGetPaymentTokenAddress();
+  const creationPrice = useReadPromoFactoryGetPromoCreationPrice({
+    query: {
+      staleTime: ONCHAIN_VARS_STALE_TIME,
+    },
+  });
+  const tokenAddress = useReadPromoFactoryGetPaymentTokenAddress({
+    query: {
+      staleTime: ONCHAIN_VARS_STALE_TIME,
+    },
+  });
   const tokenInfo = useReadContracts({
+    query: {
+      staleTime: ONCHAIN_VARS_STALE_TIME,
+    },
     contracts: [
       {
         abi: erc20Abi,

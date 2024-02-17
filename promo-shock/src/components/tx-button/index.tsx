@@ -10,6 +10,7 @@ import {
   useWriteContract,
 } from "wagmi";
 
+import { ONCHAIN_VARS_STALE_TIME } from "@promo-shock/shared/constants";
 import { useIsMounted } from "@promo-shock/shared/hooks";
 import { Button } from "@promo-shock/ui-kit";
 
@@ -40,6 +41,9 @@ const TxButton: FC<Props> = ({
   const balance = useBalance({ address: account.address });
   const contract = useWriteContract();
   const tokenInfo = useReadContracts({
+    query: {
+      staleTime: ONCHAIN_VARS_STALE_TIME,
+    },
     contracts: [
       {
         abi: erc20Abi,
@@ -51,6 +55,10 @@ const TxButton: FC<Props> = ({
         address: tokenAddress,
         functionName: "decimals",
       },
+    ],
+  });
+  const tokenAllowanceData = useReadContracts({
+    contracts: [
       {
         abi: erc20Abi,
         address: tokenAddress,
@@ -71,8 +79,8 @@ const TxButton: FC<Props> = ({
     onBlock: () => balance.refetch(),
   });
 
-  const [tokenSymbol, tokenDecimals, tokenBalance, tokenAllowance] =
-    tokenInfo.data || [];
+  const [tokenSymbol, tokenDecimals] = tokenInfo.data || [];
+  const [tokenBalance, tokenAllowance] = tokenAllowanceData.data || [];
   const gasCost =
     typeof estimatedGasFee.data?.maxFeePerGas !== "undefined" &&
     typeof estimatedGas !== "undefined"
@@ -94,9 +102,12 @@ const TxButton: FC<Props> = ({
       : undefined;
 
   const isInsufficientBalance =
-    typeof gasCost !== "undefined" &&
-    typeof balance.data?.value !== "undefined" &&
-    (gasCost > balance.data.value || balance.data.value === BigInt(0));
+    balance.data?.value === BigInt(0) ||
+    (typeof gasCost !== "undefined" &&
+      typeof balance.data?.value !== "undefined" &&
+      gasCost > balance.data.value);
+
+  console.log(balance.data?.value === BigInt(0));
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
@@ -120,7 +131,10 @@ const TxButton: FC<Props> = ({
         {...rest}
         type={isInsufficientAllowance ? "button" : type}
         loading={
-          (loading || tokenInfo.isLoading || contract.isPending) &&
+          (loading ||
+            tokenInfo.isLoading ||
+            tokenAllowanceData.isLoading ||
+            contract.isPending) &&
           !(isInsufficientBalance || isInsufficientTokenBalance)
         }
         text={
