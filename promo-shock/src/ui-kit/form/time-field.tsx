@@ -1,6 +1,7 @@
 "use client";
 import { TimePicker } from "antd";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import type { FC, Ref } from "react";
 import { forwardRef } from "react";
 
@@ -15,13 +16,14 @@ type Props = {
   label?: string;
   defaultValue?: Dayjs;
   placeholder?: string;
+  min?: Dayjs;
   error?: string;
   onChange?(value: Dayjs): void;
 };
 
 const TimeField: FC<PropsWithClassName<Props>> = forwardRef(
   (
-    { label, error, className, ...rest },
+    { label, error, className, min = dayjs(), ...rest },
     ref: Ref<{
       nativeElement: HTMLInputElement;
       focus: () => void;
@@ -35,6 +37,7 @@ const TimeField: FC<PropsWithClassName<Props>> = forwardRef(
             ref={ref}
             className={classes.input}
             suffixIcon={false}
+            minDate={min}
             {...rest}
           />
         </ErrorWrapper>

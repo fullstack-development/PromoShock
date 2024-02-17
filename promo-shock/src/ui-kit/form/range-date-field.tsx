@@ -1,6 +1,7 @@
 "use client";
 import { DatePicker } from "antd";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { forwardRef } from "react";
 import type { Ref, FC } from "react";
 
@@ -16,6 +17,7 @@ type Props = {
   labelPosition?: "top" | "left";
   defaultValue?: [Dayjs, Dayjs];
   placeholder?: [string, string];
+  min?: Dayjs;
   error?: string;
   onChange?(values: [start: Dayjs | null, end: Dayjs | null]): void;
 };
@@ -24,7 +26,7 @@ const { RangePicker } = DatePicker;
 
 const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
   (
-    { label, labelPosition = "left", className, error, ...rest },
+    { label, labelPosition = "left", min = dayjs(), className, error, ...rest },
     ref?: Ref<{
       nativeElement: HTMLInputElement;
       focus: () => void;
@@ -43,6 +45,7 @@ const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
             className={classes.input}
             suffixIcon={false}
             separator="—"
+            minDate={min}
             {...rest}
           />
         </ErrorWrapper>

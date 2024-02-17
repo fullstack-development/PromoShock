@@ -70,7 +70,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                       />
                     </ErrorWrapper>
                     <Button
-                      text="Add mode"
+                      text="Add more"
                       theme="tertiary"
                       onClick={handleAppend}
                     />
