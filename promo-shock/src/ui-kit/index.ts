@@ -7,6 +7,6 @@ export * from "./breadcrumb";
 export * from "./card";
 export * from "./logo";
 export * from "./tabs";
-export * from "./stream-card";
+export * from "./card-list";
 export * from "./tooltips";
 export * from "./popconfirm";

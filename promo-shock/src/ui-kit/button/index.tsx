@@ -8,11 +8,11 @@ import styles from "./button.module.scss";
 type Props = {
   text: string;
   type?: "button" | "submit";
-  size?: "medium" | "large" | "largeWide";
+  size?: "medium" | "big" | "large" | "largeWide";
   disabled?: boolean;
   loading?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  theme?: "primary" | "secondary" | "tertiary";
+  theme?: "primary" | "secondary" | "tertiary" | "quaternary";
   error?: boolean;
   className?: string;
 };
@@ -37,9 +37,12 @@ const Button: FC<Props> = ({
         [styles.theme_primary]: theme === "primary",
         [styles.theme_secondary]: theme === "secondary",
         [styles.theme_tertiary]: theme === "tertiary",
-        [styles.size_default]: size === "medium",
+        [styles.theme_quaternary]: theme === "quaternary",
+        [styles.size_medium]: size === "medium",
         [styles.size_large]: size === "large",
         [styles.size_largeWide]: size === "largeWide",
+        [styles.size_big]: size === "big",
+        [styles.disabled]: disabled,
         [styles.loading]: loading,
         [styles.error]: error,
       })}

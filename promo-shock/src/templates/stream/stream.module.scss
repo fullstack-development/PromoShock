@@ -1,0 +1,93 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  position: relative;
+  overflow-x: hidden;
+  z-index: 1;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  text-align: center;
+  max-width: 1200px;
+}
+
+.promoList {
+  display: flex;
+  justify-content: center;
+  gap: 56px 36px;
+  flex-wrap: wrap;
+  max-width: 1280px;
+  padding: 56px 40px 0px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.h3 {
+  @include h3;
+}
+
+.image {
+  object-fit: cover;
+  border-radius: 16px;
+
+  &_disabled {
+    opacity: 0.4;
+  }
+}
+
+.streamStarts {
+  font-weight: 700;
+  font-family: var(--font-georama);
+  font-size: 24px;
+}
+
+.subtitle {
+  font-size: 20px;
+  font-family: var(--font-georama);
+}
+
+.error {
+  color: $mainError;
+}
+
+.fire {
+  color: #FFF;
+}
+
+.description {
+  font-family: var(--font-georama);
+  line-height: 32px;
+  font-size: 20px;
+  max-width: 510px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.streamInfoWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 45px;
+  max-width: 1036px;
+  padding-bottom: 60px;
+  padding-top: 64px;
+}
+
+.streamInfo {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

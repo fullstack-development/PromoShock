@@ -24,6 +24,11 @@
     &:hover {
       background-color: $boldPink !important;
     }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+    }
   }
   
   &_secondary {
@@ -31,8 +36,10 @@
     &:hover {
       background-color: $boldCyan !important;
     }
-    &:disabled {
-      background-color: #BFBFBF !important;
+
+    &.disabled {
+      color: #FFF !important;
+      background-color: $textDisabled !important;
     }
   }
 
@@ -44,11 +51,34 @@
       background-color: $fadedBoldPurple !important;
       border: 2px solid $goldenPurple !important;
     }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+      border: 2px solid $textDisabled !important;
+    }
+  }
+
+  &_quaternary {
+    color: $mainPink !important;
+    border: 2px solid $mainPink !important;
+    background-color: $fadedPurple !important;
+
+    &:hover {
+      border: 2px solid $mainPink !important;
+      background-color: $fadedBoldPink !important;
+    }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+      border: 2px solid $textDisabled !important;
+    }
   }
 }
 
 .size {
-  &_default {
+  &_medium {
     font-size: 20px !important;
     padding: 6px 24px !important;
   }
@@ -68,6 +98,15 @@
     padding: 22px 24px !important;
     min-width: 480px;
   }
+
+  &_big {
+    padding: 13px 32px !important;
+    font-size: 28px !important;
+  }
+}
+
+.disabled {
+  pointer-events: none; 
 }
 
 .loading > * {

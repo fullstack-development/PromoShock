@@ -1,7 +1,9 @@
 import type { FC } from "react";
 
+import { Promos } from "@promo-shock/templates";
+
 const PromosPage: FC = () => {
-  return <div>Promos</div>;
+  return <Promos />;
 };
 
 export default PromosPage;

@@ -9,6 +9,11 @@
   overflow: hidden;
   max-width: 360px;
   padding-bottom: 24px;
+  border: 2px dashed $gray5;
+
+  &_disabled {
+    pointer-events: none;
+  }
 }
 
 .row {
@@ -20,6 +25,10 @@
 
 .image {
   object-fit: cover;
+
+  &_disabled {
+    opacity: 0.4;
+  }
 }
 
 .subtitle {
@@ -58,4 +67,14 @@
     text-decoration: line-through;
     color: $gray7;
   }
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.bottomDivider {
+  padding-top: 20px;
+  border-top: 1px solid $backgroundDisabled;
 }
