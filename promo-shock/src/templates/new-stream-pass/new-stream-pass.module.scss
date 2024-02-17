@@ -1,20 +1,19 @@
+@import 'src/shared/styles/mixins.scss';
+
 .root {
+  position: relative;
+  z-index: 1;
   display: grid;
   row-gap: 96px;
   width: 100%;
   max-width: 1440px;
-  padding: 0px 120px;
+  padding: 0px 180px 0 120px;
   margin: 0 auto;
 }
 
 .title {
-  font-family: Bowlby One;
-  font-size: 104px;
-  font-weight: 400;
-  line-height: 94px;
-  letter-spacing: 0em;
+  @include h1;
   text-align: center;
-  color: #F759AB;
 }
 
 .grid {
@@ -26,9 +25,6 @@
 
 .contents {
   display: contents;
-  > *:first-child {
-    margin-left: auto;
-  }
 }
 
 .col_1 {
@@ -125,16 +121,13 @@
   }
 }
 
-.first_row {
-  > * {
+.column {
+  > *:first-child > * {
     margin-bottom: 56px;
   }
-}
-
-.last_row {
-  > * {
+  > *:last-child > * {
     margin-bottom: 0;
-  }
+  } 
 }
 
 .action {

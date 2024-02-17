@@ -86,6 +86,11 @@
   &_large {
     font-size: 32px !important;
     padding: 22px 24px !important;
+
+    &.loading > *::after {
+      width: 5px;
+      height: 5px;
+    }
   }
 
   &_largeWide {
@@ -102,4 +107,34 @@
 
 .disabled {
   pointer-events: none; 
+}
+
+.loading > * {
+  position: relative;
+  display: inline-flex !important;
+  align-items: baseline;
+
+  &::after {
+    content: '';  
+    margin-left: 2px;
+    background: currentColor;
+    box-sizing: border-box;
+    animation: animloader 1s linear infinite;
+  }
+}
+
+.error {
+  border: 2px solid #FF4D4F !important;
+}
+
+@keyframes animloader {
+  0% {
+    box-shadow: 10px 0 rgba(255, 255, 255, 0), 20px 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow: 10px 0 white, 20px 0 rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 10px 0 white, 20px 0 white;
+  }
 }

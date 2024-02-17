@@ -13,6 +13,7 @@ import { LabelWrapper } from "./label-wrapper";
 type Props = {
   value?: string;
   label?: string;
+  labelPosition?: "top" | "left";
   defaultValue?: string;
   placeholder?: string;
   maxLength?: number;
@@ -24,7 +25,7 @@ const { TextArea: AntdTextArea } = Input;
 
 const TextArea: FC<PropsWithClassName<Props>> = forwardRef(
   (
-    { label, error, className, onChange, ...rest },
+    { label, labelPosition = "left", error, className, onChange, ...rest },
     ref?: Ref<HTMLTextAreaElement>,
   ) => {
     const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (event) => {
@@ -32,7 +33,11 @@ const TextArea: FC<PropsWithClassName<Props>> = forwardRef(
     };
 
     return (
-      <LabelWrapper label={label} className={className}>
+      <LabelWrapper
+        label={label}
+        labelPosition={labelPosition}
+        className={className}
+      >
         <ErrorWrapper message={error}>
           <AntdTextArea
             ref={ref}

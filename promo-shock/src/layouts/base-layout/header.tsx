@@ -1,10 +1,11 @@
 "use client";
 
 import cn from "classnames";
+import { usePathname } from "next/navigation";
 import type { FC } from "react";
 
 import { WalletButton } from "@promo-shock/components";
-import { Logo, TabLink } from "@promo-shock/ui-kit";
+import { Link, Logo, TabLink } from "@promo-shock/ui-kit";
 
 import styles from "./base-layout.module.scss";
 
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
+  const pathname = usePathname();
   return (
     <div
       className={cn(
@@ -23,12 +25,22 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
       )}
     >
       <div className={styles.container}>
-        <Logo />
+        <Link href="/" className={styles.logo}>
+          <Logo />
+        </Link>
 
         <div className={styles.rightPart}>
           <nav className={styles.nav}>
-            <TabLink active href="/CHANGE_ME" text="Streams" />
-            <TabLink href="/CHANGE_ME" text="Promo" />
+            <TabLink
+              active={pathname.includes("streams")}
+              href="/streams"
+              text="Streams"
+            />
+            <TabLink
+              active={pathname.includes("promos")}
+              href="/promos"
+              text="Promo"
+            />
           </nav>
           <WalletButton />
         </div>

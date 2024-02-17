@@ -1,6 +1,7 @@
 "use client";
 import { DatePicker } from "antd";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { forwardRef } from "react";
 import type { Ref, FC } from "react";
 
@@ -11,19 +12,19 @@ import classes from "./field.module.scss";
 import { LabelWrapper } from "./label-wrapper";
 
 type Props = {
-  value?: [Dayjs, Dayjs];
+  value?: Dayjs;
   label?: string;
-  defaultValue?: [Dayjs, Dayjs];
-  placeholder?: [string, string];
+  labelPosition?: "top" | "left";
+  defaultValue?: Dayjs;
+  placeholder?: string;
+  min?: Dayjs;
   error?: string;
-  onChange?(values: [start: Dayjs | null, end: Dayjs | null]): void;
+  onChange?(value: Dayjs): void;
 };
 
-const { RangePicker } = DatePicker;
-
-const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
+const DateField: FC<PropsWithClassName<Props>> = forwardRef(
   (
-    { label, className, error, ...rest },
+    { label, labelPosition = "left", className, error, min = dayjs(), ...rest },
     ref?: Ref<{
       nativeElement: HTMLInputElement;
       focus: () => void;
@@ -31,13 +32,17 @@ const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
     }>,
   ) => {
     return (
-      <LabelWrapper label={label} className={className}>
+      <LabelWrapper
+        label={label}
+        labelPosition={labelPosition}
+        className={className}
+      >
         <ErrorWrapper message={error}>
-          <RangePicker
+          <DatePicker
             ref={ref}
             className={classes.input}
             suffixIcon={false}
-            separator="—"
+            minDate={min}
             {...rest}
           />
         </ErrorWrapper>
@@ -46,4 +51,4 @@ const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
   },
 );
 
-export { RangeDateField };
+export { DateField };

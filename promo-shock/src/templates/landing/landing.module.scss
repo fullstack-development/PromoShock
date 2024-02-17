@@ -87,7 +87,7 @@
 .ticker {
   position: absolute;
   color: $textSunriseYellow;
-  background: linear-gradient(180deg, #FFADD2 0%, #9254DE 100%);
+  background: linear-gradient(180deg, $fadedPink 0%, $goldenPurple 100%);
   width: 100%;
   top: -80px;
   left: -10px;

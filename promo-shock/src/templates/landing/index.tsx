@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
 
@@ -34,6 +35,7 @@ const promoTabs = [
       "Spread it to your watchers",
       "Score a wave of new fans",
     ],
+    href: "/streams/pass-page",
   },
   {
     label: "brands",
@@ -42,11 +44,27 @@ const promoTabs = [
       "Whip up a promo",
       "Watch the sales go bananas!",
     ],
+    href: "/promos/new-promo",
   },
 ];
 
 export const Landing: FC = () => {
   const [selected, setSelected] = useState(0);
+  const router = useRouter();
+
+  const handleTryClick = () => {
+    const { href } = promoTabs[selected];
+    if (href) {
+      router.push(href);
+    }
+  };
+
+  const handleSelect = (index: number) => {
+    const { href } = promoTabs[index];
+    if (href) router.prefetch(href);
+
+    setSelected(index);
+  };
 
   return (
     <main className={styles.root}>
@@ -62,7 +80,7 @@ export const Landing: FC = () => {
       <div className={styles.tabs}>
         <TabList
           selected={selected}
-          setSelected={setSelected}
+          setSelected={handleSelect}
           tabList={promoTabs}
         />
         <div className={styles.panels}>
@@ -74,7 +92,12 @@ export const Landing: FC = () => {
           <DoubleTriangle />
           <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
         </div>
-        <Button theme="secondary" size="largeWide" text="I wanna try" />
+        <Button
+          theme="secondary"
+          size="largeWide"
+          text="I wanna try"
+          onClick={handleTryClick}
+        />
       </div>
 
       <div className={styles.upcoming}>
@@ -143,7 +166,12 @@ export const Landing: FC = () => {
           <DoubleTriangle />
           <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
         </div>
-        <Button theme="secondary" size="largeWide" text="I wanna try" />
+        <Button
+          theme="secondary"
+          size="largeWide"
+          text="I wanna try"
+          onClick={handleTryClick}
+        />
       </div>
     </main>
   );

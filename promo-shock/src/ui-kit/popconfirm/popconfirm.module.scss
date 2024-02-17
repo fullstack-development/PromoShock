@@ -1,0 +1,63 @@
+.root {
+  width: 236px !important;
+
+  :global(.ant-popover-arrow) {
+    &::after, 
+    &::before {
+      background-color: #262626 !important;
+    }
+  }
+
+  :global(.ant-popover-inner) {
+    padding: 16px !important;
+    background: #262626 !important;
+    border-radius: 2px !important;
+  }
+
+  :global(.ant-popconfirm-title) {
+    font-family: var(--font-georama) !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 22px !important;
+    letter-spacing: 0em !important;
+    color: #FFF !important;
+  }
+}
+
+.button {
+  display: inline-grid !important;
+  justify-items: center;
+  width: 44px !important;
+  height: 28px !important;
+  padding: 2px 12px !important;
+  border-radius: 16px !important;
+  border: 2px solid !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+  letter-spacing: 0em !important;
+  transition: 300ms background-color, 300ms border-color, 300ms color !important;
+}
+
+.cancel_button {
+  background: transparent !important;
+  border-color: #B37FEB !important;
+  color: #B37FEB !important;
+
+  &:hover {
+    border-color: #9254DE !important;
+    color: #9254DE !important;
+  }
+}
+
+.ok_button {
+  background: #F759AB !important;
+  border-color: #F759AB !important;
+
+  &:hover {
+    background: #EB2F96 !important;
+    border-color: #EB2F96 !important;
+  }
+}
+

@@ -2,8 +2,9 @@ import type { FC } from "react";
 
 import { Streams } from "@promo-shock/templates";
 
-const StreamPage: FC = () => {
+const StreamsPage: FC = () => {
   return <Streams />;
 };
 
-export default StreamPage;
+export default StreamsPage;
+

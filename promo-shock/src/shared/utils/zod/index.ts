@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { isAddress } from "viem";
 import { z } from "zod";
 
 // @ts-expect-error Parameter 'dayjs' is constructor function.
@@ -8,5 +9,7 @@ const zUploadFile = () =>
     originFileObj:
       typeof window === "undefined" ? z.custom(() => true) : z.instanceof(File),
   });
+const zAddress = () =>
+  z.custom((value) => typeof value === "string" && isAddress(value));
 
-export { zDayjs, zUploadFile };
+export { zDayjs, zUploadFile, zAddress };

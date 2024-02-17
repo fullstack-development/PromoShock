@@ -12,6 +12,7 @@ import { LabelWrapper } from "./label-wrapper";
 type Props = {
   value?: number | null;
   label?: string;
+  labelPosition?: "top" | "left";
   defaultValue?: number;
   min?: number;
   max?: number;
@@ -23,9 +24,16 @@ type Props = {
 };
 
 const NumberField: FC<PropsWithClassName<Props>> = forwardRef(
-  ({ label, className, error, ...rest }, ref?: Ref<HTMLInputElement>) => {
+  (
+    { label, labelPosition = "left", className, error, ...rest },
+    ref?: Ref<HTMLInputElement>,
+  ) => {
     return (
-      <LabelWrapper label={label} className={className}>
+      <LabelWrapper
+        label={label}
+        labelPosition={labelPosition}
+        className={className}
+      >
         <ErrorWrapper message={error}>
           <InputNumber
             type="number"

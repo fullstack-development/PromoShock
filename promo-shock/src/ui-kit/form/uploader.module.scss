@@ -1,6 +1,8 @@
+@import "src/shared/styles/vars.scss";
+
 .root {
   width: 100%;
-  border: 2px dashed #FFADD2;
+  border: 2px dashed $fadedPink;
   border-radius: 16px;
   overflow: hidden;
 }
@@ -32,7 +34,7 @@
 }
 
 .placeholder_text {
-  font-family: Georama;
+  font-family: var(--font-georama);
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
@@ -44,5 +46,5 @@
 .placeholder_icon {
   width: 14px;
   height: 14px;
-  color: #9254DE;
+  color: $goldenPurple;
 }
