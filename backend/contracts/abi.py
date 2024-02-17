@@ -32,6 +32,12 @@ def get_promo_factory_abi():
         return json.loads(c)["abi"]
 
 
+def get_promo_abi():
+    with open(os.path.abspath("../contracts/abi/Promo.sol/Promo.json")) as f:
+        c = f.read()
+        return json.loads(c)["abi"]
+
+
 def get_ticket_sale_abi():
     with open(
         os.path.abspath("../contracts/abi/TicketSale.sol/TicketSale.json"), "r"

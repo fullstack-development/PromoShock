@@ -1,6 +1,7 @@
+from enum import auto
 from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
 from sqlalchemy.orm import registry, sessionmaker
-from domain.promo import PromoCreatedEvent
+from domain.promo import Promo, PromoCreatedEvent
 from config import get_postgres_uri
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
 
@@ -16,38 +17,38 @@ ticket_sale_created_table = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column(
         "transaction_hash",
-        String(255),
+        String(256),
     ),
     Column(
         "transaction_id",
         Integer,
     ),
     Column("block_nmb", Integer),
-    Column("block_hash", String(255)),
-    Column("owner", String(255)),
-    Column("ticket_sale_addr", String(255), unique=True),
-    Column("ticket_addr", String(255), unique=True),
+    Column("block_hash", String(256)),
+    Column("owner", String(256)),
+    Column("ticket_sale_addr", String(256), unique=True),
+    Column("ticket_addr", String(256), unique=True),
 )
 
 ticket_sale_table = Table(
     "ticket_sale",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("ticket_sale_addr", String(255), unique=True),
+    Column("ticket_sale_addr", String(256), unique=True),
     Column("start_time", Integer),
     Column("end_time", Integer),
-    Column("price", String(255)),
-    Column("owner", String(255)),
+    Column("price", String(256)),
+    Column("owner", String(256)),
 )
 
 ticket_table = Table(
     "ticket",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("ticket_addr", String(255), unique=True),
-    Column("name", String(255)),
-    Column("symbol", String(255)),
-    Column("token_uri", String(255)),
+    Column("ticket_addr", String(256), unique=True),
+    Column("name", String(256)),
+    Column("symbol", String(256)),
+    Column("token_uri", String(256)),
     Column("cap", Integer),
 )
 
@@ -57,13 +58,27 @@ promo_created_event_table = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("start_time", Integer),
     Column("end_time", Integer),
-    Column("promo_addr", String(255), unique=True),
+    Column("promo_addr", String(256), unique=True),
     Column("streams", String(1024)),
     Column("description", String(512)),
-    Column("transaction_hash", String(255)),
+    Column("transaction_hash", String(256)),
     Column("transaction_index", Integer),
-    Column("block_hash", String(255)),
+    Column("block_hash", String(256)),
     Column("block_nmb", Integer),
+)
+
+promo_table = Table(
+    "promo",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("owner", String(256)),
+    Column("token_id", Integer),
+    Column("start_time", Integer),
+    Column("end_time", Integer),
+    Column("promo_addr", String(256)),
+    Column("streams", String(1024)),
+    Column("description", String(512)),
+    Column("uri", String(256)),
 )
 
 
@@ -76,4 +91,5 @@ def start_mappers():
     promo_created_event = mapper.map_imperatively(
         PromoCreatedEvent, promo_created_event_table
     )
+    promo = mapper.map_imperatively(Promo, promo_table)
     metadata.create_all(engine)

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from eth_typing import Address
+
 
 @dataclass(unsafe_hash=True)
 class TicketCollection:
@@ -12,7 +14,7 @@ class TicketCollection:
 
 @dataclass(unsafe_hash=True)
 class Ticket:
-    ticket_addr: str
+    ticket_addr: Address
     name: str
     symbol: str
     token_uri: str  # TODO: save as a dict?
@@ -21,18 +23,18 @@ class Ticket:
 
 @dataclass(unsafe_hash=True)
 class TicketSale:
-    ticket_sale_addr: str
+    ticket_sale_addr: Address
     start_time: int
     end_time: int
     price: str
-    owner: str
+    owner: Address
 
 
 @dataclass(unsafe_hash=True)
 class TicketSaleCreatedEvent:
-    owner: str
-    ticket_sale_addr: str
-    ticket_addr: str
+    owner: Address
+    ticket_sale_addr: Address
+    ticket_addr: Address
     block_nmb: int
     block_hash: str
     transaction_hash: str

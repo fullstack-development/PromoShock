@@ -29,9 +29,7 @@ async def index_ticket_sale():
         get_ticket_factory_abi(),
     )
 
-    await indexer.start_index(from_block="finalized")
-
-    return []
+    await indexer.start_index(from_block=37553211)
 
 
 @app.post("/index/promo_sale")

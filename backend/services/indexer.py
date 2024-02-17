@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from web3 import Web3
 from web3.types import BlockParams, FilterParams, LogReceipt
 
-from domain.promo import PromoCreatedEvent
-from contracts.abi import get_ticket_abi, get_ticket_sale_abi
+from domain.promo import Promo, PromoCreatedEvent
+from contracts.abi import get_ticket_abi, get_ticket_sale_abi, get_promo_abi
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,6 @@ class AbstractRepository(abc.ABC):
 
     @abc.abstractmethod
     def add(self, data):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def update(self, model_name, filter_params: dict, data: Any):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -40,6 +36,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
 
+# TODO: implement transactions
 class SqlAlchemyRepository(AbstractRepository):
 
     def __init__(self, session: Session) -> None:
@@ -47,10 +44,6 @@ class SqlAlchemyRepository(AbstractRepository):
 
     def add(self, data):
         self.session.add(data)
-
-    # TODO: update existing records if some txs were reverted by blockchain
-    def update(self, model_name, filter_params, data):
-        pass
 
     def filter(self, model_name, filter_params):
         return self.session.query(model_name).filter_by(**filter_params).all()
@@ -161,10 +154,10 @@ class NftIndexer:
         return ticket
 
     def _index_promo_created_event(self, log: LogReceipt, pattern: tuple[str]):
-        # FIXME: why is it like that??
         start_time, end_time, promo_addr, streams, description = self.decode_data(
             [pattern], log["data"]
         )[0]
+        # TODO: link stream(ticket) to promo table
         event = PromoCreatedEvent(
             start_time=start_time,
             end_time=end_time,
@@ -176,7 +169,6 @@ class NftIndexer:
             block_nmb=log["blockNumber"],
             block_hash=log["blockHash"].hex(),
         )
-        logger.debug(event)
         if (
             self._repository.get(PromoCreatedEvent, {"promo_addr": event.promo_addr})
             is None
@@ -184,6 +176,60 @@ class NftIndexer:
             self._repository.add(event)
             self._repository.commit()
         return event
+
+    def _index_promo(
+        self,
+        promo_created_event: PromoCreatedEvent,
+        from_block: BlockParams = "earliest",
+        to_block: BlockParams = "latest",
+    ):
+        logs = self._web3.eth.get_logs(
+            filter_params=FilterParams(
+                address=self._web3.to_checksum_address(promo_created_event.promo_addr),
+                fromBlock=from_block,
+                toBlock=to_block,
+            )
+        )
+
+        for log in logs:
+            try:
+                # MintPromo event
+                owner, tokenId = self.decode_data(
+                    ("address", "uint256"), HexBytes(bytes().join(log["topics"][1:]))
+                )
+                start_time, end_time, promo_addr, streams, description = (
+                    self.decode_data(
+                        ["(uint256,uint256,address,address[],string)"], log["data"]
+                    )[0]
+                )
+                contract = self._web3.eth.contract(
+                    self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
+                )
+                uri = contract.functions.tokenURI(tokenId).call()
+                promo = Promo(
+                    owner=owner,
+                    token_id=tokenId,
+                    start_time=start_time,
+                    end_time=end_time,
+                    promo_addr=promo_addr,
+                    streams=streams,
+                    description=description,
+                    uri=uri,
+                )
+                if (
+                    self._repository.get(
+                        Promo, {"promo_addr": promo_addr, "token_id": tokenId}
+                    )
+                ) is None:
+                    self._repository.add(promo)
+                    self._repository.commit()
+                    logger.info(
+                        f"Promo {promo.promo_addr.hex()}#{promo.token_id} was saved"
+                    )
+                return promo
+            except Exception as err:
+                logger.error(err)
+                continue
 
     async def start_index(
         self, from_block: BlockParams = "earliest", to_block: BlockParams = "latest"
@@ -208,10 +254,12 @@ class NftIndexer:
                 self._index_ticket_sale(ticket_sale_event.ticket_sale_addr)
                 self._index_ticket(ticket_sale_event.ticket_addr)
             elif topic_name == "PromotionCreated":
-                self._index_promo_created_event(log, pattern)
-                # self._index_promo(promo_created_event.promo_addr)
+                promo_created_event = self._index_promo_created_event(log, pattern)
+                self._index_promo(
+                    promo_created_event, from_block=from_block, to_block=to_block
+                )
 
         logger.info("Index complete")
 
-    def decode_data(self, pattern, topic):
-        return self._web3.codec.decode(pattern, topic)
+    def decode_data(self, pattern, data):
+        return self._web3.codec.decode(pattern, data)
