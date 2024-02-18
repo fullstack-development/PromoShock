@@ -3,6 +3,8 @@ import logging
 from typing import Any, List, Optional
 from ens.ens import HexBytes
 from eth_typing import Address
+import requests
+from urllib.parse import urlparse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from web3 import Web3
@@ -141,14 +143,18 @@ class NftIndexer:
         name = contract.functions.name().call()
         cap = contract.functions.CAP().call()
         symbol = contract.functions.symbol().call()
-        # TODO: load uri, save as json field
-        token_uri = contract.functions.tokenURI(0).call()
+        total_supply = contract.functions.totalSupply().call()
+        try:
+            uri = self._get_ipfs_data(contract.functions.tokenURI(0).call())
+        except requests.JSONDecodeError:
+            uri = {}
         ticket = Ticket(
             ticket_addr=ticket_addr,
             name=name,
             symbol=symbol,
-            token_uri=token_uri,
+            token_uri=uri,
             cap=cap,
+            total_supply=total_supply,
         )
         if self._repository.get(Ticket, {"ticket_addr": ticket_addr}) is None:
             self._repository.add(ticket)
@@ -206,8 +212,12 @@ class NftIndexer:
                 contract = self._web3.eth.contract(
                     self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
                 )
-                # TODO: load uri, save as json field
-                uri = contract.functions.tokenURI(tokenId).call()
+                try:
+                    uri = self._get_ipfs_data(
+                        contract.functions.tokenURI(tokenId).call()
+                    )
+                except requests.JSONDecodeError:
+                    uri = {}
                 promo = Promo(
                     owner=owner,
                     token_id=tokenId,
@@ -246,6 +256,13 @@ class NftIndexer:
             except Exception as err:
                 logger.error(err)
                 continue
+
+    def _get_ipfs_data(self, url):
+        parsed_url = urlparse(url)
+        if parsed_url.scheme == "ipfs":
+            return requests.get(f"https://ipfs.io/ipfs/{parsed_url.netloc}").json()
+        else:
+            return requests.get(url).json()
 
     async def start_index(
         self, from_block: BlockParams = "earliest", to_block: BlockParams = "latest"

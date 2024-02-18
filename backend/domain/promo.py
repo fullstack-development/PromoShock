@@ -26,7 +26,7 @@ class Promo:
     end_time: int
     promo_addr: Address
     description: str
-    uri: str
+    uri: dict
 
 
 @dataclass(unsafe_hash=True)

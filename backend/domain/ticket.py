@@ -17,8 +17,9 @@ class Ticket:
     ticket_addr: Address
     name: str
     symbol: str
-    token_uri: str  # TODO: save as a dict?
+    token_uri: dict
     cap: int
+    total_supply: int
 
 
 @dataclass(unsafe_hash=True)

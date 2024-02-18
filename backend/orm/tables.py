@@ -1,14 +1,14 @@
 from enum import auto
 from sqlalchemy import (
     Column,
-    ForeignKey,
     Integer,
     MetaData,
     String,
     Table,
     create_engine,
 )
-from sqlalchemy.orm import properties, registry, relationship, sessionmaker
+from sqlalchemy.orm import registry, sessionmaker
+from sqlalchemy.types import JSON
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from config import get_postgres_uri
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
@@ -56,8 +56,9 @@ ticket_table = Table(
     Column("ticket_addr", String(256), unique=True),
     Column("name", String(256)),
     Column("symbol", String(256)),
-    Column("token_uri", String(256)),
+    Column("token_uri", JSON),
     Column("cap", Integer),
+    Column("total_supply", Integer),
 )
 
 promo_created_event_table = Table(
@@ -85,7 +86,7 @@ promo_table = Table(
     Column("end_time", Integer),
     Column("promo_addr", String(256)),
     Column("description", String(512)),
-    Column("uri", String(256)),
+    Column("uri", JSON),
 )
 
 promo_to_ticket_table = Table(
