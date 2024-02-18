@@ -18,6 +18,7 @@ import {
   useWritePromoFactoryCreatePromo,
 } from "@generated/wagmi";
 
+import { withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 import { useConfirmLeave } from "@promo-shock/services";
@@ -35,7 +36,6 @@ import { writeMetadata } from "./mutations";
 import classes from "./new-promo.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
-import { withSwitchNetwork } from "@promo-shock/components";
 
 const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
 

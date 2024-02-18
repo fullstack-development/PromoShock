@@ -1,13 +1,40 @@
 "use client";
 
+import type { InfiniteData } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import type { FC } from "react";
 
+import type { UnwrapPromise } from "@promo-shock/shared/types";
 import { Button, CardList, PromoCard } from "@promo-shock/ui-kit";
 
-import { PROMOS_LIST_MOCK } from "./mocks/fixtures";
 import styles from "./promos.module.scss";
+import { fetchInfinitePromoCards } from "../queries";
 
-export const Promos: FC = () => {
+type Props = {
+  initialData?: InfiniteData<
+    UnwrapPromise<ReturnType<typeof fetchInfinitePromoCards>>,
+    number
+  >;
+};
+
+export const Promos: FC<Props> = ({ initialData }) => {
+  const promos = useInfiniteQuery({
+    initialData,
+    initialPageParam: 0,
+    queryKey: ["promos"] as ["promos"],
+    queryFn: fetchInfinitePromoCards,
+    select: (data) => data.pages.map((item) => item.pages).flat(),
+    getNextPageParam: (lastPage) => lastPage.cursor,
+  });
+
+  const handleGetMore = async () => {
+    try {
+      await promos.fetchNextPage();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <main className={styles.root}>
       <h1 className={styles.title}>Streams</h1>
@@ -20,15 +47,18 @@ export const Promos: FC = () => {
       />
 
       <CardList>
-        {PROMOS_LIST_MOCK.map((options) => (
-          <PromoCard
-            key={`${options.title}${options.description}`}
-            {...options}
-          />
-        ))}
+        {promos.data?.map((promo) => <PromoCard key={promo.id} {...promo} />)}
       </CardList>
 
-      <Button text="Get more" size="medium" theme="tertiary" />
+      {promos.hasNextPage && (
+        <Button
+          text="Get more"
+          size="medium"
+          theme="tertiary"
+          loading={promos.isFetchingNextPage}
+          onClick={handleGetMore}
+        />
+      )}
     </main>
   );
 };

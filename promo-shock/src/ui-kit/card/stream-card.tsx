@@ -7,28 +7,31 @@ import styles from "./streamCard.module.scss";
 import { Button } from "../button";
 
 type Props = {
-  preview: string;
-  cost: number;
-  date: number;
-  title: string;
+  name: string;
   description: string;
-  ticketsTotal: number;
-  ticketsLeft: number;
+  address: string;
+  banner: string;
+  price: number;
+  date: number;
+  totalAmount: number;
+  reservedAmount: number;
   onlyWatch?: boolean;
 };
 
 export const StreamCard: FC<Props> = ({
-  preview,
-  cost,
-  date: dateTimestamp,
-  title,
+  name,
   description,
-  ticketsTotal,
-  ticketsLeft,
+  address,
+  banner,
+  price,
+  date: dateUnix,
+  totalAmount,
+  reservedAmount,
   onlyWatch,
 }) => {
-  const date = dayjs(dateTimestamp);
-  const ticketsAreOut = ticketsLeft < 1 && date.isAfter(dayjs());
+  const date = dayjs(dateUnix);
+  const remainingAmount = totalAmount - reservedAmount;
+  const ticketsAreOut = remainingAmount === 0 && date.isAfter(dayjs());
   const streamHasFinished = date.isBefore(dayjs());
 
   return (
@@ -37,16 +40,16 @@ export const StreamCard: FC<Props> = ({
         className={styles.image}
         width={360}
         height={255}
-        src={preview}
-        alt="stream preview"
+        src={banner || ""}
+        alt="stream banner"
       />
       <div className={styles.row}>
         <span className={styles.subtitle}>{date.format("DD.MM.YYYY")}</span>
 
-        {ticketsLeft > 0 && date.isAfter(dayjs()) && (
+        {remainingAmount > 0 && date.isAfter(dayjs()) && (
           <span className={styles.subtitle}>
-            {ticketsLeft < 5 ? <span className={styles.fire}>🔥</span> : ""}
-            {ticketsLeft} of {ticketsTotal} tickets left
+            {remainingAmount < 5 ? <span className={styles.fire}>🔥</span> : ""}
+            {remainingAmount} of {totalAmount} tickets left
           </span>
         )}
 
@@ -64,7 +67,7 @@ export const StreamCard: FC<Props> = ({
       </div>
 
       <div className={styles.description}>
-        <h5 className={styles.title}>{title}</h5>
+        <h5 className={styles.title}>{name}</h5>
         <p>{description}</p>
       </div>
 
@@ -76,12 +79,17 @@ export const StreamCard: FC<Props> = ({
                 [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
               })}
             >
-              {cost} USDT
+              {price} USDT
             </span>
             {ticketsAreOut || streamHasFinished ? (
               <Button text="See promos" theme="tertiary" size="medium" />
             ) : (
-              <Button text="Buy access" theme="primary" size="medium" />
+              <Button
+                text="Buy access"
+                theme="primary"
+                size="medium"
+                href={`/streams/${address}`}
+              />
             )}
           </>
         )}

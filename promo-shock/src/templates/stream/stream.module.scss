@@ -1,12 +1,15 @@
 @import 'src/shared/styles/mixins.scss';
 
 .root {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: 32px;
   position: relative;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 1440px;
+  padding: 0px 120px 0 120px;
+  margin: 0 auto;
   z-index: 1;
 }
 
@@ -75,8 +78,9 @@
 }
 
 .streamInfoWrapper {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  width: 100%;
   gap: 45px;
   max-width: 1036px;
   padding-bottom: 60px;

@@ -1,15 +1,22 @@
 import type { FC } from "react";
+import type { Address } from "viem";
+import { getAccount } from "wagmi/actions";
 
-import { MyPromos } from "@promo-shock/templates";
-import { PROMOS_LIST_MOCK } from "@promo-shock/templates/promos/mocks/fixtures";
-
-const getData = () => {
-  return PROMOS_LIST_MOCK;
-};
+import { queryClient } from "@promo-shock/configs/query";
+import { web3Config } from "@promo-shock/configs/web3";
+import { MyPromos, fetchInfinitePromoCards } from "@promo-shock/templates";
 
 const MyPromosPage: FC = async () => {
-  const data = await getData();
-  return <MyPromos data={data} />;
+  const account = getAccount(web3Config);
+  const initialData = await queryClient.fetchInfiniteQuery({
+    initialPageParam: 0,
+    queryKey: ["promos", { owner: account.address }] as [
+      "promos",
+      filters?: { owner: Address },
+    ],
+    queryFn: fetchInfinitePromoCards,
+  });
+  return <MyPromos initialData={initialData} />;
 };
 
 export default MyPromosPage;

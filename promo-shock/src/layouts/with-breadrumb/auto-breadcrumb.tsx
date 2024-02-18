@@ -1,11 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
-import type { FC } from "react";
+import type { ComponentProps, FC } from "react";
 import React from "react";
 
 import { Breadcrumb } from "@promo-shock/ui-kit";
 
-const AutoBreadcrumb: FC = () => {
+type Props = Pick<ComponentProps<typeof Breadcrumb>, "mapTitle">;
+
+const AutoBreadcrumb: FC<Props> = ({ mapTitle }) => {
   const pathname = usePathname();
   const paths = pathname.split("/").filter((path) => path);
 
@@ -15,6 +17,7 @@ const AutoBreadcrumb: FC = () => {
         const href = `/${paths.slice(0, index + 1).join("/")}`;
         return { href, title: path.split("-").join(" ") };
       })}
+      mapTitle={mapTitle}
     />
   );
 };

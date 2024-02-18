@@ -7,44 +7,45 @@ import styles from "./streamCard.module.scss";
 import { Button } from "../button";
 
 type Props = {
-  preview: string;
+  name: string;
+  description: string;
+  cover: string;
   startDate: number;
   endDate: number;
-  title: string;
-  description: string;
-  url?: string;
+  saleUrl?: string;
 };
 
 export const PromoCard: FC<Props> = ({
-  preview,
-  endDate,
-  startDate,
-  url,
-  title,
+  name,
+  cover,
+  endDate: endDateUnix,
+  startDate: startDateUnix,
+  saleUrl,
   description,
 }) => {
+  const startDate = dayjs(startDateUnix);
+  const endDate = dayjs(endDateUnix);
   return (
     <a
       target="_blank"
-      className={cn(styles.root, { [styles.root_disabled]: !url })}
-      href={url}
+      className={cn(styles.root, { [styles.root_disabled]: !saleUrl })}
+      href={saleUrl}
     >
       <Image
-        className={cn(styles.image, { [styles.image_disabled]: !url })}
+        className={cn(styles.image, { [styles.image_disabled]: !saleUrl })}
         width={360}
         height={255}
-        src={preview}
-        alt="stream preview"
+        src={cover}
+        alt="stream cover"
       />
       <div className={styles.row}>
         <span className={styles.subtitle}>
-          {dayjs(startDate).format("DD.MM.YYYY")} -{" "}
-          {dayjs(endDate).format("DD.MM.YYYY")}
+          {startDate.format("DD.MM.YYYY")} - {endDate.format("DD.MM.YYYY")}
         </span>
       </div>
 
       <div className={styles.description}>
-        <h5 className={styles.title}>{title}</h5>
+        <h5 className={styles.title}>{name}</h5>
         <p>{description}</p>
       </div>
 
@@ -53,7 +54,7 @@ export const PromoCard: FC<Props> = ({
           text="Go shopping"
           theme="primary"
           size="medium"
-          disabled={!url}
+          disabled={!saleUrl}
         />
       </div>
     </a>

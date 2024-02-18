@@ -1,15 +1,22 @@
 "use client";
 
+import type { InfiniteData } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { FC } from "react";
+import { useAccount } from "wagmi";
 
-import type { Promo } from "@promo-shock/shared/types";
+import type { UnwrapPromise } from "@promo-shock/shared/types";
 import { CardList, PromoCard, TabList } from "@promo-shock/ui-kit";
 
 import styles from "./my-promos.module.scss";
+import { fetchInfinitePromoCards } from "../queries";
 
 type Props = {
-  data: Promo[];
+  initialData?: InfiniteData<
+    UnwrapPromise<ReturnType<typeof fetchInfinitePromoCards>>,
+    number
+  >;
 };
 
 const tabs = [
@@ -17,8 +24,20 @@ const tabs = [
   { label: "My promos", url: "/profile/my-promos" },
 ];
 
-export const MyPromos: FC<Props> = ({ data }) => {
+export const MyPromos: FC<Props> = ({ initialData }) => {
+  const account = useAccount();
   const router = useRouter();
+  const promos = useInfiniteQuery({
+    initialData,
+    initialPageParam: 0,
+    queryKey: ["promos", { owner: account.address }] as [
+      "promos",
+      filters?: { owner: string },
+    ],
+    queryFn: fetchInfinitePromoCards,
+    select: (data) => data.pages.map((item) => item.pages).flat(),
+    getNextPageParam: (lastPage) => lastPage.cursor,
+  });
 
   const selected = 1;
   const opposite = 0;
@@ -34,12 +53,7 @@ export const MyPromos: FC<Props> = ({ data }) => {
       <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
 
       <CardList>
-        {data.map((options) => (
-          <PromoCard
-            key={`${options.title}${options.description}`}
-            {...options}
-          />
-        ))}
+        {promos.data?.map((promo) => <PromoCard key={promo.id} {...promo} />)}
       </CardList>
     </main>
   );

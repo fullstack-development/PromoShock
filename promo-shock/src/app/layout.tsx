@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unassigned-import */
 import "the-new-css-reset";
 import "@rainbow-me/rainbowkit/styles.css";
+import { dehydrate } from "@tanstack/react-query";
 import cn from "classnames";
 import type { Metadata } from "next";
 import { Bowlby_One, Bowlby_One_SC, Georama } from "next/font/google";
@@ -9,6 +10,7 @@ import { headers } from "next/headers";
 import type { FC, PropsWithChildren } from "react";
 import { cookieToInitialState } from "wagmi";
 
+import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
 import { BaseLayout } from "@promo-shock/layouts";
 
@@ -50,7 +52,10 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           georama.variable,
         )}
       >
-        <RootProvider web3InitialState={web3InitialState}>
+        <RootProvider
+          web3InitialState={web3InitialState}
+          dehydratedState={dehydrate(queryClient)}
+        >
           <BaseLayout>{children}</BaseLayout>
         </RootProvider>
       </body>

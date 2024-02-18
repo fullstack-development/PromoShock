@@ -1,9 +1,9 @@
 "use client";
-
 import Image from "next/image";
 import { useState } from "react";
 import type { FC } from "react";
 
+import type { UnwrapPromise } from "@promo-shock/shared/types";
 import {
   Button,
   Marquee,
@@ -12,42 +12,18 @@ import {
   TextLink,
 } from "@promo-shock/ui-kit";
 
+import { promoTabs } from "./constants";
 import { DoubleTriangle } from "./img/DoubleTriangle";
 import backgroundIcons from "./img/icons.svg";
 import { Star } from "./img/Star";
 import styles from "./landing.module.scss";
-import { STREAMS_PREVIEWS_MOCK } from "./mocks/fixtures";
+import type { fetchStreamCards } from "../queries";
 
-const promoTabs = [
-  {
-    label: "watchers",
-    panel: [
-      "Unlock the VIP streams",
-      "Watch your fav streamers",
-      "Score sweet deals from brands",
-    ],
-  },
-  {
-    label: "streamers",
-    panel: [
-      "Whip up a pass for stream",
-      "Spread it to your watchers",
-      "Score a wave of new fans",
-    ],
-    href: "/streams/pass-page",
-  },
-  {
-    label: "brands",
-    panel: [
-      "Pick the juiciest TA",
-      "Whip up a promo",
-      "Watch the sales go bananas!",
-    ],
-    href: "/promos/new-promo",
-  },
-];
+type Props = {
+  streams: UnwrapPromise<ReturnType<typeof fetchStreamCards>>;
+};
 
-export const Landing: FC = () => {
+export const Landing: FC<Props> = ({ streams }) => {
   const [selected, setSelected] = useState(0);
 
   const handleSelect = (index: number) => {
@@ -109,17 +85,14 @@ export const Landing: FC = () => {
           <TextLink
             title="See all shows"
             underline
-            href="/CHANGE_ME"
+            href="/streams"
             className={styles.seeAllShowsLink}
           />
         </div>
 
         <div className={styles.previewsContainer}>
-          {STREAMS_PREVIEWS_MOCK.map((options) => (
-            <StreamCard
-              key={`${options.title}${options.description}`}
-              {...options}
-            />
+          {streams.map((stream) => (
+            <StreamCard key={stream.address} {...stream} />
           ))}
         </div>
 

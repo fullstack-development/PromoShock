@@ -1,7 +1,8 @@
 import { defineConfig, loadEnv } from "@wagmi/cli";
 import { actions, react } from "@wagmi/cli/plugins";
-import ticketFactoryAbi from './abis/ticket-factory.json';
-import promoFactoryAbi from './abis/promo-factory.json';
+import ticketFactoryAbi from "./abis/ticket-factory.json";
+import ticketSaleAbi from "./abis/ticket-sale.json";
+import promoFactoryAbi from "./abis/promo-factory.json";
 
 // @ts-expect-error Abis imported from JSON files
 export default defineConfig(() => {
@@ -24,6 +25,10 @@ export default defineConfig(() => {
         address: env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS,
         abi: promoFactoryAbi
       },
+      {
+        name: "TicketSale",
+        abi: ticketSaleAbi
+      }
     ],
     plugins: [
       react(),

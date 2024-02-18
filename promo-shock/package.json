@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:wagmi": "wagmi generate --config ./wagmi.config.ts"
+    "gen:wagmi": "wagmi generate --config ./wagmi.config.ts",
+    "gen:api": "openapi-generator-cli generate -i ./schemas/openapi.yaml -g typescript-axios -o ./generated/api"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
@@ -16,6 +17,7 @@
     "@rainbow-me/rainbowkit": "^2.0.0",
     "@tanstack/react-query": "^5.14.6",
     "antd": "^5.14.0",
+    "axios": "^1.6.7",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.10",
     "next": "14.0.4",
@@ -23,6 +25,7 @@
     "react-dom": "^18",
     "react-fast-marquee": "^1.6.4",
     "react-hook-form": "^7.50.1",
+    "react-use": "^17.5.0",
     "the-new-css-reset": "^1.11.2",
     "viem": "^2.7.8",
     "wagmi": "^2.5.6",
@@ -30,6 +33,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.9.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

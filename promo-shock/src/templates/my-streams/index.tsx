@@ -1,24 +1,42 @@
 "use client";
-
+import type { InfiniteData } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { FC } from "react";
+import { useAccount } from "wagmi";
 
-import type { Stream } from "@promo-shock/shared/types";
+import type { UnwrapPromise } from "@promo-shock/shared/types";
 import { CardList, StreamCard, TabList } from "@promo-shock/ui-kit";
 
 import styles from "./my-streams.module.scss";
-
-type Props = {
-  data: Stream[];
-};
+import { fetchInfiniteStreamCards } from "../queries";
 
 const tabs = [
   { label: "My streams", url: "/profile/my-streams" },
   { label: "My promos", url: "/profile/my-promos" },
 ];
 
-export const MyStreams: FC<Props> = ({ data }) => {
+type Props = {
+  initialData?: InfiniteData<
+    UnwrapPromise<ReturnType<typeof fetchInfiniteStreamCards>>,
+    number
+  >;
+};
+
+export const MyStreams: FC<Props> = ({ initialData }) => {
+  const account = useAccount();
   const router = useRouter();
+  const streams = useInfiniteQuery({
+    initialData,
+    initialPageParam: 0,
+    queryKey: ["streams", { owner: account.address }] as [
+      "streams",
+      filters?: { owner: string },
+    ],
+    queryFn: fetchInfiniteStreamCards,
+    select: (data) => data.pages.map((item) => item.pages).flat(),
+    getNextPageParam: (lastPage) => lastPage.cursor,
+  });
 
   const selected = 0;
   const opposite = 1;
@@ -34,12 +52,8 @@ export const MyStreams: FC<Props> = ({ data }) => {
       <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
 
       <CardList>
-        {data.map((options) => (
-          <StreamCard
-            key={`${options.title}${options.description}`}
-            {...options}
-            onlyWatch
-          />
+        {streams.data?.map((stream) => (
+          <StreamCard key={stream.address} {...stream} />
         ))}
       </CardList>
     </main>
