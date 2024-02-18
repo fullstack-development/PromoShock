@@ -120,19 +120,22 @@
   }
 }
 
-.loading > * {
-  position: relative;
-  display: inline-flex !important;
-  align-items: baseline;
+.loading {
+  cursor: wait !important;
+  > * {
+    position: relative;
+    display: inline-flex !important;
+    align-items: baseline;
 
-  &::after {
-    content: '';  
-      width: calc(2px * var(--size));
-      height: calc(2px * var(--size));
-    margin-left: 2px;
-    background: currentColor;
-    box-sizing: border-box;
-    animation: animloader 1s linear infinite;
+    &::after {
+      content: '';  
+        width: calc(2px * var(--size));
+        height: calc(2px * var(--size));
+      margin-left: 2px;
+      background: currentColor;
+      box-sizing: border-box;
+      animation: animloader 1s linear infinite;
+    }
   }
 }
 

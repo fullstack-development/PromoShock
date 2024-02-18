@@ -8,7 +8,8 @@ export default defineConfig(() => {
   const env = loadEnv({
     mode: process.env.NODE_ENV,
     envDir: process.cwd(),
-  })
+  });
+
 
   return ({
     out: "generated/wagmi.ts",

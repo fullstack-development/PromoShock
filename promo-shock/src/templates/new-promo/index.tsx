@@ -1,18 +1,25 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
 import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { formatUnits } from "viem";
+import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig } from "wagmi";
+import { useClient, useConfig, useReadContracts } from "wagmi";
 
-import { simulatePromoFactoryCreatePromo } from "@generated/wagmi";
+import {
+  simulatePromoFactoryCreatePromo,
+  useReadPromoFactoryGetPaymentTokenAddress,
+  useReadPromoFactoryGetPromoCreationPrice,
+  useWritePromoFactoryCreatePromo,
+} from "@generated/wagmi";
 
-import { TxButton } from "@promo-shock/components";
+import { withApprove } from "@promo-shock/components/tx-button/with-approve";
+import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -20,13 +27,17 @@ import {
   TextField,
   DynamicFieldset,
   ImageUploader,
+  Button,
 } from "@promo-shock/ui-kit";
 
 import { errorMap } from "./errors";
-import { useCreatePromo, usePaymentInfo, useWriteMetadata } from "./hooks";
+import { writeMetadata } from "./mutations";
 import classes from "./new-promo.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
+import { withSwitchNetwork } from "@promo-shock/components";
+
+const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
 
 const NewPromo: FC = () => {
   const config = useConfig();
@@ -42,15 +53,39 @@ const NewPromo: FC = () => {
     },
     shouldFocusError: false,
   });
-  const createPromo = useCreatePromo();
-  const writeMetadata = useWriteMetadata();
+  const createPromo = useWritePromoFactoryCreatePromo();
+  const metadata = useMutation({
+    mutationFn: writeMetadata,
+  });
   const [estimatedGasForCreatePromo, setEstimatedGasForCreatePromo] =
     useState<bigint>();
   const streamAddresses = useWatch({
     control,
     name: "promo_stream_addresses",
   });
-  const [creationPrice, tokenInfo, tokenAddress] = usePaymentInfo();
+  const creationPrice = useReadPromoFactoryGetPromoCreationPrice({
+    chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+  });
+  const tokenAddress = useReadPromoFactoryGetPaymentTokenAddress({
+    chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+  });
+  const tokenInfo = useReadContracts({
+    query: { staleTime: Infinity },
+    contracts: [
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: tokenAddress.data,
+        functionName: "decimals",
+      },
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: tokenAddress.data,
+        functionName: "symbol",
+      },
+    ],
+  });
 
   useConfirmLeave(
     isDirty,
@@ -60,7 +95,7 @@ const NewPromo: FC = () => {
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     try {
-      const metadataCid = await writeMetadata.mutateAsync({
+      const metadataCid = await metadata.mutateAsync({
         name: data.promo_name,
         description: data.promo_description,
         image: data.promo_cover.originFileObj!,
@@ -78,11 +113,15 @@ const NewPromo: FC = () => {
       await Promise.all([
         createPromo.writeContractAsync({
           args,
+          chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
         }),
         (async () => {
           const simulatedCreateStream = await simulatePromoFactoryCreatePromo(
             config,
-            { args },
+            {
+              args,
+              chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+            },
           );
           const estimatedGas =
             client &&
@@ -109,10 +148,9 @@ const NewPromo: FC = () => {
         }`
       : undefined;
 
-  const isPending = createPromo.isPending || writeMetadata.isPending;
-
-  const isLoading =
-    isPending ||
+  const pending = createPromo.isPending || metadata.isPending;
+  const loading =
+    pending ||
     tokenInfo.isLoading ||
     creationPrice.isLoading ||
     tokenAddress.isLoading;
@@ -132,7 +170,7 @@ const NewPromo: FC = () => {
                   aspectRatio="416/307"
                   placeholder="Upload promo cover"
                   error={errors.promo_cover?.message}
-                  disabled={isPending}
+                  disabled={pending}
                   {...field}
                 />
               </div>
@@ -147,7 +185,7 @@ const NewPromo: FC = () => {
                 placeholder="Study with the HARVARD STUDY"
                 className={classNames(classes.col_1, classes.contents)}
                 error={errors.promo_name?.message}
-                disabled={isPending}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -162,7 +200,7 @@ const NewPromo: FC = () => {
                 placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
                 maxLength={100}
                 error={errors.promo_description?.message}
-                disabled={isPending}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -176,7 +214,7 @@ const NewPromo: FC = () => {
                 className={classNames(classes.col_1, classes.contents)}
                 placeholder={["13.12.2024", "24.12.2042"]}
                 error={errors.promo_sale_time?.message}
-                disabled={isPending}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -199,7 +237,7 @@ const NewPromo: FC = () => {
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
-              disabled={isPending}
+              disabled={pending}
             />
           </div>
         </div>
@@ -209,7 +247,9 @@ const NewPromo: FC = () => {
         <TxButton
           type="submit"
           text={`Pay ${creationPriceSumString} and create promo`}
-          loading={isLoading}
+          size="large"
+          theme="secondary"
+          loading={loading}
           estimatedGas={estimatedGasForCreatePromo}
           tokenAddress={tokenAddress.data}
           tokenAmount={creationPriceSum}
