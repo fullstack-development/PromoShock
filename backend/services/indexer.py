@@ -24,11 +24,13 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def filter(self, model_name, filter_params: dict) -> List[Any]:
+    def filter(
+        self, model_name, filter_params: dict, offset: int = 0, limit: int = 25
+    ) -> List[Any]:
         raise NotImplementedError
 
     def get(self, model_name, filter_params: dict) -> Optional[Any]:
-        entities = self.filter(model_name=model_name, filter_params=filter_params)
+        entities = self.filter(model_name, filter_params)
         if len(entities) != 1 or len(entities) > 1:  # FIXME: is this right?
             return None
         return entities[0]
@@ -47,8 +49,14 @@ class SqlAlchemyRepository(AbstractRepository):
     def add(self, data):
         self.session.add(data)
 
-    def filter(self, model_name, filter_params):
-        return self.session.query(model_name).filter_by(**filter_params).all()
+    def filter(self, model_name, filter_params, offset=0, limit=25):
+        return (
+            self.session.query(model_name)
+            .filter_by(**filter_params)
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
 
     def commit(self):
         try:
@@ -254,7 +262,6 @@ class NftIndexer:
                         self._repository.commit()
                 return promo
             except Exception as err:
-                logger.error(err)
                 continue
 
     def _get_ipfs_data(self, url):
