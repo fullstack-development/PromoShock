@@ -25,6 +25,12 @@ class Promo:
     start_time: int
     end_time: int
     promo_addr: Address
-    streams: List[Address]
     description: str
     uri: str
+
+
+@dataclass(unsafe_hash=True)
+class PromoToTicket:
+    promo_addr: Address
+    ticket_addr: Address
+    token_id: int

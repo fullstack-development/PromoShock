@@ -19,26 +19,21 @@ web3 = Web3(Web3.HTTPProvider(get_web3_uri()))
 start_mappers()
 
 
-@app.post("/index/ticket_sale")
-async def index_ticket_sale():
-    session = get_session()
-    indexer = NftIndexer(
+@app.post("/index/start")
+async def start_index():
+    repo = SqlAlchemyRepository(get_session())
+    ticket_indexer = NftIndexer(
         web3,
-        SqlAlchemyRepository(session),
+        repo,
         get_ticket_factory_address(),
         get_ticket_factory_abi(),
     )
-
-    await indexer.start_index(from_block=37553211)
-
-
-@app.post("/index/promo_sale")
-async def index_promo_sale():
-    session = get_session()
-    indexer = NftIndexer(
+    promo_indexer = NftIndexer(
         web3,
-        SqlAlchemyRepository(session),
+        repo,
         get_promo_factory_address(),
         get_promo_factory_abi(),
     )
-    await indexer.start_index(from_block=37553211)
+    # TODO: run async
+    await ticket_indexer.start_index(from_block=37553211)
+    await promo_indexer.start_index(from_block=37553211)

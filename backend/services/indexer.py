@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from web3 import Web3
 from web3.types import BlockParams, FilterParams, LogReceipt
 
-from domain.promo import Promo, PromoCreatedEvent
+from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from contracts.abi import get_ticket_abi, get_ticket_sale_abi, get_promo_abi
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
 
@@ -53,6 +53,7 @@ class SqlAlchemyRepository(AbstractRepository):
             self.session.commit()
         except SQLAlchemyError as err:
             self.session.rollback()
+            logger.error(err)
             raise err
 
 
@@ -140,6 +141,7 @@ class NftIndexer:
         name = contract.functions.name().call()
         cap = contract.functions.CAP().call()
         symbol = contract.functions.symbol().call()
+        # TODO: load uri, save as json field
         token_uri = contract.functions.tokenURI(0).call()
         ticket = Ticket(
             ticket_addr=ticket_addr,
@@ -157,7 +159,6 @@ class NftIndexer:
         start_time, end_time, promo_addr, streams, description = self.decode_data(
             [pattern], log["data"]
         )[0]
-        # TODO: link stream(ticket) to promo table
         event = PromoCreatedEvent(
             start_time=start_time,
             end_time=end_time,
@@ -193,7 +194,7 @@ class NftIndexer:
 
         for log in logs:
             try:
-                # MintPromo event
+                # TODO: parse MintPromo event
                 owner, tokenId = self.decode_data(
                     ("address", "uint256"), HexBytes(bytes().join(log["topics"][1:]))
                 )
@@ -205,6 +206,7 @@ class NftIndexer:
                 contract = self._web3.eth.contract(
                     self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
                 )
+                # TODO: load uri, save as json field
                 uri = contract.functions.tokenURI(tokenId).call()
                 promo = Promo(
                     owner=owner,
@@ -212,7 +214,6 @@ class NftIndexer:
                     start_time=start_time,
                     end_time=end_time,
                     promo_addr=promo_addr,
-                    streams=streams,
                     description=description,
                     uri=uri,
                 )
@@ -223,9 +224,24 @@ class NftIndexer:
                 ) is None:
                     self._repository.add(promo)
                     self._repository.commit()
-                    logger.info(
-                        f"Promo {promo.promo_addr.hex()}#{promo.token_id} was saved"
+                    logger.info(f"Promo {promo.promo_addr}#{promo.token_id} was saved")
+                for stream_addr in streams:
+                    promo_to_ticket = PromoToTicket(
+                        promo_addr=promo_addr, ticket_addr=stream_addr, token_id=tokenId
                     )
+                    if (
+                        self._repository.get(
+                            PromoToTicket,
+                            {
+                                "promo_addr": promo_addr,
+                                "ticket_addr": stream_addr,
+                                "token_id": tokenId,
+                            },
+                        )
+                        is None
+                    ):
+                        self._repository.add(promo_to_ticket)
+                        self._repository.commit()
                 return promo
             except Exception as err:
                 logger.error(err)
