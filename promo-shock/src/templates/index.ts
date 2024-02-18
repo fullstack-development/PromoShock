@@ -6,3 +6,5 @@ export * from "./stream";
 export * from "./new-promo";
 export * from "./my-promos";
 export * from "./my-streams";
+export * from "./about";
+export * from "./roadmap";
