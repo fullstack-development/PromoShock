@@ -28,6 +28,7 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   errors?: Array<string | undefined>;
   disabled?: boolean;
   placeholder?: string;
+  caption?: string;
 };
 
 const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
@@ -39,6 +40,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   labelPosition = "left",
   disabled,
   className,
+  caption,
 }: PropsWithClassName<Props<T, K>>): ReactElement => {
   const fieldset = useFieldArray({ control, name });
 
@@ -73,12 +75,15 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                         {...field}
                       />
                     </ErrorWrapper>
-                    <Button
-                      text="Add more"
-                      theme="tertiary"
-                      onClick={handleAppend}
-                      disabled={disabled}
-                    />
+                    <div className={classes.append}>
+                      <Button
+                        text="Add more"
+                        theme="tertiary"
+                        onClick={handleAppend}
+                        disabled={disabled}
+                      />
+                      <span className={classes.caption}>{caption}</span>
+                    </div>
                   </>
                 ) : (
                   <>

@@ -135,6 +135,8 @@ const NewPromo: FC = () => {
     }
   };
 
+  const [tokenDecimals, tokenSymbol] = tokenInfo.data || [];
+
   const creationPriceSum =
     typeof creationPrice.data !== "undefined"
       ? creationPrice.data * BigInt(streamAddresses.length)
@@ -142,10 +144,19 @@ const NewPromo: FC = () => {
 
   const creationPriceSumString =
     typeof creationPriceSum !== "undefined" &&
-    typeof tokenInfo.data?.[0].result !== "undefined" &&
-    typeof tokenInfo.data?.[1].result !== "undefined"
-      ? `${formatUnits(creationPriceSum, tokenInfo.data[0].result)} ${
-          tokenInfo.data[1].result
+    typeof tokenDecimals?.result !== "undefined" &&
+    typeof tokenSymbol?.result !== "undefined"
+      ? `${formatUnits(creationPriceSum, tokenDecimals.result)} ${
+          tokenSymbol.result
+        }`
+      : undefined;
+
+  const creationPriceString =
+    typeof creationPrice.data !== "undefined" &&
+    typeof tokenDecimals?.result !== "undefined" &&
+    typeof tokenSymbol?.result !== "undefined"
+      ? `${formatUnits(creationPrice.data, tokenDecimals.result)} ${
+          tokenSymbol.result
         }`
       : undefined;
 
@@ -253,6 +264,7 @@ const NewPromo: FC = () => {
                 (error) => error?.value?.message,
               )}
               disabled={pending}
+              caption={creationPriceString && `+${creationPriceString}`}
             />
           </div>
         </div>
