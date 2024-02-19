@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+import os
 from typing import List, Optional
 from eth_typing import Address
 from web3 import Web3
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
+from web3.types import BlockParams
 
 from domain.promo import Promo, PromoToTicket
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
@@ -23,9 +26,14 @@ memcache = Client(get_memcache_uri())
 web3 = Web3(Web3.HTTPProvider(get_web3_uri()))
 start_mappers()
 
+if os.environ.get("ENV") == "DEVELOPMENT":
+    app.add_middleware(
+            CORSMiddleware,
+            allow_headers=['*']
+            )
 
 @app.post("/index/start")
-async def start_index():
+async def start_index(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -40,9 +48,30 @@ async def start_index():
         get_promo_factory_abi(),
     )
     # TODO: run async
-    await ticket_indexer.start_index(from_block=37553211)
-    await promo_indexer.start_index(from_block=37553211)
+    await ticket_indexer.start_index(from_block=from_block)
+    await promo_indexer.start_index(from_block=from_block)
 
+@app.post("/index/ticket")
+async def index_ticket(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
+    repo = SqlAlchemyRepository(get_session())
+    ticket_indexer = NftIndexer(
+        web3,
+        repo,
+        get_ticket_factory_address(),
+        get_ticket_factory_abi(),
+    )
+    await ticket_indexer.start_index(from_block=from_block, to_block=to_block)
+
+@app.post("/index/promo")
+async def index_promo(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
+    repo = SqlAlchemyRepository(get_session())
+    promo_indexer = NftIndexer(
+        web3,
+        repo,
+        get_promo_factory_address(),
+        get_promo_factory_abi(),
+    )
+    await promo_indexer.start_index(from_block=from_block, to_block=to_block)
 
 @dataclass(frozen=True)
 class Stream:
