@@ -29,7 +29,10 @@ start_mappers()
 if os.environ.get("ENV") == "DEVELOPMENT":
     app.add_middleware(
             CORSMiddleware,
-            allow_headers=['*']
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
             )
 
 @app.post("/index/start")
