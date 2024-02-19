@@ -58,6 +58,9 @@ class SqlAlchemyRepository(AbstractRepository):
             .all()
         )
 
+    def filter_in(self, model_name, field, param, filter_params={}, offset=0, limit=25):
+        return self.session.query(model_name).filter(field.in_(param)).filter_by(**filter_params).limit(limit).offset(offset).all()
+
     def commit(self):
         try:
             self.session.commit()
