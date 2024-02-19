@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -9,18 +10,20 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig, useReadContracts } from "wagmi";
+import { useAccount, useClient, useConfig, useReadContracts } from "wagmi";
 
 import {
   simulatePromoFactoryCreatePromo,
   useReadPromoFactoryGetPaymentTokenAddress,
   useReadPromoFactoryGetPromoCreationPrice,
+  useWatchPromoFactoryPromotionCreatedEvent,
   useWritePromoFactoryCreatePromo,
 } from "@generated/wagmi";
 
 import { withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
+import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -40,6 +43,8 @@ import type { FormData } from "./types";
 const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
 
 const NewPromo: FC = () => {
+  const router = useRouter();
+  const account = useAccount();
   const config = useConfig();
   const client = useClient();
   const {
@@ -86,15 +91,29 @@ const NewPromo: FC = () => {
       },
     ],
   });
+  const [pending, setPending] = useState(false);
 
   useConfirmLeave(
     isDirty,
     "Are you sure you want to leave the page? Data is not saved",
   );
 
+  useWatchPromoFactoryPromotionCreatedEvent({
+    enabled: pending,
+    args: { marketer: account.address },
+    onLogs: async (logs) => {
+      await api.startIndexIndexStartPost();
+      setPending(false);
+      router.push(
+        `/promos?highlight_address=${logs[0]?.args?.promotion?.promoAddr.toLowerCase()}`,
+      );
+    },
+  });
+
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     try {
+      setPending(true);
       const metadataCid = await metadata.mutateAsync({
         name: data.promo_name,
         description: data.promo_description,
@@ -160,7 +179,6 @@ const NewPromo: FC = () => {
         }`
       : undefined;
 
-  const pending = createPromo.isPending || metadata.isPending;
   const loading =
     pending ||
     tokenInfo.isLoading ||

@@ -1,7 +1,6 @@
 .previewList {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   justify-content: center;
   gap: 56px 36px;
   flex-wrap: wrap;

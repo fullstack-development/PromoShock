@@ -2,19 +2,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig } from "wagmi";
+import { useAccount, useClient, useConfig } from "wagmi";
 
 import {
   simulateTicketFactoryCreateTicketSale,
+  useWatchTicketFactoryTicketSaleCreatedEvent,
   useWriteTicketFactoryCreateTicketSale,
 } from "@generated/wagmi";
 
 import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
+import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   Button,
@@ -44,8 +47,11 @@ const NewStreamPass: FC = () => {
     resolver: zodResolver(formSchema, { errorMap }),
     shouldFocusError: false,
   });
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
   const config = useConfig();
   const client = useClient();
+  const account = useAccount();
   const metadata = useMutation({
     mutationFn: writeMetadata,
   });
@@ -58,9 +64,22 @@ const NewStreamPass: FC = () => {
     "Are you sure you want to leave the page? Data is not saved",
   );
 
+  useWatchTicketFactoryTicketSaleCreatedEvent({
+    enabled: pending,
+    args: { creator: account.address },
+    onLogs: async (logs) => {
+      await api.startIndexIndexStartPost();
+      setPending(false);
+      router.push(
+        `/streams?highlight_address=${logs[0]?.args?.ticketSaleAddr?.toLowerCase()}`,
+      );
+    },
+  });
+
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     try {
+      setPending(true);
       const metadataCid = await metadata.mutateAsync({
         name: data.stream_name,
         description: data.stream_description,
@@ -110,8 +129,6 @@ const NewStreamPass: FC = () => {
       console.error(e);
     }
   };
-
-  const pending = createStream.isPending || metadata.isPending;
 
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>

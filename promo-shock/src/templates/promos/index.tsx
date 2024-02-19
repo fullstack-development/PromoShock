@@ -37,7 +37,7 @@ export const Promos: FC<Props> = ({ initialData }) => {
 
   return (
     <main className={styles.root}>
-      <h1 className={styles.title}>Streams</h1>
+      <h1 className={styles.title}>Promos</h1>
 
       <Button
         theme="quaternary"
