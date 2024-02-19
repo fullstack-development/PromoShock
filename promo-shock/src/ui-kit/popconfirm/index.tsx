@@ -4,6 +4,7 @@ import classNames from "classnames";
 import type { FC, PropsWithChildren } from "react";
 
 import classes from "./popconfirm.module.scss";
+import buttonClasses from "../button/button.module.scss";
 
 type Props = {
   message?: string;
@@ -24,10 +25,20 @@ const Popconfirm: FC<PropsWithChildren<Props>> = ({
       okText="Yes"
       cancelText="No"
       okButtonProps={{
-        className: classNames(classes.button, classes.ok_button),
+        className: classNames(
+          buttonClasses.button,
+          buttonClasses.theme_primary,
+          buttonClasses.size_small,
+          classes.button,
+        ),
       }}
       cancelButtonProps={{
-        className: classNames(classes.button, classes.cancel_button),
+        className: classNames(
+          buttonClasses.button,
+          buttonClasses.theme_quinary,
+          buttonClasses.size_small,
+          classes.button,
+        ),
       }}
     >
       {children}

@@ -1,10 +1,10 @@
 import type { QueryFunctionContext } from "@tanstack/react-query";
-import type { ComponentProps } from "react";
 
 import { api } from "@promo-shock/configs/axios";
-import type { PromoCard } from "@promo-shock/ui-kit";
+import type { Promo } from "@promo-shock/shared/entities";
 
 type Filters = {
+  account?: string;
   owner?: string;
   stream?: string;
   limit?: number;
@@ -13,7 +13,7 @@ type Filters = {
 const promoToPromoCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promo: any,
-): Omit<ComponentProps<typeof PromoCard>, "highlighted"> => ({
+): Promo => ({
   promoAddress: promo.promo_addr,
   tokenId: promo.token_id,
   name: promo.name,
@@ -21,7 +21,7 @@ const promoToPromoCard = (
   cover: promo.cover,
   startDate: Number(promo.start_date) * 1000,
   endDate: Number(promo.end_date) * 1000,
-  shoppingLink: "",
+  shoppingLink: promo.shopping_link,
 });
 
 const fetchPromoCards = async ({

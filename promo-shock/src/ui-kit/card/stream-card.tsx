@@ -3,38 +3,42 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
 import { useHover } from "react-use";
+import { erc721Abi } from "viem";
+import { useReadContract } from "wagmi";
+
+import type { Stream } from "@promo-shock/shared/entities";
 
 import styles from "./streamCard.module.scss";
 import { Button } from "../button";
 import { CopyToClipboard } from "../copy-to-clipboard";
 
-type Props = {
-  name: string;
-  description: string;
-  saleAddress: string;
-  ticketAddress: string;
-  banner: string;
-  price: number;
-  date: number;
-  totalAmount: number;
-  reservedAmount: number;
-  onlyWatch?: boolean;
+type Props = Omit<
+  Stream,
+  "streamerLink" | "streamLink" | "purchased" | "saleAddress"
+> & {
   highlight?: boolean;
 };
 
 export const StreamCard: FC<Props> = ({
   name,
   description,
-  saleAddress,
   ticketAddress,
+  paymentTokenAddress,
   banner,
   price,
-  date: dateUnix,
+  startDate: startDateUnix,
+  endDate: endDateUnix,
+  saleStartDate: saleStartDateUnix,
+  saleEndDate: saleEndDateUnix,
   totalAmount,
   reservedAmount,
-  onlyWatch,
   highlight,
 }) => {
+  const paymentTokenSymbol = useReadContract({
+    abi: erc721Abi,
+    address: paymentTokenAddress,
+    functionName: "symbol",
+  });
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
       <div
@@ -54,10 +58,14 @@ export const StreamCard: FC<Props> = ({
       />
     </div>
   ));
-  const date = dayjs(dateUnix);
+  const startDate = dayjs(startDateUnix);
+  const endDate = dayjs(endDateUnix);
+  const ongoing = startDate.isBefore(dayjs()) && endDate.isAfter(dayjs());
+  const saleStartDate = dayjs(saleStartDateUnix);
+  const saleEndDate = dayjs(saleEndDateUnix);
   const remainingAmount = totalAmount - reservedAmount;
-  const ticketsAreOut = remainingAmount === 0 && date.isAfter(dayjs());
-  const streamHasFinished = date.isBefore(dayjs());
+  const ticketsAreOut = remainingAmount === 0 && startDate.isAfter(dayjs());
+  const streamHasFinished = endDate.isBefore(dayjs());
 
   return (
     <div className={styles.wrap}>
@@ -69,9 +77,11 @@ export const StreamCard: FC<Props> = ({
       >
         {imageElement}
         <div className={styles.row}>
-          <span className={styles.subtitle}>{date.format("DD.MM.YYYY")}</span>
+          <span className={styles.subtitle}>
+            {startDate.format("DD.MM.YYYY")}
+          </span>
 
-          {remainingAmount > 0 && date.isAfter(dayjs()) && (
+          {remainingAmount > 0 && !streamHasFinished && (
             <span className={styles.subtitle}>
               {remainingAmount < 5 ? (
                 <span className={styles.fire}>🔥</span>
@@ -101,36 +111,48 @@ export const StreamCard: FC<Props> = ({
         </div>
 
         <div className={cn(styles.row, styles.bottomDivider)}>
-          {!onlyWatch && (
+          {!ongoing && (
             <>
               <span
                 className={cn(styles.cost, {
                   [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
                 })}
               >
-                {price} USDT
+                {paymentTokenSymbol.data
+                  ? `${price} ${paymentTokenSymbol.data}`
+                  : "loading..."}
               </span>
               {ticketsAreOut || streamHasFinished ? (
-                <Button text="See promos" theme="tertiary" size="medium" />
+                <Button
+                  text="See promos"
+                  theme="tertiary"
+                  size="medium"
+                  href={`/streams/${ticketAddress}`}
+                />
               ) : (
                 <Button
                   text="Buy access"
                   theme="primary"
                   size="medium"
-                  href={`/streams/${saleAddress}`}
+                  href={`/streams/${ticketAddress}`}
                 />
               )}
             </>
           )}
-          {onlyWatch && (
+          {ongoing && (
             <Button
               theme="quaternary"
               size="big"
               fullwidth
+              href={`/streams/${ticketAddress}`}
               text="Watch stream"
             />
           )}
         </div>
+        <span className={styles.sale_period}>
+          Selling period: {saleStartDate.format("DD.MM.YY")} —{" "}
+          {saleEndDate.format("DD.MM.YY")}
+        </span>
       </div>
     </div>
   );

@@ -99,30 +99,36 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
               chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
             });
             await waitForTransactionReceipt(web3Config, { hash });
+            await queryClient.invalidateQueries({
+              queryKey: tokenAllowance.queryKey,
+            });
           } catch (e) {
             // TODO :: handle error
             console.error(e);
           } finally {
             setPending(false);
           }
+        } else {
+          props.onClick?.(e);
         }
-        await props.onClick?.(e);
       };
+
+      const disabled = !account.address || props.disabled;
 
       return (
         <Component
           {...props}
           ref={ref}
           type={isInsufficientAllowance ? "button" : props.type}
-          loading={loading || pending}
+          loading={(loading || pending) && !disabled}
           text={
-            loading || pending
+            (loading || pending) && !disabled
               ? "Blockchain magic happening"
-              : isInsufficientAllowance
+              : isInsufficientAllowance && !disabled
               ? `Approve ${amountToApproveString}`
               : props.text
           }
-          disabled={!account.address}
+          disabled={disabled}
           onClick={handleApprove}
         />
       );

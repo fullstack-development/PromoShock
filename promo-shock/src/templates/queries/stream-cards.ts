@@ -1,27 +1,52 @@
 import type { QueryFunctionContext } from "@tanstack/react-query";
-import type { ComponentProps } from "react";
 
 import { api } from "@promo-shock/configs/axios";
-import type { StreamCard } from "@promo-shock/ui-kit";
+import type { Stream } from "@promo-shock/shared/entities";
 
-const streamToStreamCard = (
+const streamToStream = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stream: any,
-): Omit<ComponentProps<typeof StreamCard>, "onlyWatch" | "highlighted"> => ({
+): Stream => ({
   saleAddress: stream.sale_address,
-  ticketAddress: stream.ticket_addr,
+  ticketAddress: stream.ticket_address,
+  paymentTokenAddress: stream.payment_token_address,
   name: stream.name,
   description: stream.description,
   banner: stream.banner,
   price: stream.price,
-  date: Number(stream.sale_date) * 1000,
+  startDate: Number(stream.start_date) * 1000,
+  endDate: (Number(stream.start_date) + 60 * 60 * 24) * 1000,
+  streamLink: stream.stream_link,
+  streamerLink: stream.streamer_link,
+  saleStartDate: Number(stream.sale_start_date) * 1000,
+  saleEndDate: Number(stream.sale_end_date) * 1000,
   totalAmount: stream.total_amount,
   reservedAmount: stream.reserved_amount,
+  purchased: stream.purchased,
 });
 
 type Filters = {
+  account?: string;
   owner?: string;
   limit?: number;
+};
+
+const fetchStreamCard = async ({
+  queryKey: [, address],
+  signal,
+}: QueryFunctionContext<[string, address: string]>) => {
+  // FIXME :: codegen parameters
+  try {
+    const { data } = await api.getStreamTicketTicketAddrGet(address, {
+      params: {
+        address,
+      },
+      signal,
+    });
+    return streamToStream(data);
+  } catch {
+    return null;
+  }
 };
 
 const fetchStreamCards = async ({
@@ -29,7 +54,7 @@ const fetchStreamCards = async ({
   signal,
 }: QueryFunctionContext<[string, filters?: Filters]>) => {
   const limit = filters?.limit;
-  const owner = filters?.owner?.toLocaleLowerCase();
+  const owner = filters?.owner?.toLowerCase();
   // FIXME :: codegen parameters
   const { data } = await api.allTicketsTicketGet(
     undefined,
@@ -45,7 +70,7 @@ const fetchStreamCards = async ({
     },
   );
 
-  return (data as []).map(streamToStreamCard);
+  return (data as []).map(streamToStream);
 };
 
 const fetchInfiniteStreamCards = async ({
@@ -55,7 +80,7 @@ const fetchInfiniteStreamCards = async ({
 }: QueryFunctionContext<[string, filters?: Filters], number>) => {
   // FIXME :: codegen parameters
   const limit = filters?.limit;
-  const owner = filters?.owner?.toLocaleLowerCase();
+  const owner = filters?.owner?.toLowerCase();
   const { data } = await api.allTicketsTicketGet(
     undefined,
     undefined,
@@ -71,9 +96,9 @@ const fetchInfiniteStreamCards = async ({
   );
 
   return {
-    pages: (data as []).map(streamToStreamCard),
+    pages: (data as []).map(streamToStream),
     cursor: data.length ? pageParam + 1 : null,
   };
 };
 
-export { fetchStreamCards, fetchInfiniteStreamCards };
+export { fetchStreamCard, fetchStreamCards, fetchInfiniteStreamCards };

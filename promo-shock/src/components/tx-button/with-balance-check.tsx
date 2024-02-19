@@ -116,18 +116,22 @@ const withBalanceCheck = <T extends ComponentProps<typeof Button>>(
         tokenInfo.isLoading ||
         balance.isLoading;
 
+      const disabled = props.disabled || !account.address;
+
       return (
         <div className={classes.error_wrap}>
           <Component
             {...props}
             ref={ref}
-            loading={loading}
-            text={loading ? "Blockchain magic happening" : props.text}
-            disabled={!account.address}
-            error={error && !loading}
+            loading={loading && !disabled}
+            text={
+              loading && !disabled ? "Blockchain magic happening" : props.text
+            }
+            disabled={disabled}
+            error={error && !loading && !disabled}
           />
 
-          {error && !loading && (
+          {error && !loading && !disabled && (
             <span className={classes.error_message}>
               {isInsufficientBalance
                 ? "You need some BNB in your wallet to send a transaction."

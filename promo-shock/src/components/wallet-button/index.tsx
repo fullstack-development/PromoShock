@@ -62,10 +62,9 @@ const WalletButton: FC<Props> = (props) => {
           />
           <div className={classes.popover_separator} />
           <Button
-            className={classes.popover_button}
             text="Log out"
-            theme="tertiary"
-            size="medium"
+            theme="quinary"
+            size="small"
             onClick={handleLogout}
           />
         </div>
@@ -81,7 +80,7 @@ const WalletButton: FC<Props> = (props) => {
     </Popover>
   ) : (
     <Button
-      text={"Connect"}
+      text="Connect wallet"
       onClick={openConnectModal}
       theme="primary"
       size="medium"

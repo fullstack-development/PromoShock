@@ -16,16 +16,6 @@
   border: 2px dashed #595959;
 }
 
-.popover_button {
-  background-color: transparent !important;
-  border-color: #B37FEB !important;
-  color: #B37FEB !important;
-
-  &:hover {
-    background-color: #FFF !important;
-  }
-}
-
 .invert {
   &:not(:hover) {
     color: #FFF !important;
