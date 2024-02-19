@@ -107,9 +107,9 @@ class NftIndexer:
     def _index_ticket_sale_created_event(self, log, pattern, data):
         owner, ticket_sale_addr, ticket_addr = self.decode_data(pattern, data)
         event = TicketSaleCreatedEvent(
-            owner=owner,
-            ticket_sale_addr=ticket_sale_addr,
-            ticket_addr=ticket_addr,
+            owner=owner.lower(),
+            ticket_sale_addr=ticket_sale_addr.lower(),
+            ticket_addr=ticket_addr.lower(),
             block_nmb=log["blockNumber"],
             block_hash=log["blockHash"].hex(),
             transaction_hash=log["transactionHash"].hex(),
@@ -138,7 +138,7 @@ class NftIndexer:
             end_time=end_time,
             price=str(price),
             owner=owner.lower(),
-            token_payment_addr=token_payment_addr,
+            token_payment_addr=token_payment_addr.lower(),
         )
         if (
             self._repository.get(TicketSale, {"ticket_sale_addr": ticket_sale_addr.lower()})

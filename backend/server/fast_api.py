@@ -98,19 +98,16 @@ class Stream:
 @app.get("/ticket")
 async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
     # TODO: cleanup, fix pyright errors
-    def make_stream(ticket: Ticket):
+    def make_stream(ticket_sale: TicketSale):
         ticket_sale_created = repo.get(
-            TicketSaleCreatedEvent, {"ticket_addr": ticket.ticket_addr}
+            TicketSaleCreatedEvent, {"ticket_sale_addr": ticket_sale.ticket_sale_addr}
         )
         if ticket_sale_created is None:
             return None
-        filter_params = {"ticket_sale_addr": ticket_sale_created.ticket_sale_addr}
-        if owner:
-            filter_params["owner"] = owner
-        ticket_sale = repo.get(
-            TicketSale, filter_params
+        ticket = repo.get(
+                Ticket, {"ticket_addr": ticket_sale_created.ticket_addr}
         )
-        if ticket_sale is None:
+        if ticket is None:
             return None
         return Stream(
             owner_address=ticket_sale.owner,
@@ -130,10 +127,14 @@ async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
             reserved_amount=ticket.total_supply,
         )
 
+    filter_params = {}
+    if owner:
+        filter_params["owner"] = owner
+
     repo = SqlAlchemyRepository(get_session())
-    tickets = repo.filter(Ticket, {}, offset, limit)
+    ticket_sales = repo.filter(TicketSale, filter_params, offset, limit)
     streams = []
-    for t in tickets:
+    for t in ticket_sales:
         s = make_stream(t)
         if s is not None:
             streams.append(s)
