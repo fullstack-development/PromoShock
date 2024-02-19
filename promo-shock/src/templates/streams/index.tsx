@@ -1,6 +1,7 @@
 "use client";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import type { FC } from "react";
 
 import type { UnwrapPromise } from "@promo-shock/shared/types";
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export const Streams: FC<Props> = ({ initialData }) => {
+  const searchParams = useSearchParams();
   const streams = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
@@ -25,6 +27,8 @@ export const Streams: FC<Props> = ({ initialData }) => {
     select: (data) => data.pages.map((item) => item.pages).flat(),
     getNextPageParam: (lastPage) => lastPage.cursor,
   });
+
+  const highlightAddress = searchParams.get("highlight_address");
 
   const handleGetMore = async () => {
     try {
@@ -47,7 +51,11 @@ export const Streams: FC<Props> = ({ initialData }) => {
 
       <CardList>
         {streams.data?.map((stream) => (
-          <StreamCard key={stream.address} {...stream} />
+          <StreamCard
+            key={stream.address}
+            highlight={stream.address === highlightAddress}
+            {...stream}
+          />
         ))}
       </CardList>
 

@@ -7,7 +7,7 @@ import type { StreamCard } from "@promo-shock/ui-kit";
 const streamToStreamCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stream: any,
-): Omit<ComponentProps<typeof StreamCard>, "onlyWatch"> => ({
+): Omit<ComponentProps<typeof StreamCard>, "onlyWatch" | "highlighted"> => ({
   address: stream.sale_address,
   name: stream.name,
   description: stream.description,

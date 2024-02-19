@@ -14,14 +14,14 @@ const promoToPromoCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promo: any,
   idx: number,
-): ComponentProps<typeof PromoCard> & { id: string } => ({
+): Omit<ComponentProps<typeof PromoCard>, "highlighted"> & { id: string } => ({
   id: promo.id || idx.toString(),
   name: promo.name,
   description: promo.description,
   cover: promo.cover,
   startDate: Number(promo.startDate) * 1000,
   endDate: Number(promo.endDate) * 1000,
-  saleUrl: "",
+  shoppingLink: "",
 });
 
 const fetchPromoCards = async ({

@@ -6,14 +6,40 @@
   gap: 16px;
   background: #FFF;
   border-radius: 16px;
-  overflow: hidden;
   max-width: 360px;
   padding-bottom: 24px;
   border: 2px dashed $gray5;
+  overflow: hidden;
 
   &_disabled {
     pointer-events: none;
   }
+}
+
+.root_highlight {
+  z-index: 1;
+  border: none;
+  border-radius: 12px;
+}
+
+.wrap {
+  position: relative;
+  z-index: 0;
+
+  &:has(.highlight) {
+    padding: 6px;
+  }
+}
+
+.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  background-image: linear-gradient(180deg, #FFADD2 0%, #9254DE 100%);
+  z-index: -1;
 }
 
 .image_wrap {
