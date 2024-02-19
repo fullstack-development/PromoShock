@@ -1,0 +1,56 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 96px;
+  position: relative;
+  overflow-x: hidden;
+  z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  text-align: center;
+  max-width: 1140px;
+}
+
+.titleAccent {
+  color: $goldenPurple;
+  text-align: start;
+}
+
+.h3 {
+  @include h3;
+
+  color: $mainPink;
+}
+
+.h3Team {
+  @include h3;
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: var(--font-georama);
+  font-size: 20px;
+  line-height: 32px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.cardList {
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}

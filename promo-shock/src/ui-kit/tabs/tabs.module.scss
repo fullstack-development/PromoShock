@@ -1,0 +1,22 @@
+@import 'src/shared/styles/vars.scss';
+
+.root {
+  display: flex;
+  flex-wrap: nowrap;
+  background: #FFF;
+  border: 2px dashed $fadedPink;
+  padding: 8px;
+  border-radius: 22px;
+}
+
+.tab {
+  border-radius: 22px;
+  padding: 4px 32px;
+  font-size: 20px;
+  cursor: pointer;
+  background: transparent;
+
+  &_active {
+    background: $fadedPink;
+  }
+}

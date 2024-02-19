@@ -1,0 +1,55 @@
+@import 'src/shared/styles/vars.scss';
+
+.textLink {
+  transition: 300ms color;
+  position: relative;
+  cursor: pointer;
+
+  &_underline {
+    &::after {
+      width: 100%;
+      height: 5px;
+      border-radius: 5px;
+      content: "";
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: $mainPink;
+      transform: rotate(-2deg);
+      transition: 300ms height;
+    }
+  }
+
+  &:hover {
+    color: $mainPink;
+
+    &.link_underline {
+      &::after {
+        height: 9.5px;
+      }
+    }
+  }
+}
+
+.tabLink {
+  width: max-content;
+  padding: 8px 24px;
+  border-radius: 16px;
+  font-family: inherit !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+  letter-spacing: 0em !important;
+  text-align: center !important;
+  transition: 300ms color;
+  cursor: pointer;
+
+  &:hover {
+    color: $mainPink;
+  }
+
+  &_active {
+    color: $mainPink;
+    background-color: $dustRed;
+  }
+}

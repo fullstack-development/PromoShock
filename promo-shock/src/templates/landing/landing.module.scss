@@ -1,0 +1,106 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 80px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.backgroundIcons {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 132px;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  max-width: 900px;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  z-index: 1;
+}
+
+.panels {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: nowrap;
+  font-weight: 700;
+  font-size: 24px;
+  font-family: var(--font-georama);
+}
+
+.middlePanel {
+  min-width: 300px;
+  text-align: center;
+}
+
+.panel {
+  min-width: 350px;
+  text-align: center;
+}
+
+.upcoming {
+  background: $mainCyan;
+  min-height: 865px;
+  width: 120%;
+  padding: 56px 0 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-top: 180px;
+  transform: rotate(-2deg);
+}
+
+.seeAllShowsLink {
+  font-size: 24px;
+  margin-bottom: 40px;
+  margin-left: auto;
+  transform: rotate(2deg);
+}
+
+.previewsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+  transform: rotate(2deg);
+}
+
+.ticker {
+  position: absolute;
+  color: $textSunriseYellow;
+  background: linear-gradient(180deg, $fadedPink 0%, $goldenPurple 100%);
+  width: 100%;
+  top: -80px;
+  left: -10px;
+  font-size: 64px;
+  white-space: nowrap;
+  width: 200%;
+  font-family: var(--font-bowlby-one-sc);
+}
+
+.tickerLine {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  transform: translate3d(-400px, 0, 0);
+}
