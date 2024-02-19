@@ -49,7 +49,13 @@ export const MyPromos: FC<Props> = ({ initialData, queryKey }) => {
     <main className={styles.root}>
       <h1 className={styles.title}>My promos</h1>
 
-      <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
+      <div className={styles.tabs}>
+        <TabList
+          tabList={tabs}
+          selected={selected}
+          setSelected={handleSelect}
+        />
+      </div>
 
       <CardList>
         {promos.data?.map((promo) => (

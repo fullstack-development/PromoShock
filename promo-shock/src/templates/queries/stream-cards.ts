@@ -36,17 +36,13 @@ const fetchStreamCard = async ({
   signal,
 }: QueryFunctionContext<[string, address: string]>) => {
   // FIXME :: codegen parameters
-  try {
-    const { data } = await api.getStreamTicketTicketAddrGet(address, {
-      params: {
-        address,
-      },
-      signal,
-    });
-    return streamToStream(data);
-  } catch {
-    return null;
-  }
+  const { data } = await api.getStreamTicketTicketAddrGet(address, {
+    params: {
+      address,
+    },
+    signal,
+  });
+  return streamToStream(data);
 };
 
 const fetchStreamCards = async ({

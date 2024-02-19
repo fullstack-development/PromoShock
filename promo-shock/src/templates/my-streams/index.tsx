@@ -48,7 +48,13 @@ export const MyStreams: FC<Props> = ({ initialData, queryKey }) => {
     <main className={styles.root}>
       <h1 className={styles.title}>My streams</h1>
 
-      <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
+      <div className={styles.tabs}>
+        <TabList
+          tabList={tabs}
+          selected={selected}
+          setSelected={handleSelect}
+        />
+      </div>
 
       <CardList>
         {streams.data?.map((stream) => (
