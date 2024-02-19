@@ -35,11 +35,7 @@ export const MyStreams: FC<Props> = ({ data }) => {
 
       <CardList>
         {data.map((options) => (
-          <StreamCard
-            key={`${options.title}${options.description}`}
-            {...options}
-            onlyWatch
-          />
+          <StreamCard key={options.id} {...options} onlyWatch />
         ))}
       </CardList>
     </main>

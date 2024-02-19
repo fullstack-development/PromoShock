@@ -22,7 +22,12 @@ export const About: FC = () => {
           <br />
           Today we are a distributed team that still puts people first.
         </p>
-        <Button text="Visit Metalamp.io" theme="tertiary" size="medium" />
+        <Button
+          href="https://metalamp.io/"
+          text="Visit Metalamp.io"
+          theme="tertiary"
+          size="medium"
+        />
       </article>
 
       <article className={styles.article}>
@@ -37,11 +42,8 @@ export const About: FC = () => {
         </p>
 
         <div className={styles.cardList}>
-          {TEAM_LIST_MOCK.map((options) => (
-            <TeamCard
-              key={`${options.title}${options.description}`}
-              {...options}
-            />
+          {TEAM_LIST_MOCK.map((options, i) => (
+            <TeamCard key={i} {...options} />
           ))}
         </div>
       </article>

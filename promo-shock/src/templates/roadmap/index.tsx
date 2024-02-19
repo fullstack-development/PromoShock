@@ -16,8 +16,8 @@ export const Roadmap: FC = () => {
           the community informed if something is changed for any reason.
         </p>
 
-        {PHASES_LIST.map(({ text, title, status }) => (
-          <div className={styles.phaseCard} key={title}>
+        {PHASES_LIST.map(({ text, title, status }, i) => (
+          <div className={styles.phaseCard} key={i}>
             <h4 className={styles.phaseTitle}>
               {title}{" "}
               {status && (

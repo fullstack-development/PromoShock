@@ -21,10 +21,7 @@ export const Streams: FC = () => {
         {[STREAMS_PREVIEWS_MOCK, STREAMS_PREVIEWS_MOCK, STREAMS_PREVIEWS_MOCK]
           .flat()
           .map((options) => (
-            <StreamCard
-              key={`${options.title}${options.description}`}
-              {...options}
-            />
+            <StreamCard key={options.id} {...options} />
           ))}
       </CardList>
 

@@ -9,6 +9,7 @@ export const STREAMS_PREVIEWS_MOCK = [
     description: "For the first time in three years, Felix ‘xQc’ Lengye.",
     ticketsTotal: 50,
     ticketsLeft: 1,
+    id: "1",
   },
   {
     preview: streamPreviewMock.src,
@@ -19,6 +20,7 @@ export const STREAMS_PREVIEWS_MOCK = [
       "For the first time in three years, Felix ‘xQc’ Lengyel is not the most-watched streamer on Twitch.",
     ticketsTotal: 50,
     ticketsLeft: 0,
+    id: "2",
   },
   {
     preview: streamPreviewMock.src,
@@ -29,5 +31,6 @@ export const STREAMS_PREVIEWS_MOCK = [
       "For the first time in three years, Felix ‘xQc’ Lengyel is not the most-watched streamer on Twitch, as new streamers rise up to the top of the pile.",
     ticketsTotal: 50,
     ticketsLeft: 49,
+    id: "3",
   },
 ];

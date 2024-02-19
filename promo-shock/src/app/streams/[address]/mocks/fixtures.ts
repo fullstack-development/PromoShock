@@ -10,4 +10,5 @@ export const STREAM_INFO_MOCK = {
   cost: 523,
   preview: PROMOS_LIST_MOCK[0].preview,
   promos: PROMOS_LIST_MOCK,
+  id: "1",
 };

@@ -80,10 +80,7 @@ export const Stream: FC<Props> = ({
 
       <div className={styles.promoList}>
         {promos.map((options) => (
-          <PromoCard
-            key={`${options.title}${options.description}`}
-            {...options}
-          />
+          <PromoCard key={options.id} {...options} />
         ))}
       </div>
     </main>

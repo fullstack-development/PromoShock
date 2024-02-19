@@ -10,6 +10,7 @@ type Promo = {
   startDate: number;
   title: string;
   description: string;
+  id: string;
 };
 
 type Stream = {
@@ -20,6 +21,7 @@ type Stream = {
   date: number;
   ticketsTotal: number;
   ticketsLeft: number;
+  id: string;
 };
 
 export type {

@@ -35,10 +35,7 @@ export const MyPromos: FC<Props> = ({ data }) => {
 
       <CardList>
         {data.map((options) => (
-          <PromoCard
-            key={`${options.title}${options.description}`}
-            {...options}
-          />
+          <PromoCard key={options.id} {...options} />
         ))}
       </CardList>
     </main>

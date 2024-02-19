@@ -116,10 +116,7 @@ export const Landing: FC = () => {
 
         <div className={styles.previewsContainer}>
           {STREAMS_PREVIEWS_MOCK.map((options) => (
-            <StreamCard
-              key={`${options.title}${options.description}`}
-              {...options}
-            />
+            <StreamCard key={options.id} {...options} />
           ))}
         </div>
 
