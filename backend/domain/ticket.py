@@ -25,6 +25,7 @@ class Ticket:
 @dataclass(unsafe_hash=True)
 class TicketSale:
     ticket_sale_addr: Address
+    token_payment_addr: Address
     start_time: int
     end_time: int
     price: str

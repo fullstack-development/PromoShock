@@ -58,6 +58,9 @@ class SqlAlchemyRepository(AbstractRepository):
             .all()
         )
 
+    def filter_in(self, model_name, field, param, filter_params={}, offset=0, limit=25):
+        return self.session.query(model_name).filter(field.in_(param)).filter_by(**filter_params).limit(limit).offset(offset).all()
+
     def commit(self):
         try:
             self.session.commit()
@@ -104,9 +107,9 @@ class NftIndexer:
     def _index_ticket_sale_created_event(self, log, pattern, data):
         owner, ticket_sale_addr, ticket_addr = self.decode_data(pattern, data)
         event = TicketSaleCreatedEvent(
-            owner=owner,
-            ticket_sale_addr=ticket_sale_addr,
-            ticket_addr=ticket_addr,
+            owner=owner.lower(),
+            ticket_sale_addr=ticket_sale_addr.lower(),
+            ticket_addr=ticket_addr.lower(),
             block_nmb=log["blockNumber"],
             block_hash=log["blockHash"].hex(),
             transaction_hash=log["transactionHash"].hex(),
@@ -115,7 +118,7 @@ class NftIndexer:
         if (
             self._repository.get(
                 TicketSaleCreatedEvent,
-                {"ticket_sale_addr": ticket_sale_addr, "ticket_addr": ticket_addr},
+                {"ticket_sale_addr": ticket_sale_addr.lower(), "ticket_addr": ticket_addr.lower()},
             )
             is None
         ):
@@ -123,21 +126,22 @@ class NftIndexer:
             self._repository.commit()
         return event
 
-    def _index_ticket_sale(self, ticket_sale_addr):
+    def _index_ticket_sale(self, ticket_sale_addr, owner):
         contract = self._web3.eth.contract(
             self._web3.to_checksum_address(ticket_sale_addr), abi=get_ticket_sale_abi()
         )
-        start_time, end_time, price, owner = contract.functions.getSaleParams().call()
+        start_time, end_time, price, token_payment_addr = contract.functions.getSaleParams().call()
 
         ticket_sale = TicketSale(
-            ticket_sale_addr=ticket_sale_addr,
+            ticket_sale_addr=ticket_sale_addr.lower(),
             start_time=start_time,
             end_time=end_time,
             price=str(price),
-            owner=owner,
+            owner=owner.lower(),
+            token_payment_addr=token_payment_addr.lower(),
         )
         if (
-            self._repository.get(TicketSale, {"ticket_sale_addr": ticket_sale_addr})
+            self._repository.get(TicketSale, {"ticket_sale_addr": ticket_sale_addr.lower()})
             is None
         ):
             self._repository.add(ticket_sale)
@@ -157,26 +161,28 @@ class NftIndexer:
         except requests.JSONDecodeError:
             uri = {}
         ticket = Ticket(
-            ticket_addr=ticket_addr,
+            ticket_addr=ticket_addr.lower(),
             name=name,
             symbol=symbol,
             token_uri=uri,
             cap=cap,
             total_supply=total_supply,
         )
-        if self._repository.get(Ticket, {"ticket_addr": ticket_addr}) is None:
+        if self._repository.get(Ticket, {"ticket_addr": ticket_addr.lower()}) is None:
             self._repository.add(ticket)
             self._repository.commit()
         return ticket
 
     def _index_promo_created_event(self, log: LogReceipt, pattern: tuple[str]):
+        [owner] = self.decode_data(["address"], log["topics"][1])
         start_time, end_time, promo_addr, streams, description = self.decode_data(
             [pattern], log["data"]
         )[0]
         event = PromoCreatedEvent(
             start_time=start_time,
             end_time=end_time,
-            promo_addr=promo_addr,
+            owner=owner.lower(),
+            promo_addr=promo_addr.lower(),
             streams=streams,
             description=description,
             transaction_hash=log["transactionHash"].hex(),
@@ -185,7 +191,7 @@ class NftIndexer:
             block_hash=log["blockHash"].hex(),
         )
         if (
-            self._repository.get(PromoCreatedEvent, {"promo_addr": event.promo_addr})
+            self._repository.get(PromoCreatedEvent, {"promo_addr": event.promo_addr.lower()})
             is None
         ):
             self._repository.add(event)
@@ -209,7 +215,7 @@ class NftIndexer:
         for log in logs:
             try:
                 # TODO: parse MintPromo event
-                owner, tokenId = self.decode_data(
+                payment_token_addr, tokenId = self.decode_data(
                     ("address", "uint256"), HexBytes(bytes().join(log["topics"][1:]))
                 )
                 start_time, end_time, promo_addr, streams, description = (
@@ -227,17 +233,18 @@ class NftIndexer:
                 except requests.JSONDecodeError:
                     uri = {}
                 promo = Promo(
-                    owner=owner,
+                    owner=promo_created_event.owner.lower(),
+                    payment_token_addr=payment_token_addr.lower(),
                     token_id=tokenId,
                     start_time=start_time,
                     end_time=end_time,
-                    promo_addr=promo_addr,
+                    promo_addr=promo_addr.lower(),
                     description=description,
                     uri=uri,
                 )
                 if (
                     self._repository.get(
-                        Promo, {"promo_addr": promo_addr, "token_id": tokenId}
+                        Promo, {"promo_addr": promo_addr.lower(), "token_id": tokenId}
                     )
                 ) is None:
                     self._repository.add(promo)
@@ -245,14 +252,14 @@ class NftIndexer:
                     logger.info(f"Promo {promo.promo_addr}#{promo.token_id} was saved")
                 for stream_addr in streams:
                     promo_to_ticket = PromoToTicket(
-                        promo_addr=promo_addr, ticket_addr=stream_addr, token_id=tokenId
+                        promo_addr=promo_addr.lower(), ticket_addr=stream_addr.lower(), token_id=tokenId
                     )
                     if (
                         self._repository.get(
                             PromoToTicket,
                             {
-                                "promo_addr": promo_addr,
-                                "ticket_addr": stream_addr,
+                                "promo_addr": promo_addr.lower(),
+                                "ticket_addr": stream_addr.lower(),
                                 "token_id": tokenId,
                             },
                         )
@@ -291,7 +298,7 @@ class NftIndexer:
                 ticket_sale_event = self._index_ticket_sale_created_event(
                     log, pattern, topic_bytes
                 )
-                self._index_ticket_sale(ticket_sale_event.ticket_sale_addr)
+                self._index_ticket_sale(ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner)
                 self._index_ticket(ticket_sale_event.ticket_addr)
             elif topic_name == "PromotionCreated":
                 promo_created_event = self._index_promo_created_event(log, pattern)

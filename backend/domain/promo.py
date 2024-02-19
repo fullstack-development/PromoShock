@@ -8,6 +8,7 @@ from eth_typing import Address
 @dataclass(unsafe_hash=True)
 class PromoCreatedEvent:
     start_time: date
+    owner: Address
     end_time: date
     promo_addr: Address
     streams: List[Address]
@@ -21,6 +22,7 @@ class PromoCreatedEvent:
 @dataclass(unsafe_hash=True)
 class Promo:
     owner: Address
+    payment_token_addr: Address
     token_id: int
     start_time: int
     end_time: int
