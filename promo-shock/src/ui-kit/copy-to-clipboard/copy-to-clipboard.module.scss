@@ -1,4 +1,6 @@
 .root {
+  display: flex;
+  align-items: center;
   padding: 8px 12px;
   border-radius: 16px;
   border: 2px solid #9254DE;
@@ -11,4 +13,5 @@
   line-height: 20px;
   letter-spacing: 0em;
   text-align: center;
+  cursor: pointer;
 }

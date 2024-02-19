@@ -99,6 +99,7 @@ const NewPromo: FC = () => {
         name: data.promo_name,
         description: data.promo_description,
         image: data.promo_cover.originFileObj!,
+        shopping_link: data.promo_shopping_link,
       });
       const args = [
         {
@@ -181,7 +182,7 @@ const NewPromo: FC = () => {
             control={control}
             render={({ field }) => (
               <TextField
-                label="Promo name"
+                label="Promo name:"
                 placeholder="Study with the HARVARD STUDY"
                 className={classNames(classes.col_1, classes.contents)}
                 error={errors.promo_name?.message}
@@ -195,11 +196,25 @@ const NewPromo: FC = () => {
             control={control}
             render={({ field }) => (
               <TextArea
-                label="More about"
+                label="More about:"
                 className={classNames(classes.col_1, classes.contents)}
                 placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
                 maxLength={100}
                 error={errors.promo_description?.message}
+                disabled={pending}
+                {...field}
+              />
+            )}
+          />
+          <Controller<FormData, "promo_shopping_link">
+            name="promo_shopping_link"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Link to shopping:"
+                placeholder="heretowatch.com"
+                className={classNames(classes.col_1, classes.contents)}
+                error={errors.promo_shopping_link?.message}
                 disabled={pending}
                 {...field}
               />
@@ -231,7 +246,7 @@ const NewPromo: FC = () => {
             <DynamicFieldset<FormData, "promo_stream_addresses">
               control={control}
               labelPosition="top"
-              label="Smart contract address"
+              label="Smart contract address:"
               placeholder="x43djvnprjvfbo2ei2e2e"
               name="promo_stream_addresses"
               errors={errors.promo_stream_addresses?.map?.(

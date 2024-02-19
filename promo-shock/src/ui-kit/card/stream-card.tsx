@@ -2,9 +2,11 @@ import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
+import { useHover } from "react-use";
 
 import styles from "./streamCard.module.scss";
 import { Button } from "../button";
+import { CopyToClipboard } from "../copy-to-clipboard";
 
 type Props = {
   name: string;
@@ -29,6 +31,25 @@ export const StreamCard: FC<Props> = ({
   reservedAmount,
   onlyWatch,
 }) => {
+  const [imageElement] = useHover((hovered) => (
+    <div className={styles.image_wrap}>
+      <div
+        className={cn(styles.copy, {
+          [styles.copy_hovered]: hovered,
+        })}
+      >
+        <CopyToClipboard text={address} message="Copy ticket address" />
+      </div>
+
+      <Image
+        className={styles.image}
+        fill
+        sizes="33vw"
+        src={banner || ""}
+        alt="stream banner"
+      />
+    </div>
+  ));
   const date = dayjs(dateUnix);
   const remainingAmount = totalAmount - reservedAmount;
   const ticketsAreOut = remainingAmount === 0 && date.isAfter(dayjs());
@@ -36,13 +57,7 @@ export const StreamCard: FC<Props> = ({
 
   return (
     <div className={styles.root}>
-      <Image
-        className={styles.image}
-        width={360}
-        height={255}
-        src={banner || ""}
-        alt="stream banner"
-      />
+      {imageElement}
       <div className={styles.row}>
         <span className={styles.subtitle}>{date.format("DD.MM.YYYY")}</span>
 

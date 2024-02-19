@@ -3,13 +3,14 @@ import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
 import type { ComponentProps, FC } from "react";
+import { useHover } from "react-use";
 import { parseUnits } from "viem";
 import type { Address } from "viem";
 
 import { useWriteTicketSaleBuy } from "@generated/wagmi";
 
 import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
-import { Button, PromoCard } from "@promo-shock/ui-kit";
+import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
 
@@ -48,10 +49,30 @@ export const Stream: FC<Props> = ({
   reservedAmount,
   promos,
 }) => {
+  const [imageElement] = useHover((hovered) => (
+    <div className={styles.image_wrap}>
+      <div
+        className={cn(styles.copy, {
+          [styles.copy_hovered]: hovered,
+        })}
+      >
+        <CopyToClipboard text={address} message="Copy ticket address" />
+      </div>
+
+      <Image
+        className={styles.image}
+        fill
+        sizes="50vw"
+        src={banner}
+        alt="stream preview"
+      />
+    </div>
+  ));
+
+  const buy = useWriteTicketSaleBuy();
   const date = dayjs(dateUnix);
   const saleEndDate = dayjs(saleEndDateUnix);
   const saleStartDate = dayjs(saleStartDateUnix);
-  const buy = useWriteTicketSaleBuy();
   const remainingAmount = totalAmount - reservedAmount;
   const ticketsAreOut = remainingAmount === 0 && date.isAfter(dayjs());
   const saleHasFinished = saleEndDate.isBefore(dayjs());
@@ -85,13 +106,7 @@ export const Stream: FC<Props> = ({
 
       <div className={styles.streamInfoWrapper}>
         <div className={styles.streamInfo}>
-          <Image
-            className={styles.image}
-            width={480}
-            height={354}
-            src={banner}
-            alt="stream preview"
-          />
+          {imageElement}
           <div className={styles.row}>
             <span>
               <div className={styles.streamStarts}>Stream starts</div>
