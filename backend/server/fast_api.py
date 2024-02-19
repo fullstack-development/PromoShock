@@ -158,6 +158,7 @@ async def get_stream(ticket_addr: str) -> Optional[Stream]:
         owner_address=ticket_sale.owner,
         sale_address=ticket_sale.ticket_sale_addr,
         ticket_addr=ticket.ticket_addr,
+        payment_token_addr=ticket_sale.token_payment_addr,
         name=ticket.name,
         description=ticket.token_uri.get("description", ""),
         banner=ticket.token_uri.get("image", ""),
