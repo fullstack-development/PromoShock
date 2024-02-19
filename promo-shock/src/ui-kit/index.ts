@@ -11,3 +11,4 @@ export * from "./card-list";
 export * from "./tooltips";
 export * from "./popconfirm";
 export * from "./popover";
+export * from "./copy-to-clipboard";

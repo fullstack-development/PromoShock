@@ -8,3 +8,4 @@ export * from "./my-promos";
 export * from "./my-streams";
 export * from "./about";
 export * from "./roadmap";
+export * from "./queries";

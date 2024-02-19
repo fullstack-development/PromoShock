@@ -5,6 +5,9 @@ const nextConfig = {
     return config;
   },
   sassOptions: {},
+  images: {
+    domains: ["ipfs.io"],
+  },
 };
 
 module.exports = nextConfig;

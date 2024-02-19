@@ -7,55 +7,66 @@ import styles from "./streamCard.module.scss";
 import { Button } from "../button";
 
 type Props = {
-  preview: string;
+  name: string;
+  description: string;
+  cover: string;
   startDate: number;
   endDate: number;
-  title: string;
-  description: string;
-  url?: string;
+  shoppingLink?: string;
+  highlighted?: boolean;
 };
 
 export const PromoCard: FC<Props> = ({
-  preview,
-  endDate,
-  startDate,
-  url,
-  title,
+  name,
+  cover,
+  endDate: endDateUnix,
+  startDate: startDateUnix,
+  shoppingLink,
   description,
+  highlighted,
 }) => {
+  const startDate = dayjs(startDateUnix);
+  const endDate = dayjs(endDateUnix);
   return (
-    <a
-      target="_blank"
-      className={cn(styles.root, { [styles.root_disabled]: !url })}
-      href={url}
-    >
-      <Image
-        className={cn(styles.image, { [styles.image_disabled]: !url })}
-        width={360}
-        height={255}
-        src={preview}
-        alt="stream preview"
-      />
-      <div className={styles.row}>
-        <span className={styles.subtitle}>
-          {dayjs(startDate).format("DD.MM.YYYY")} -{" "}
-          {dayjs(endDate).format("DD.MM.YYYY")}
-        </span>
-      </div>
-
-      <div className={styles.description}>
-        <h5 className={styles.title}>{title}</h5>
-        <p>{description}</p>
-      </div>
-
-      <div className={cn(styles.center, styles.bottomDivider)}>
-        <Button
-          text="Go shopping"
-          theme="primary"
-          size="medium"
-          disabled={!url}
+    <div className={styles.wrap}>
+      {highlighted && <div className={styles.highlight}></div>}
+      <a
+        target="_blank"
+        className={cn(styles.root, {
+          [styles.root_disabled]: !shoppingLink,
+          [styles.root_highlighted]: highlighted,
+        })}
+        href={shoppingLink}
+      >
+        <Image
+          className={cn(styles.image, {
+            [styles.image_disabled]: !shoppingLink,
+          })}
+          width={360}
+          height={255}
+          src={cover}
+          alt="stream cover"
         />
-      </div>
-    </a>
+        <div className={styles.row}>
+          <span className={styles.subtitle}>
+            {startDate.format("DD.MM.YYYY")} - {endDate.format("DD.MM.YYYY")}
+          </span>
+        </div>
+
+        <div className={styles.description}>
+          <h5 className={styles.title}>{name}</h5>
+          <p>{description}</p>
+        </div>
+
+        <div className={cn(styles.center, styles.bottomDivider)}>
+          <Button
+            text="Go shopping"
+            theme="primary"
+            size="medium"
+            disabled={!shoppingLink}
+          />
+        </div>
+      </a>
+    </div>
   );
 };

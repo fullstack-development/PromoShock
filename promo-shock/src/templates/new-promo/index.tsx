@@ -1,18 +1,29 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { formatUnits } from "viem";
+import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
-import { useClient, useConfig } from "wagmi";
+import { useAccount, useClient, useConfig, useReadContracts } from "wagmi";
 
-import { simulatePromoFactoryCreatePromo } from "@generated/wagmi";
+import {
+  simulatePromoFactoryCreatePromo,
+  useReadPromoFactoryGetPaymentTokenAddress,
+  useReadPromoFactoryGetPromoCreationPrice,
+  useWatchPromoFactoryPromotionCreatedEvent,
+  useWritePromoFactoryCreatePromo,
+} from "@generated/wagmi";
 
-import { TxButton } from "@promo-shock/components";
+import { withSwitchNetwork } from "@promo-shock/components";
+import { withApprove } from "@promo-shock/components/tx-button/with-approve";
+import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
+import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -20,15 +31,20 @@ import {
   TextField,
   DynamicFieldset,
   ImageUploader,
+  Button,
 } from "@promo-shock/ui-kit";
 
 import { errorMap } from "./errors";
-import { useCreatePromo, usePaymentInfo, useWriteMetadata } from "./hooks";
+import { writeMetadata } from "./mutations";
 import classes from "./new-promo.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
 
+const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
+
 const NewPromo: FC = () => {
+  const router = useRouter();
+  const account = useAccount();
   const config = useConfig();
   const client = useClient();
   const {
@@ -42,28 +58,67 @@ const NewPromo: FC = () => {
     },
     shouldFocusError: false,
   });
-  const createPromo = useCreatePromo();
-  const writeMetadata = useWriteMetadata();
+  const createPromo = useWritePromoFactoryCreatePromo();
+  const metadata = useMutation({
+    mutationFn: writeMetadata,
+  });
   const [estimatedGasForCreatePromo, setEstimatedGasForCreatePromo] =
     useState<bigint>();
   const streamAddresses = useWatch({
     control,
     name: "promo_stream_addresses",
   });
-  const [creationPrice, tokenInfo, tokenAddress] = usePaymentInfo();
+  const creationPrice = useReadPromoFactoryGetPromoCreationPrice({
+    chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+  });
+  const tokenAddress = useReadPromoFactoryGetPaymentTokenAddress({
+    chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+  });
+  const tokenInfo = useReadContracts({
+    query: { staleTime: Infinity },
+    contracts: [
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: tokenAddress.data,
+        functionName: "decimals",
+      },
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: tokenAddress.data,
+        functionName: "symbol",
+      },
+    ],
+  });
+  const [pending, setPending] = useState(false);
 
   useConfirmLeave(
     isDirty,
     "Are you sure you want to leave the page? Data is not saved",
   );
 
+  useWatchPromoFactoryPromotionCreatedEvent({
+    enabled: pending,
+    args: { marketer: account.address },
+    onLogs: async (logs) => {
+      await api.startIndexIndexStartPost();
+      setPending(false);
+      router.push(
+        `/promos?highlight_address=${logs[0]?.args?.promotion?.promoAddr.toLowerCase()}`,
+      );
+    },
+  });
+
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     try {
-      const metadataCid = await writeMetadata.mutateAsync({
+      setPending(true);
+      const metadataCid = await metadata.mutateAsync({
         name: data.promo_name,
         description: data.promo_description,
         image: data.promo_cover.originFileObj!,
+        shopping_link: data.promo_shopping_link,
       });
       const args = [
         {
@@ -78,11 +133,15 @@ const NewPromo: FC = () => {
       await Promise.all([
         createPromo.writeContractAsync({
           args,
+          chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
         }),
         (async () => {
           const simulatedCreateStream = await simulatePromoFactoryCreatePromo(
             config,
-            { args },
+            {
+              args,
+              chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+            },
           );
           const estimatedGas =
             client &&
@@ -95,6 +154,8 @@ const NewPromo: FC = () => {
     }
   };
 
+  const [tokenDecimals, tokenSymbol] = tokenInfo.data || [];
+
   const creationPriceSum =
     typeof creationPrice.data !== "undefined"
       ? creationPrice.data * BigInt(streamAddresses.length)
@@ -102,17 +163,24 @@ const NewPromo: FC = () => {
 
   const creationPriceSumString =
     typeof creationPriceSum !== "undefined" &&
-    typeof tokenInfo.data?.[0].result !== "undefined" &&
-    typeof tokenInfo.data?.[1].result !== "undefined"
-      ? `${formatUnits(creationPriceSum, tokenInfo.data[0].result)} ${
-          tokenInfo.data[1].result
+    typeof tokenDecimals?.result !== "undefined" &&
+    typeof tokenSymbol?.result !== "undefined"
+      ? `${formatUnits(creationPriceSum, tokenDecimals.result)} ${
+          tokenSymbol.result
         }`
       : undefined;
 
-  const isPending = createPromo.isPending || writeMetadata.isPending;
+  const creationPriceString =
+    typeof creationPrice.data !== "undefined" &&
+    typeof tokenDecimals?.result !== "undefined" &&
+    typeof tokenSymbol?.result !== "undefined"
+      ? `${formatUnits(creationPrice.data, tokenDecimals.result)} ${
+          tokenSymbol.result
+        }`
+      : undefined;
 
-  const isLoading =
-    isPending ||
+  const loading =
+    pending ||
     tokenInfo.isLoading ||
     creationPrice.isLoading ||
     tokenAddress.isLoading;
@@ -132,7 +200,7 @@ const NewPromo: FC = () => {
                   aspectRatio="416/307"
                   placeholder="Upload promo cover"
                   error={errors.promo_cover?.message}
-                  disabled={isPending}
+                  disabled={pending}
                   {...field}
                 />
               </div>
@@ -143,11 +211,11 @@ const NewPromo: FC = () => {
             control={control}
             render={({ field }) => (
               <TextField
-                label="Promo name"
+                label="Promo name:"
                 placeholder="Study with the HARVARD STUDY"
                 className={classNames(classes.col_1, classes.contents)}
                 error={errors.promo_name?.message}
-                disabled={isPending}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -157,12 +225,26 @@ const NewPromo: FC = () => {
             control={control}
             render={({ field }) => (
               <TextArea
-                label="More about"
+                label="More about:"
                 className={classNames(classes.col_1, classes.contents)}
                 placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
                 maxLength={100}
                 error={errors.promo_description?.message}
-                disabled={isPending}
+                disabled={pending}
+                {...field}
+              />
+            )}
+          />
+          <Controller<FormData, "promo_shopping_link">
+            name="promo_shopping_link"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Link to shopping:"
+                placeholder="heretowatch.com"
+                className={classNames(classes.col_1, classes.contents)}
+                error={errors.promo_shopping_link?.message}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -176,7 +258,7 @@ const NewPromo: FC = () => {
                 className={classNames(classes.col_1, classes.contents)}
                 placeholder={["13.12.2024", "24.12.2042"]}
                 error={errors.promo_sale_time?.message}
-                disabled={isPending}
+                disabled={pending}
                 {...field}
               />
             )}
@@ -193,13 +275,14 @@ const NewPromo: FC = () => {
             <DynamicFieldset<FormData, "promo_stream_addresses">
               control={control}
               labelPosition="top"
-              label="Smart contract address"
+              label="Smart contract address:"
               placeholder="x43djvnprjvfbo2ei2e2e"
               name="promo_stream_addresses"
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
-              disabled={isPending}
+              disabled={pending}
+              caption={creationPriceString && `+${creationPriceString}`}
             />
           </div>
         </div>
@@ -209,7 +292,9 @@ const NewPromo: FC = () => {
         <TxButton
           type="submit"
           text={`Pay ${creationPriceSumString} and create promo`}
-          loading={isLoading}
+          size="large"
+          theme="secondary"
+          loading={loading}
           estimatedGas={estimatedGasForCreatePromo}
           tokenAddress={tokenAddress.data}
           tokenAmount={creationPriceSum}

@@ -1,5 +1,6 @@
 .previewList {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   justify-content: center;
   gap: 56px 36px;
   flex-wrap: wrap;

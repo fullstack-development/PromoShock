@@ -23,11 +23,13 @@ type Stream = {
   ticketsLeft: number;
   id: string;
 };
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : never;
 
 export type {
   PropsWithClassName,
   CompoundComponent,
   ComponentWithSkeleton,
-  Promo,
+  UnwrapPromise,
   Stream,
+  Promo,
 };

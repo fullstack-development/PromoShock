@@ -16,3 +16,24 @@
     cursor: not-allowed;
   }
 }
+
+.append {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  justify-items: center;
+}
+
+.caption {
+  position: absolute;
+  top: calc(100% + 4px);
+  justify-self: center;
+  font-family: var(--font-georama);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #000000D9;
+}
+

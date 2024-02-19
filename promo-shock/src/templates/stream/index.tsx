@@ -1,44 +1,112 @@
+"use client";
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
-import type { FC } from "react";
+import type { ComponentProps, FC } from "react";
+import { useHover } from "react-use";
+import { parseUnits } from "viem";
+import type { Address } from "viem";
 
-import { TxButton } from "@promo-shock/components";
-import type { Promo, Stream as StreamType } from "@promo-shock/shared/types";
-import { Button, PromoCard } from "@promo-shock/ui-kit";
+import { useWriteTicketSaleBuy } from "@generated/wagmi";
+
+import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
+import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
 
-type Props = StreamType & { promos: Promo[] };
+type Props = {
+  name: string;
+  description: string;
+  address: Address;
+  paymentToken: Address;
+  paymentTokenSymbol: string;
+  paymentTokenDecimals: number;
+  saleStartDate: number;
+  saleEndDate: number;
+  banner: string;
+  price: number;
+  date: number;
+  totalAmount: number;
+  reservedAmount: number;
+  promos: Array<ComponentProps<typeof PromoCard> & { id: string }>;
+};
+
+const TxButton = withBalanceCheck(withSwitchNetwork(Button));
 
 export const Stream: FC<Props> = ({
-  title,
-  date: dateTimestamp,
-  ticketsLeft,
-  ticketsTotal,
-  preview,
+  name,
+  date: dateUnix,
   description,
+  address,
+  paymentToken,
+  paymentTokenSymbol,
+  paymentTokenDecimals,
+  saleEndDate: saleEndDateUnix,
+  saleStartDate: saleStartDateUnix,
+  banner,
+  price,
+  totalAmount,
+  reservedAmount,
   promos,
 }) => {
-  const date = dayjs(dateTimestamp);
-  const ticketsAreOut = ticketsLeft < 1 && date.isAfter(dayjs());
+  const [imageElement] = useHover((hovered) => (
+    <div className={styles.image_wrap}>
+      <div
+        className={cn(styles.copy, {
+          [styles.copy_hovered]: hovered,
+        })}
+      >
+        <CopyToClipboard text={address} message="Copy ticket address" />
+      </div>
+
+      <Image
+        className={styles.image}
+        fill
+        sizes="50vw"
+        src={banner}
+        alt="stream preview"
+      />
+    </div>
+  ));
+
+  const buy = useWriteTicketSaleBuy();
+  const date = dayjs(dateUnix);
+  const saleEndDate = dayjs(saleEndDateUnix);
+  const saleStartDate = dayjs(saleStartDateUnix);
+  const remainingAmount = totalAmount - reservedAmount;
+  const ticketsAreOut = remainingAmount === 0 && date.isAfter(dayjs());
+  const saleHasFinished = saleEndDate.isBefore(dayjs());
+  const saleHasNotStarted = saleStartDate.isAfter(dayjs());
   const streamHasFinished = date.isBefore(dayjs());
+
+  const handleBuy = async () => {
+    try {
+      // TODO :: handle case when sale has not started or has finished
+      if (saleHasFinished) throw new Error("Sale has finished");
+      if (saleHasNotStarted) throw new Error("Sale has not started");
+      await buy.writeContractAsync({
+        address,
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <main className={styles.root}>
-      <h1 className={styles.title}>{title}</h1>
+      <h1 className={styles.title}>{name}</h1>
 
-      <Button theme="quaternary" size="big" text="Watch stream" />
+      <Button
+        className={styles.watchLink}
+        theme="quaternary"
+        size="big"
+        text="Watch stream"
+      />
 
       <div className={styles.streamInfoWrapper}>
         <div className={styles.streamInfo}>
-          <Image
-            className={styles.image}
-            width={480}
-            height={354}
-            src={preview}
-            alt="stream preview"
-          />
+          {imageElement}
           <div className={styles.row}>
             <span>
               <div className={styles.streamStarts}>Stream starts</div>
@@ -47,10 +115,14 @@ export const Stream: FC<Props> = ({
               </span>
             </span>
 
-            {ticketsLeft > 0 && date.isAfter(dayjs()) && (
+            {remainingAmount > 0 && date.isAfter(dayjs()) && (
               <span className={styles.subtitle}>
-                {ticketsLeft < 5 ? <span className={styles.fire}>🔥</span> : ""}
-                {ticketsLeft} of {ticketsTotal} tickets left
+                {remainingAmount < 5 ? (
+                  <span className={styles.fire}>🔥</span>
+                ) : (
+                  ""
+                )}
+                {remainingAmount} of {totalAmount} tickets left
               </span>
             )}
 
@@ -67,7 +139,15 @@ export const Stream: FC<Props> = ({
             )}
           </div>
 
-          <TxButton type="button" text="Buy access" />
+          <TxButton
+            size="large"
+            theme="secondary"
+            type="button"
+            text={`Pay ${price} ${paymentTokenSymbol} and buy access`}
+            tokenAddress={paymentToken}
+            tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
+            onClick={handleBuy}
+          />
         </div>
 
         <div className={styles.description}>
@@ -79,8 +159,8 @@ export const Stream: FC<Props> = ({
       <h3 className={styles.h3}>Promos</h3>
 
       <div className={styles.promoList}>
-        {promos.map((options) => (
-          <PromoCard key={options.id} {...options} />
+        {promos.map((promo) => (
+          <PromoCard key={promo.id} {...promo} />
         ))}
       </div>
     </main>
