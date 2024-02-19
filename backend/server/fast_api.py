@@ -80,11 +80,12 @@ async def index_promo(from_block: BlockParams = 37553211, to_block: BlockParams 
 class Stream:
     owner_address: Address
     sale_address: Address
-    ticket_addr: Address
-    payment_token_addr: Address
+    ticket_address: Address
+    payment_token_address: Address
     name: str
     description: str
     banner: str
+    start_date: int
     sale_start_date: int
     sale_end_date: int
     link: str
@@ -114,11 +115,12 @@ async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
         return Stream(
             owner_address=ticket_sale.owner,
             sale_address=ticket_sale.ticket_sale_addr,
-            ticket_addr=ticket.ticket_addr,
-            payment_token_addr=ticket_sale.token_payment_addr,
+            ticket_address=ticket.ticket_addr,
+            payment_token_address=ticket_sale.token_payment_addr,
             name=ticket.name,
             description=ticket.token_uri.get("description", ""),
             banner=ticket.token_uri.get("image", ""),
+            start_date=ticket.token_uri.get("start_time", 0),
             sale_start_date=ticket_sale.start_time,
             sale_end_date=ticket_sale.end_time,
             link=ticket.token_uri.get("link", ""),
