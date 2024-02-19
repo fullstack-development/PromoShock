@@ -48,6 +48,7 @@ async def start_index():
 @dataclass(frozen=True)
 class Stream:
     owner_address: Address
+    ticket_addr: Address
     name: str
     description: str
     banner: str
@@ -63,7 +64,7 @@ class Stream:
 @app.get("/ticket")
 async def all_tickets(offset=0, limit=25) -> List[Stream]:
     # TODO: cleanup, fix pyright errors
-    def make_stream(ticket):
+    def make_stream(ticket: Ticket):
         ticket_sale_created = repo.get(
             TicketSaleCreatedEvent, {"ticket_addr": ticket.ticket_addr}
         )
@@ -72,6 +73,7 @@ async def all_tickets(offset=0, limit=25) -> List[Stream]:
         )
         return Stream(
             owner_address=ticket_sale.owner,
+            ticket_addr=ticket.ticket_addr,
             name=ticket.name,
             description=ticket.token_uri.get("description", ""),
             banner=ticket.token_uri.get("image", ""),
