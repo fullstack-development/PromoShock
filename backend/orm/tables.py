@@ -43,6 +43,7 @@ ticket_sale_table = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("ticket_sale_addr", String(256), unique=True),
+    Column("token_payment_addr", String(256)),
     Column("start_time", Integer),
     Column("end_time", Integer),
     Column("price", String(256)),

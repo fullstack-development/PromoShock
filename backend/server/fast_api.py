@@ -81,6 +81,7 @@ class Stream:
     owner_address: Address
     sale_address: Address
     ticket_addr: Address
+    payment_token_addr: Address
     name: str
     description: str
     banner: str
@@ -114,6 +115,7 @@ async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
             owner_address=ticket_sale.owner,
             sale_address=ticket_sale.ticket_sale_addr,
             ticket_addr=ticket.ticket_addr,
+            payment_token_addr=ticket_sale.token_payment_addr,
             name=ticket.name,
             description=ticket.token_uri.get("description", ""),
             banner=ticket.token_uri.get("image", ""),

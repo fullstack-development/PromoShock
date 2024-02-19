@@ -126,11 +126,11 @@ class NftIndexer:
             self._repository.commit()
         return event
 
-    def _index_ticket_sale(self, ticket_sale_addr):
+    def _index_ticket_sale(self, ticket_sale_addr, owner):
         contract = self._web3.eth.contract(
             self._web3.to_checksum_address(ticket_sale_addr), abi=get_ticket_sale_abi()
         )
-        start_time, end_time, price, owner = contract.functions.getSaleParams().call()
+        start_time, end_time, price, token_payment_addr = contract.functions.getSaleParams().call()
 
         ticket_sale = TicketSale(
             ticket_sale_addr=ticket_sale_addr.lower(),
@@ -138,6 +138,7 @@ class NftIndexer:
             end_time=end_time,
             price=str(price),
             owner=owner.lower(),
+            token_payment_addr=token_payment_addr,
         )
         if (
             self._repository.get(TicketSale, {"ticket_sale_addr": ticket_sale_addr.lower()})
@@ -297,7 +298,7 @@ class NftIndexer:
                 ticket_sale_event = self._index_ticket_sale_created_event(
                     log, pattern, topic_bytes
                 )
-                self._index_ticket_sale(ticket_sale_event.ticket_sale_addr)
+                self._index_ticket_sale(ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner)
                 self._index_ticket(ticket_sale_event.ticket_addr)
             elif topic_name == "PromotionCreated":
                 promo_created_event = self._index_promo_created_event(log, pattern)
