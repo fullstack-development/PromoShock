@@ -2,13 +2,35 @@ from dataclasses import dataclass
 from datetime import date
 from typing import List
 
-from domain.stream import Stream
+from eth_typing import Address
 
 
-@dataclass(frozen=True)
-class Promo:
+@dataclass(unsafe_hash=True)
+class PromoCreatedEvent:
     start_time: date
     end_time: date
-    promo_address: str
-    streams: List[Stream]
+    promo_addr: Address
+    streams: List[Address]
     description: str
+    transaction_hash: str
+    transaction_id: int
+    block_hash: str
+    block_nmb: int
+
+
+@dataclass(unsafe_hash=True)
+class Promo:
+    owner: Address
+    token_id: int
+    start_time: int
+    end_time: int
+    promo_addr: Address
+    description: str
+    uri: dict
+
+
+@dataclass(unsafe_hash=True)
+class PromoToTicket:
+    promo_addr: Address
+    ticket_addr: Address
+    token_id: int
