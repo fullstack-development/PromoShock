@@ -127,7 +127,7 @@ const withBalanceCheck = <T extends ComponentProps<typeof Button>>(
             error={error && !loading}
           />
 
-          {error && (
+          {error && !loading && (
             <span className={classes.error_message}>
               {isInsufficientBalance
                 ? "You need some BNB in your wallet to send a transaction."

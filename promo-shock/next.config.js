@@ -6,7 +6,13 @@ const nextConfig = {
   },
   sassOptions: {},
   images: {
-    domains: ["ipfs.io"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ipfs.io",
+        pathname: "/ipfs/**",
+      },
+    ],
   },
 };
 

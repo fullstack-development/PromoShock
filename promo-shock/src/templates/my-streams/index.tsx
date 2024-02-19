@@ -1,9 +1,8 @@
 "use client";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FC } from "react";
-import { useAccount } from "wagmi";
 
 import type { UnwrapPromise } from "@promo-shock/shared/types";
 import { CardList, StreamCard, TabList } from "@promo-shock/ui-kit";
@@ -21,18 +20,16 @@ type Props = {
     UnwrapPromise<ReturnType<typeof fetchInfiniteStreamCards>>,
     number
   >;
+  queryKey: [string, { owner: string; limit?: number }];
 };
 
-export const MyStreams: FC<Props> = ({ initialData }) => {
-  const account = useAccount();
+export const MyStreams: FC<Props> = ({ initialData, queryKey }) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const streams = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
-    queryKey: ["streams", { owner: account.address }] as [
-      "streams",
-      filters?: { owner: string },
-    ],
+    queryKey,
     queryFn: fetchInfiniteStreamCards,
     select: (data) => data.pages.map((item) => item.pages).flat(),
     getNextPageParam: (lastPage) => lastPage.cursor,
@@ -45,6 +42,8 @@ export const MyStreams: FC<Props> = ({ initialData }) => {
     router.push(tabs[opposite].url);
   };
 
+  const highlightAddress = searchParams.get("highlight_address");
+
   return (
     <main className={styles.root}>
       <h1 className={styles.title}>My streams</h1>
@@ -53,7 +52,11 @@ export const MyStreams: FC<Props> = ({ initialData }) => {
 
       <CardList>
         {streams.data?.map((stream) => (
-          <StreamCard key={stream.address} {...stream} />
+          <StreamCard
+            key={stream.saleAddress}
+            highlight={stream.saleAddress === highlightAddress}
+            {...stream}
+          />
         ))}
       </CardList>
     </main>

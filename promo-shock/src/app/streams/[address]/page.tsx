@@ -7,7 +7,11 @@ import { readTicketSaleGetSaleParams } from "@generated/wagmi";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
-import { Stream, fetchStreamCards } from "@promo-shock/templates";
+import {
+  Stream,
+  fetchPromoCards,
+  fetchStreamCards,
+} from "@promo-shock/templates";
 
 const StreamPage: FC<{ params: { address: Address } }> = async ({
   params: { address },
@@ -16,15 +20,23 @@ const StreamPage: FC<{ params: { address: Address } }> = async ({
     queryKey: ["streams"] as ["streams"],
     queryFn: fetchStreamCards,
   });
-  const data = streams.find((stream) => stream.address === address);
+  const data = streams.find((stream) => stream.saleAddress === address);
 
   if (!data) throw new Error("Stream not found");
-  if (!isAddress(data.address)) throw new Error("Invalid address");
+  if (!isAddress(data.saleAddress)) throw new Error("Invalid address");
+
+  const promos = await queryClient.fetchQuery({
+    queryKey: ["promos", { stream: data.saleAddress }] as [
+      "promos",
+      { stream: string },
+    ],
+    queryFn: fetchPromoCards,
+  });
 
   const { paymentToken, startTime, endTime } =
     await readTicketSaleGetSaleParams(web3Config, {
       chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
-      address: data.address,
+      address: data.saleAddress,
     });
   const [symbol, decimals] = await readContracts(web3Config, {
     contracts: [
@@ -46,13 +58,14 @@ const StreamPage: FC<{ params: { address: Address } }> = async ({
   return (
     <Stream
       {...data}
-      address={data.address}
-      paymentToken={process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS}
+      saleAddress={data.saleAddress}
+      ticketAddress={data.ticketAddress as Address}
+      paymentTokenAddress={paymentToken}
       paymentTokenDecimals={decimals.result || 18}
       paymentTokenSymbol={symbol.result || ""}
       saleStartDate={Number(startTime)}
       saleEndDate={Number(endTime)}
-      promos={[]}
+      promos={promos}
     />
   );
 };

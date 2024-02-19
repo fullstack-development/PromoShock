@@ -11,7 +11,8 @@ import { CopyToClipboard } from "../copy-to-clipboard";
 type Props = {
   name: string;
   description: string;
-  address: string;
+  saleAddress: string;
+  ticketAddress: string;
   banner: string;
   price: number;
   date: number;
@@ -24,7 +25,8 @@ type Props = {
 export const StreamCard: FC<Props> = ({
   name,
   description,
-  address,
+  saleAddress,
+  ticketAddress,
   banner,
   price,
   date: dateUnix,
@@ -40,7 +42,7 @@ export const StreamCard: FC<Props> = ({
           [styles.copy_hovered]: hovered,
         })}
       >
-        <CopyToClipboard text={address} message="Copy ticket address" />
+        <CopyToClipboard text={ticketAddress} message="Copy ticket address" />
       </div>
 
       <Image
@@ -115,7 +117,7 @@ export const StreamCard: FC<Props> = ({
                   text="Buy access"
                   theme="primary"
                   size="medium"
-                  href={`/streams/${address}`}
+                  href={`/streams/${saleAddress}`}
                 />
               )}
             </>

@@ -1,6 +1,6 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import type { ComponentProps, FC, MouseEventHandler } from "react";
 import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";
@@ -11,7 +11,9 @@ import {
   useWatchBlocks,
   useWriteContract,
 } from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
 
+import { web3Config } from "@promo-shock/configs/web3";
 import type { Button } from "@promo-shock/ui-kit";
 
 type Props<T extends ComponentProps<typeof Button>> = {
@@ -25,6 +27,7 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
 ) => {
   return forwardRef<HTMLButtonElement, Props<T>>(
     function WithApprove(props, ref) {
+      const [pending, setPending] = useState(false);
       const queryClient = useQueryClient();
       const account = useAccount();
       const contract = useWriteContract();
@@ -66,7 +69,6 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
 
       const loading =
         props.loading || tokenInfo.isLoading || tokenAllowance.isLoading;
-      const pending = contract.isPending;
 
       const amountToApproveString =
         typeof props.tokenAmount !== "undefined" &&
@@ -86,7 +88,8 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
       const handleApprove: MouseEventHandler<HTMLButtonElement> = async (e) => {
         if (isInsufficientAllowance) {
           try {
-            await contract.writeContractAsync({
+            setPending(true);
+            const hash = await contract.writeContractAsync({
               abi: erc20Abi,
               // @ts-expect-error - TS doesn't know that `tokenAddress` is defined
               address: props.tokenAddress,
@@ -95,9 +98,12 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
               args: [props.recipientAddress, props.tokenAmount],
               chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
             });
+            await waitForTransactionReceipt(web3Config, { hash });
           } catch (e) {
             // TODO :: handle error
             console.error(e);
+          } finally {
+            setPending(false);
           }
         }
         await props.onClick?.(e);

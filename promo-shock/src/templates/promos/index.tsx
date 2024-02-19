@@ -15,13 +15,14 @@ type Props = {
     UnwrapPromise<ReturnType<typeof fetchInfinitePromoCards>>,
     number
   >;
+  queryKey: [string, { limit?: number }];
 };
 
-export const Promos: FC<Props> = ({ initialData }) => {
+const Promos: FC<Props> = ({ initialData, queryKey }) => {
   const promos = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
-    queryKey: ["promos"] as ["promos"],
+    queryKey,
     queryFn: fetchInfinitePromoCards,
     select: (data) => data.pages.map((item) => item.pages).flat(),
     getNextPageParam: (lastPage) => lastPage.cursor,
@@ -47,7 +48,9 @@ export const Promos: FC<Props> = ({ initialData }) => {
       />
 
       <CardList>
-        {promos.data?.map((promo) => <PromoCard key={promo.id} {...promo} />)}
+        {promos.data?.map((promo) => (
+          <PromoCard key={promo.tokenId} {...promo} />
+        ))}
       </CardList>
 
       {promos.hasNextPage && (
@@ -62,3 +65,5 @@ export const Promos: FC<Props> = ({ initialData }) => {
     </main>
   );
 };
+
+export { Promos };

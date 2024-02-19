@@ -2,9 +2,8 @@
 
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FC } from "react";
-import { useAccount } from "wagmi";
 
 import type { UnwrapPromise } from "@promo-shock/shared/types";
 import { CardList, PromoCard, TabList } from "@promo-shock/ui-kit";
@@ -17,6 +16,7 @@ type Props = {
     UnwrapPromise<ReturnType<typeof fetchInfinitePromoCards>>,
     number
   >;
+  queryKey: [string, { owner: string; limit?: number }];
 };
 
 const tabs = [
@@ -24,16 +24,13 @@ const tabs = [
   { label: "My promos", url: "/profile/my-promos" },
 ];
 
-export const MyPromos: FC<Props> = ({ initialData }) => {
-  const account = useAccount();
+export const MyPromos: FC<Props> = ({ initialData, queryKey }) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const promos = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
-    queryKey: ["promos", { owner: account.address }] as [
-      "promos",
-      filters?: { owner: string },
-    ],
+    queryKey,
     queryFn: fetchInfinitePromoCards,
     select: (data) => data.pages.map((item) => item.pages).flat(),
     getNextPageParam: (lastPage) => lastPage.cursor,
@@ -46,6 +43,8 @@ export const MyPromos: FC<Props> = ({ initialData }) => {
     router.push(tabs[opposite].url);
   };
 
+  const highlightAddress = searchParams.get("highlight_address");
+
   return (
     <main className={styles.root}>
       <h1 className={styles.title}>My promos</h1>
@@ -53,7 +52,13 @@ export const MyPromos: FC<Props> = ({ initialData }) => {
       <TabList tabList={tabs} selected={selected} setSelected={handleSelect} />
 
       <CardList>
-        {promos.data?.map((promo) => <PromoCard key={promo.id} {...promo} />)}
+        {promos.data?.map((promo) => (
+          <PromoCard
+            key={promo.tokenId}
+            highlighted={promo.promoAddress === highlightAddress}
+            {...promo}
+          />
+        ))}
       </CardList>
     </main>
   );

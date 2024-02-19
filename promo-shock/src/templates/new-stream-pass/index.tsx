@@ -65,13 +65,13 @@ const NewStreamPass: FC = () => {
   );
 
   useWatchTicketFactoryTicketSaleCreatedEvent({
-    enabled: pending,
     args: { creator: account.address },
     onLogs: async (logs) => {
+      const log = logs[0] || {};
       await api.startIndexIndexStartPost();
       setPending(false);
       router.push(
-        `/streams?highlight_address=${logs[0]?.args?.ticketSaleAddr?.toLowerCase()}`,
+        `/profile/my-streams?highlight_address=${log.args?.ticketSaleAddr?.toLowerCase()}`,
       );
     },
   });
@@ -126,6 +126,7 @@ const NewStreamPass: FC = () => {
         })(),
       ]);
     } catch (e) {
+      setPending(false);
       console.error(e);
     }
   };

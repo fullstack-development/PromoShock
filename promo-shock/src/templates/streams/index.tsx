@@ -1,7 +1,6 @@
 "use client";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import type { FC } from "react";
 
 import type { UnwrapPromise } from "@promo-shock/shared/types";
@@ -15,20 +14,18 @@ type Props = {
     UnwrapPromise<ReturnType<typeof fetchInfiniteStreamCards>>,
     number
   >;
+  queryKey: [string, { limit?: number }];
 };
 
-export const Streams: FC<Props> = ({ initialData }) => {
-  const searchParams = useSearchParams();
+export const Streams: FC<Props> = ({ initialData, queryKey }) => {
   const streams = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
-    queryKey: ["streams"] as ["streams"],
+    queryKey,
     queryFn: fetchInfiniteStreamCards,
     select: (data) => data.pages.map((item) => item.pages).flat(),
     getNextPageParam: (lastPage) => lastPage.cursor,
   });
-
-  const highlightAddress = searchParams.get("highlight_address");
 
   const handleGetMore = async () => {
     try {
@@ -51,11 +48,7 @@ export const Streams: FC<Props> = ({ initialData }) => {
 
       <CardList>
         {streams.data?.map((stream) => (
-          <StreamCard
-            key={stream.address}
-            highlight={stream.address === highlightAddress}
-            {...stream}
-          />
+          <StreamCard key={stream.saleAddress} {...stream} />
         ))}
       </CardList>
 

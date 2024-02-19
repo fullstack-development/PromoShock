@@ -8,17 +8,141 @@ paths:
     post:
       summary: Start Index
       operationId: start_index_index_start_post
+      parameters:
+      - name: from_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: 37553211
+          title: From Block
+      - name: to_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: latest
+          title: To Block
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/index/ticket":
+    post:
+      summary: Index Ticket
+      operationId: index_ticket_index_ticket_post
+      parameters:
+      - name: from_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: 37553211
+          title: From Block
+      - name: to_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: latest
+          title: To Block
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/index/promo":
+    post:
+      summary: Index Promo
+      operationId: index_promo_index_promo_post
+      parameters:
+      - name: from_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: 37553211
+          title: From Block
+      - name: to_block
+        in: query
+        required: false
+        schema:
+          enum:
+          - latest
+          - earliest
+          - pending
+          - safe
+          - finalized
+          type: string
+          default: latest
+          title: To Block
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
   "/ticket":
     get:
       summary: All Tickets
       operationId: all_tickets_ticket_get
       parameters:
+      - name: owner
+        in: query
+        required: false
+        schema:
+          title: Owner
       - name: offset
         in: query
         required: false
@@ -47,11 +171,48 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/HTTPValidationError"
+  "/ticket/{ticket_addr}":
+    get:
+      summary: Get Stream
+      operationId: get_stream_ticket__ticket_addr__get
+      parameters:
+      - name: ticket_addr
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Ticket Addr
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - "$ref": "#/components/schemas/Stream"
+                - type: 'null'
+                title: Response Get Stream Ticket  Ticket Addr  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
   "/promo":
     get:
       summary: All Promos
       operationId: all_promos_promo_get
       parameters:
+      - name: stream
+        in: query
+        required: false
+        schema:
+          title: Stream
+      - name: owner
+        in: query
+        required: false
+        schema:
+          title: Owner
       - name: offset
         in: query
         required: false
@@ -89,14 +250,22 @@ components:
       title: HTTPValidationError
     Stream:
       properties:
-        sale_address:
-          type: string
-          format: binary
-          title: Sale Address
         owner_address:
           type: string
           format: binary
           title: Owner Address
+        sale_address:
+          type: string
+          format: binary
+          title: Sale Address
+        ticket_addr:
+          type: string
+          format: binary
+          title: Ticket Addr
+        payment_token_addr:
+          type: string
+          format: binary
+          title: Payment Token Addr
         name:
           type: string
           title: Name
@@ -106,9 +275,6 @@ components:
         banner:
           type: string
           title: Banner
-        start_date:
-          type: integer
-          title: Start Date
         sale_start_date:
           type: integer
           title: Sale Start Date
@@ -122,7 +288,7 @@ components:
           type: string
           title: Streamer Link
         price:
-          type: integer
+          type: string
           title: Price
         total_amount:
           type: integer
@@ -132,12 +298,13 @@ components:
           title: Reserved Amount
       type: object
       required:
-      - sale_address
       - owner_address
+      - sale_address
+      - ticket_addr
+      - payment_token_addr
       - name
       - description
       - banner
-      - start_date
       - sale_start_date
       - sale_end_date
       - link

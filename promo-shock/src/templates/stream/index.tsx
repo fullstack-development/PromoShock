@@ -9,7 +9,11 @@ import type { Address } from "viem";
 
 import { useWriteTicketSaleBuy } from "@generated/wagmi";
 
-import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
+import {
+  withApprove,
+  withBalanceCheck,
+  withSwitchNetwork,
+} from "@promo-shock/components";
 import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
@@ -17,8 +21,9 @@ import styles from "./stream.module.scss";
 type Props = {
   name: string;
   description: string;
-  address: Address;
-  paymentToken: Address;
+  saleAddress: Address;
+  ticketAddress: Address;
+  paymentTokenAddress: Address;
   paymentTokenSymbol: string;
   paymentTokenDecimals: number;
   saleStartDate: number;
@@ -28,17 +33,18 @@ type Props = {
   date: number;
   totalAmount: number;
   reservedAmount: number;
-  promos: Array<ComponentProps<typeof PromoCard> & { id: string }>;
+  promos: Array<ComponentProps<typeof PromoCard>>;
 };
 
-const TxButton = withBalanceCheck(withSwitchNetwork(Button));
+const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
 
 export const Stream: FC<Props> = ({
   name,
   date: dateUnix,
   description,
-  address,
-  paymentToken,
+  saleAddress,
+  ticketAddress,
+  paymentTokenAddress,
   paymentTokenSymbol,
   paymentTokenDecimals,
   saleEndDate: saleEndDateUnix,
@@ -56,7 +62,7 @@ export const Stream: FC<Props> = ({
           [styles.copy_hovered]: hovered,
         })}
       >
-        <CopyToClipboard text={address} message="Copy ticket address" />
+        <CopyToClipboard text={ticketAddress} message="Copy ticket address" />
       </div>
 
       <Image
@@ -85,7 +91,7 @@ export const Stream: FC<Props> = ({
       if (saleHasFinished) throw new Error("Sale has finished");
       if (saleHasNotStarted) throw new Error("Sale has not started");
       await buy.writeContractAsync({
-        address,
+        address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
       });
     } catch (e) {
@@ -144,8 +150,9 @@ export const Stream: FC<Props> = ({
             theme="secondary"
             type="button"
             text={`Pay ${price} ${paymentTokenSymbol} and buy access`}
-            tokenAddress={paymentToken}
+            tokenAddress={paymentTokenAddress}
             tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
+            recipientAddress={ticketAddress}
             onClick={handleBuy}
           />
         </div>
@@ -160,7 +167,7 @@ export const Stream: FC<Props> = ({
 
       <div className={styles.promoList}>
         {promos.map((promo) => (
-          <PromoCard key={promo.id} {...promo} />
+          <PromoCard key={promo.tokenId} {...promo} />
         ))}
       </div>
     </main>

@@ -8,12 +8,13 @@ const streamToStreamCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stream: any,
 ): Omit<ComponentProps<typeof StreamCard>, "onlyWatch" | "highlighted"> => ({
-  address: stream.sale_address,
+  saleAddress: stream.sale_address,
+  ticketAddress: stream.ticket_addr,
   name: stream.name,
   description: stream.description,
   banner: stream.banner,
   price: stream.price,
-  date: Number(stream.start_date) * 1000,
+  date: Number(stream.sale_date) * 1000,
   totalAmount: stream.total_amount,
   reservedAmount: stream.reserved_amount,
 });
@@ -26,37 +27,51 @@ type Filters = {
 const fetchStreamCards = async ({
   queryKey: [, filters],
   signal,
-}: QueryFunctionContext<["streams", filters?: Filters]>) => {
+}: QueryFunctionContext<[string, filters?: Filters]>) => {
   const limit = filters?.limit;
+  const owner = filters?.owner?.toLocaleLowerCase();
   // FIXME :: codegen parameters
-  const { data } = await api.allTicketsTicketGet(limit, 0, {
-    params: {
-      limit,
-      offset: 0,
+  const { data } = await api.allTicketsTicketGet(
+    undefined,
+    undefined,
+    undefined,
+    {
+      params: {
+        limit,
+        owner,
+        offset: 0,
+      },
+      signal,
     },
-    signal,
-  });
+  );
 
-  return data.map(streamToStreamCard);
+  return (data as []).map(streamToStreamCard);
 };
 
 const fetchInfiniteStreamCards = async ({
   queryKey: [, filters],
   pageParam,
   signal,
-}: QueryFunctionContext<["streams", filters?: Filters], number>) => {
+}: QueryFunctionContext<[string, filters?: Filters], number>) => {
   // FIXME :: codegen parameters
-  const limit = filters?.limit || 1;
-  const { data } = await api.allTicketsTicketGet(limit * pageParam, limit, {
-    params: {
-      limit,
-      offset: limit * pageParam,
+  const limit = filters?.limit;
+  const owner = filters?.owner?.toLocaleLowerCase();
+  const { data } = await api.allTicketsTicketGet(
+    undefined,
+    undefined,
+    undefined,
+    {
+      params: {
+        limit,
+        owner,
+        offset: limit && limit * pageParam,
+      },
+      signal,
     },
-    signal,
-  });
+  );
 
   return {
-    pages: data.map(streamToStreamCard),
+    pages: (data as []).map(streamToStreamCard),
     cursor: data.length ? pageParam + 1 : null,
   };
 };

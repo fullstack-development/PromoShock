@@ -7,6 +7,8 @@ import styles from "./streamCard.module.scss";
 import { Button } from "../button";
 
 type Props = {
+  tokenId: string;
+  promoAddress: string;
   name: string;
   description: string;
   cover: string;

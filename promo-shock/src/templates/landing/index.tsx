@@ -92,7 +92,7 @@ export const Landing: FC<Props> = ({ streams }) => {
 
         <div className={styles.previewsContainer}>
           {streams.map((stream) => (
-            <StreamCard key={stream.address} {...stream} />
+            <StreamCard key={stream.saleAddress} {...stream} />
           ))}
         </div>
 

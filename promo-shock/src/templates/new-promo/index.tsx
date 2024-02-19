@@ -74,6 +74,7 @@ const NewPromo: FC = () => {
   const tokenAddress = useReadPromoFactoryGetPaymentTokenAddress({
     chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
   });
+
   const tokenInfo = useReadContracts({
     query: { staleTime: Infinity },
     contracts: [
@@ -99,13 +100,13 @@ const NewPromo: FC = () => {
   );
 
   useWatchPromoFactoryPromotionCreatedEvent({
-    enabled: pending,
     args: { marketer: account.address },
     onLogs: async (logs) => {
+      const log = logs[0] || {};
       await api.startIndexIndexStartPost();
       setPending(false);
       router.push(
-        `/promos?highlight_address=${logs[0]?.args?.promotion?.promoAddr.toLowerCase()}`,
+        `/profile/my-promos?highlight_address=${log.args?.promotion?.promoAddr.toLowerCase()}`,
       );
     },
   });
@@ -150,6 +151,7 @@ const NewPromo: FC = () => {
         })(),
       ]);
     } catch (error) {
+      setPending(false);
       console.error(error);
     }
   };
