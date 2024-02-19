@@ -62,7 +62,7 @@ class Stream:
 
 
 @app.get("/ticket")
-async def all_tickets(owner = None, offset=0, limit=25):
+async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
     # TODO: cleanup, fix pyright errors
     def make_stream(ticket: Ticket):
         ticket_sale_created = repo.get(
