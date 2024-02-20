@@ -81,9 +81,6 @@ export const Stream: FC<Props> = ({
 
   const handleBuy = async () => {
     try {
-      // TODO :: handle case when sale has not started or has finished
-      if (saleHasFinished) throw new Error("Sale has finished");
-      if (saleHasNotStarted) throw new Error("Sale has not started");
       await buy.writeContractAsync({
         address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
@@ -92,6 +89,8 @@ export const Stream: FC<Props> = ({
       console.error(e);
     }
   };
+
+  const disabled = saleHasFinished || saleHasNotStarted || ticketsAreOut;
 
   return (
     <main className={styles.root}>
@@ -153,9 +152,7 @@ export const Stream: FC<Props> = ({
             tokenAddress={paymentTokenAddress}
             tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
             recipientAddress={saleAddress}
-            disabled={
-              saleHasFinished || saleHasNotStarted || ticketsAreOut || purchased
-            }
+            disabled={disabled || purchased}
             onClick={handleBuy}
           />
           <span className={styles.sale_period}>
