@@ -28,15 +28,16 @@ start_mappers()
 
 if os.environ.get("ENV") == "DEVELOPMENT":
     app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-            )
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
 
 @app.post("/index/start")
-async def start_index(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
+async def start_index(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -51,11 +52,12 @@ async def start_index(from_block: BlockParams = 37553211, to_block: BlockParams 
         get_promo_factory_abi(),
     )
     # TODO: run async
-    await ticket_indexer.start_index(from_block=from_block)
-    await promo_indexer.start_index(from_block=from_block)
+    await ticket_indexer.start_index(from_block=from_block, to_block=to_block)
+    await promo_indexer.start_index(from_block=from_block, to_block=to_block)
+
 
 @app.post("/index/ticket")
-async def index_ticket(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
+async def index_ticket(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -65,8 +67,9 @@ async def index_ticket(from_block: BlockParams = 37553211, to_block: BlockParams
     )
     await ticket_indexer.start_index(from_block=from_block, to_block=to_block)
 
+
 @app.post("/index/promo")
-async def index_promo(from_block: BlockParams = 37553211, to_block: BlockParams = "latest"):
+async def index_promo(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     promo_indexer = NftIndexer(
         web3,
@@ -75,6 +78,7 @@ async def index_promo(from_block: BlockParams = 37553211, to_block: BlockParams 
         get_promo_factory_abi(),
     )
     await promo_indexer.start_index(from_block=from_block, to_block=to_block)
+
 
 @dataclass(frozen=True)
 class Stream:
@@ -97,7 +101,7 @@ class Stream:
 
 
 @app.get("/ticket")
-async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
+async def all_tickets(owner=None, offset=0, limit=25) -> List[Stream]:
     # TODO: cleanup, fix pyright errors
     def make_stream(ticket_sale: TicketSale):
         ticket_sale_created = repo.get(
@@ -105,9 +109,7 @@ async def all_tickets(owner = None, offset=0, limit=25) -> List[Stream]:
         )
         if ticket_sale_created is None:
             return None
-        ticket = repo.get(
-                Ticket, {"ticket_addr": ticket_sale_created.ticket_addr}
-        )
+        ticket = repo.get(Ticket, {"ticket_addr": ticket_sale_created.ticket_addr})
         if ticket is None:
             return None
         return Stream(
@@ -196,7 +198,7 @@ class PromoInfo:
 
 
 @app.get("/promo")
-async def all_promos(stream = None, owner = None, offset=0, limit=25):
+async def all_promos(stream=None, owner=None, offset=0, limit=25):
     repo = SqlAlchemyRepository(get_session())
     filter_params = {}
     if owner:
@@ -205,7 +207,14 @@ async def all_promos(stream = None, owner = None, offset=0, limit=25):
     if stream:
         promo_to_tickets = repo.filter(PromoToTicket, {"ticket_addr": stream})
         promo_addresses = [a.promo_addr for a in promo_to_tickets]
-        promos = repo.filter_in(Promo, Promo.promo_addr, promo_addresses, filter_params=filter_params, offset=offset, limit=limit)
+        promos = repo.filter_in(
+            Promo,
+            Promo.promo_addr,
+            promo_addresses,
+            filter_params=filter_params,
+            offset=offset,
+            limit=limit,
+        )
     else:
         promos = repo.filter(Promo, filter_params, offset, limit)
 
