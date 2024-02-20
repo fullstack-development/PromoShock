@@ -258,14 +258,14 @@ components:
           type: string
           format: binary
           title: Sale Address
-        ticket_addr:
+        ticket_address:
           type: string
           format: binary
-          title: Ticket Addr
-        payment_token_addr:
+          title: Ticket Address
+        payment_token_address:
           type: string
           format: binary
-          title: Payment Token Addr
+          title: Payment Token Address
         name:
           type: string
           title: Name
@@ -275,15 +275,18 @@ components:
         banner:
           type: string
           title: Banner
+        start_date:
+          type: integer
+          title: Start Date
         sale_start_date:
           type: integer
           title: Sale Start Date
         sale_end_date:
           type: integer
           title: Sale End Date
-        link:
+        stream_link:
           type: string
-          title: Link
+          title: Stream Link
         streamer_link:
           type: string
           title: Streamer Link
@@ -296,22 +299,27 @@ components:
         reserved_amount:
           type: integer
           title: Reserved Amount
+        purchased:
+          type: boolean
+          title: Purchased
       type: object
       required:
       - owner_address
       - sale_address
-      - ticket_addr
-      - payment_token_addr
+      - ticket_address
+      - payment_token_address
       - name
       - description
       - banner
+      - start_date
       - sale_start_date
       - sale_end_date
-      - link
+      - stream_link
       - streamer_link
       - price
       - total_amount
       - reserved_amount
+      - purchased
       title: Stream
     ValidationError:
       properties:

@@ -29,24 +29,24 @@ const fetchPromoCards = async ({
   signal,
 }: QueryFunctionContext<[string, filters?: Filters]>) => {
   const limit = filters?.limit;
+  const offset = 0;
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
-  // FIXME :: codegen parameters
+  // TODO :: uncomment when FastAPI will be correctly generated
+  // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
+  //   signal,
+  // });
   const { data } = await api.allPromosPromoGet(
     undefined,
     undefined,
     undefined,
     undefined,
     {
-      params: {
-        limit,
-        offset: 0,
-        owner,
-        stream,
-      },
+      params: { stream, owner, offset, limit },
       signal,
     },
   );
+  // FIXME :: codegen return type
   return (data as []).map(promoToPromoCard);
 };
 
@@ -56,25 +56,25 @@ const fetchInfinitePromoCards = async ({
   signal,
 }: QueryFunctionContext<[string, filters?: Filters], number>) => {
   const limit = filters?.limit;
+  const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
-  // FIXME :: codegen parameters
+  // TODO :: uncomment when FastAPI will be correctly generated
+  // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
+  //   signal,
+  // });
   const { data } = await api.allPromosPromoGet(
     undefined,
     undefined,
     undefined,
     undefined,
     {
-      params: {
-        limit,
-        offset: limit && limit * pageParam,
-        owner,
-        stream,
-      },
+      params: { stream, owner, offset, limit },
       signal,
     },
   );
   return {
+    // FIXME :: codegen return type
     pages: (data as []).map(promoToPromoCard),
     cursor: data.length ? pageParam + 1 : null,
   };

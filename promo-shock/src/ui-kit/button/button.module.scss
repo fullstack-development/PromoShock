@@ -151,7 +151,7 @@
 
 .loading {
   cursor: wait !important;
-  > * {
+  > span:last-child {
     position: relative;
     display: inline-flex !important;
     align-items: baseline;

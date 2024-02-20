@@ -1,4 +1,5 @@
 import type { QueryFunctionContext } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
 import { api } from "@promo-shock/configs/axios";
 import type { Stream } from "@promo-shock/shared/entities";
@@ -36,37 +37,46 @@ const fetchStreamCard = async ({
   signal,
 }: QueryFunctionContext<[string, address: string]>) => {
   // FIXME :: codegen parameters
-  const { data } = await api.getStreamTicketTicketAddrGet(address, {
-    params: {
-      address,
-    },
-    signal,
-  });
-  return streamToStream(data);
+  try {
+    const { data } = await api.getStreamTicketTicketAddrGet(address, {
+      params: {
+        address,
+      },
+      signal,
+    });
+
+    return data;
+  } catch (error) {
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
 };
 
 const fetchStreamCards = async ({
   queryKey: [, filters],
   signal,
 }: QueryFunctionContext<[string, filters?: Filters]>) => {
+  const offset = 0;
   const limit = filters?.limit;
   const owner = filters?.owner?.toLowerCase();
-  // FIXME :: codegen parameters
+  // TODO :: uncomment when FastAPI will be correctly generated
+  // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
+  //   signal,
+  // });
   const { data } = await api.allTicketsTicketGet(
     undefined,
     undefined,
     undefined,
     {
-      params: {
-        limit,
-        owner,
-        offset: 0,
-      },
+      params: { owner, offset, limit },
       signal,
     },
   );
 
-  return (data as []).map(streamToStream);
+  return data.map(streamToStream);
 };
 
 const fetchInfiniteStreamCards = async ({
@@ -74,25 +84,25 @@ const fetchInfiniteStreamCards = async ({
   pageParam,
   signal,
 }: QueryFunctionContext<[string, filters?: Filters], number>) => {
-  // FIXME :: codegen parameters
   const limit = filters?.limit;
+  const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
+  // TODO :: uncomment when FastAPI will be correctly generated
+  // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
+  //   signal,
+  // });
   const { data } = await api.allTicketsTicketGet(
     undefined,
     undefined,
     undefined,
     {
-      params: {
-        limit,
-        owner,
-        offset: limit && limit * pageParam,
-      },
+      params: { owner, offset, limit },
       signal,
     },
   );
 
   return {
-    pages: (data as []).map(streamToStream),
+    pages: data.map(streamToStream),
     cursor: data.length ? pageParam + 1 : null,
   };
 };

@@ -10,6 +10,10 @@ import { Controller, useForm } from "react-hook-form";
 import { estimateContractGas } from "viem/actions";
 import { useAccount, useClient, useConfig } from "wagmi";
 
+import type {
+  IndexTicketIndexTicketPostFromBlockEnum,
+  IndexTicketIndexTicketPostToBlockEnum,
+} from "@generated/api";
 import {
   simulateTicketFactoryCreateTicketSale,
   useWatchTicketFactoryTicketSaleCreatedEvent,
@@ -68,11 +72,22 @@ const NewStreamPass: FC = () => {
     args: { creator: account.address },
     onLogs: async (logs) => {
       const log = logs[0] || {};
-      await api.startIndexIndexStartPost();
-      setPending(false);
-      router.push(
-        `/profile/my-streams?highlight_address=${log.args?.ticketSaleAddr?.toLowerCase()}`,
-      );
+      try {
+        await api.indexTicketIndexTicketPost(
+          Number(
+            log.blockNumber,
+          ) as unknown as IndexTicketIndexTicketPostFromBlockEnum,
+          Number(
+            log.blockNumber,
+          ) as unknown as IndexTicketIndexTicketPostToBlockEnum,
+        );
+      } catch {
+      } finally {
+        setPending(false);
+        router.push(
+          `/profile/my-streams?highlight_address=${log.args?.ticketSaleAddr?.toLowerCase()}`,
+        );
+      }
     },
   });
 
