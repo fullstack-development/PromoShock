@@ -118,7 +118,9 @@ export const StreamCard: FC<Props> = ({
             <>
               <span
                 className={cn(styles.cost, {
-                  [styles.cost_lineThrough]: ticketsAreOut || streamHasFinished,
+                  [styles.cost_lineThrough]:
+                    (ticketsAreOut || streamHasFinished) &&
+                    !paymentTokenSymbol.isLoading,
                 })}
               >
                 {paymentTokenSymbol.data
