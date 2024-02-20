@@ -23,6 +23,17 @@ class Ticket:
 
 
 @dataclass(unsafe_hash=True)
+class TicketBoughtEvent:
+    buyer: Address
+    ticket_addr: Address
+    token_id: int
+    transaction_hash: str
+    transaction_index: int
+    block_hash: str
+    block_nmb: int
+
+
+@dataclass(unsafe_hash=True)
 class TicketSale:
     ticket_sale_addr: Address
     token_payment_addr: Address

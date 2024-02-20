@@ -12,7 +12,7 @@ from web3.types import BlockIdentifier, FilterParams, LogReceipt
 
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from contracts.abi import get_ticket_abi, get_ticket_sale_abi, get_promo_abi
-from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
+from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +90,10 @@ TESTNET_LOG_EVENTS = {
     "0xd9b42bb096f4c62dfc76023d46bac952fbc443c1f23189362ce518e507e5d5ab": (
         "PromotionCreated",
         "(uint256,uint256,address,address[],string)",
+    ),
+    "0xa34e6b78e9a990f62e47ba1c3993ff82d0d748e22617d46c5a79c7b86d10e19b": (
+        "MintTicket",
+        ["address"],
     ),
 }
 
@@ -295,6 +299,50 @@ class NftIndexer:
             return requests.get(f"https://ipfs.io/ipfs/{parsed_url.netloc}").json()
         else:
             return requests.get(url).json()
+
+    async def index_ticket_bought_event(self, from_block, to_block):
+        tickets: List[Ticket] = self._repository.filter(Ticket, {})
+        for ticket in tickets:
+            logs = self._web3.eth.get_logs(
+                filter_params=FilterParams(
+                    address=self._web3.to_checksum_address(ticket.ticket_addr),
+                    fromBlock=from_block,
+                    toBlock=to_block,
+                )
+            )
+            for log in logs:
+                topic_name, pattern = self._log_events.get(
+                    log["topics"][0].hex(), (None, None)
+                )
+                if topic_name is None or pattern is None:
+                    continue
+                if topic_name == "MintTicket":
+                    [buyer] = self.decode_data(
+                        pattern, HexBytes(bytes().join(log["topics"][1:]))
+                    )
+                    [token_id] = self.decode_data(["uint256"], log["data"])
+                    event = TicketBoughtEvent(
+                        buyer=buyer.lower(),
+                        token_id=token_id,
+                        ticket_addr=ticket.ticket_addr,
+                        transaction_hash=log["transactionHash"].hex(),
+                        transaction_index=log["transactionIndex"],
+                        block_hash=log["blockHash"].hex(),
+                        block_nmb=log["blockNumber"],
+                    )
+                    if (
+                        self._repository.get(
+                            TicketBoughtEvent,
+                            {
+                                "buyer": buyer.lower(),
+                                "ticket_addr": ticket.ticket_addr,
+                                "token_id": token_id,
+                            },
+                        )
+                        is None
+                    ):
+                        self._repository.add(event)
+                        self._repository.commit()
 
     async def start_index(
         self,
