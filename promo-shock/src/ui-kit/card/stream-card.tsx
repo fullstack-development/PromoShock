@@ -123,8 +123,10 @@ export const StreamCard: FC<Props> = ({
                     !paymentTokenSymbol.isLoading,
                 })}
               >
-                {paymentTokenSymbol.data
-                  ? `${price} ${paymentTokenSymbol.data}`
+                {paymentTokenSymbol.isLoading
+                  ? paymentTokenSymbol.data
+                    ? `${price} ${paymentTokenSymbol.data}`
+                    : price
                   : "loading..."}
               </span>
               {ticketsAreOut || streamHasFinished ? (
