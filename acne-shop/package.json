@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen:wagmi": "wagmi generate --config ./wagmi.config.ts"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
@@ -17,6 +18,7 @@
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.50.1",
     "the-new-css-reset": "^1.11.2",
     "viem": "^2.7.8",
     "wagmi": "^2.5.6",
@@ -28,6 +30,7 @@
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@typescript-eslint/parser": "^6.8.0",
+    "@wagmi/cli": "^2.1.1",
     "autoprefixer": "^10.0.1",
     "encoding": "^0.1.13",
     "eslint": "^8",

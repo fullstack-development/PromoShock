@@ -57,3 +57,16 @@
   grid-column: 1;
   align-self: end;
 }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.textField {
+  width: 100%;
+  display: flex;
+  padding-bottom: 20px;
+}
