@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import os
 from typing import List, Optional
 from eth_typing import Address
-from web3 import Web3
+from web3 import AsyncWeb3, Web3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
@@ -23,7 +23,7 @@ from contracts.abi import (
 
 app = FastAPI()
 memcache = Client(get_memcache_uri())
-web3 = Web3(Web3.HTTPProvider(get_web3_uri()))
+web3 = AsyncWeb3(Web3.AsyncHTTPProvider(get_web3_uri()))
 start_mappers()
 
 if os.environ.get("ENV") == "DEVELOPMENT":
@@ -246,15 +246,13 @@ async def all_promos(stream=None, owner=None, offset=0, limit=25):
 async def my_promos(buyer, offset=0, limit=25):
     repo = SqlAlchemyRepository(get_session())
 
-    ticket_bought_events = repo.filter(
-        TicketBoughtEvent, {"buyer": buyer}, offset, limit
-    )
+    ticket_bought_events = repo.filter(TicketBoughtEvent, {"buyer": buyer})
     ticket_addrs = [t.ticket_addr for t in ticket_bought_events]
     promo_to_tickets = repo.filter_in(
         PromoToTicket, PromoToTicket.ticket_addr, ticket_addrs
     )
     promo_addrs = [p.promo_addr for p in promo_to_tickets]
-    promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs)
+    promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs, offset, limit)
     return [
         PromoInfo(
             owner_address=p.owner,
