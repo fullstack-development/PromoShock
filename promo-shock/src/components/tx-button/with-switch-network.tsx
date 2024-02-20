@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import type { ComponentProps, MouseEventHandler } from "react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useConnections, useSwitchChain } from "wagmi";
 
 import type { Button } from "@promo-shock/ui-kit";
 
@@ -12,7 +12,8 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
   return forwardRef<HTMLButtonElement, Props<T>>(
     function WithSwitchNetwork(props, ref) {
       const account = useAccount();
-      const chainId = useChainId();
+      const [connection] = useConnections() || [];
+      const chainId = connection?.chainId;
       const switchChain = useSwitchChain();
 
       const handleClick: MouseEventHandler<HTMLButtonElement> = async (e) => {
@@ -31,7 +32,6 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
         }
       };
 
-      // TODO :: detect current chain
       const wrongChain =
         chainId !== Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID);
       const loading = props.loading;
@@ -46,7 +46,7 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
             (loading || pending) && !disabled
               ? "Blockchain magic happening"
               : wrongChain && !disabled
-              ? "Switch to BSC"
+              ? "Switch network"
               : props.text
           }
           loading={(loading || pending) && !disabled}

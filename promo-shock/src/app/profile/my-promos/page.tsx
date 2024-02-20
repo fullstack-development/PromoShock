@@ -1,5 +1,4 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import type { FC } from "react";
 import type { Address } from "viem";
 import { cookieToInitialState } from "wagmi";
@@ -16,8 +15,6 @@ const MyPromosPage: FC = async () => {
   const account =
     web3InitialState?.current &&
     web3InitialState.connections.get(web3InitialState.current)?.accounts[0];
-
-  if (!account) return redirect("/");
 
   const queryKey = ["promos", { owner: account }] as [
     string,

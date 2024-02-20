@@ -61,6 +61,7 @@ export const MyStreams: FC<Props> = ({ initialData, queryKey }) => {
           <StreamCard
             key={stream.saleAddress}
             highlight={stream.saleAddress === highlightAddress}
+            watchOnly
             {...stream}
           />
         ))}

@@ -17,6 +17,7 @@ type Props = Omit<
   "streamerLink" | "streamLink" | "purchased" | "saleAddress"
 > & {
   highlight?: boolean;
+  watchOnly?: boolean;
 };
 
 export const StreamCard: FC<Props> = ({
@@ -33,6 +34,7 @@ export const StreamCard: FC<Props> = ({
   totalAmount,
   reservedAmount,
   highlight,
+  watchOnly,
 }) => {
   const paymentTokenSymbol = useReadContract({
     abi: erc721Abi,
@@ -60,7 +62,8 @@ export const StreamCard: FC<Props> = ({
   ));
   const startDate = dayjs(startDateUnix);
   const endDate = dayjs(endDateUnix);
-  const ongoing = startDate.isBefore(dayjs()) && endDate.isAfter(dayjs());
+  const ongoing =
+    (startDate.isBefore(dayjs()) && endDate.isAfter(dayjs())) || watchOnly;
   const saleStartDate = dayjs(saleStartDateUnix);
   const saleEndDate = dayjs(saleEndDateUnix);
   const remainingAmount = totalAmount - reservedAmount;
@@ -81,7 +84,7 @@ export const StreamCard: FC<Props> = ({
             {startDate.format("DD.MM.YYYY")}
           </span>
 
-          {remainingAmount > 0 && !streamHasFinished && (
+          {!watchOnly && remainingAmount > 0 && !streamHasFinished && (
             <span className={styles.subtitle}>
               {remainingAmount < 5 ? (
                 <span className={styles.fire}>🔥</span>
@@ -92,13 +95,13 @@ export const StreamCard: FC<Props> = ({
             </span>
           )}
 
-          {ticketsAreOut && (
+          {!watchOnly && ticketsAreOut && (
             <span className={cn(styles.subtitle, styles.error)}>
               💔 No tickets left
             </span>
           )}
 
-          {streamHasFinished && (
+          {!watchOnly && streamHasFinished && (
             <span className={cn(styles.subtitle, styles.error)}>
               🚫 Stream has finished
             </span>
