@@ -3,7 +3,7 @@ version: "3"
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     depends_on:
       - postgres
