@@ -1,4 +1,3 @@
-from enum import auto
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,7 +10,7 @@ from sqlalchemy.orm import registry, sessionmaker
 from sqlalchemy.types import JSON
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from config import get_postgres_uri
-from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
+from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 
 
 metadata = MetaData()
@@ -48,6 +47,19 @@ ticket_sale_table = Table(
     Column("end_time", Integer),
     Column("price", String(256)),
     Column("owner", String(256)),
+)
+
+ticket_bought_event_table = Table(
+    "ticket_bought_event",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("buyer", String(256)),
+    Column("ticket_addr", String(256)),
+    Column("token_id", Integer),
+    Column("transaction_hash", String(256)),
+    Column("transaction_id", Integer),
+    Column("block_hash", String(256)),
+    Column("block_nmb", Integer),
 )
 
 ticket_table = Table(
@@ -103,17 +115,14 @@ promo_to_ticket_table = Table(
 
 
 def start_mappers():
-    ticket_sale_created = mapper.map_imperatively(
-        TicketSaleCreatedEvent, ticket_sale_created_table
-    )
-    ticket_sale = mapper.map_imperatively(TicketSale, ticket_sale_table)
-    ticket = mapper.map_imperatively(Ticket, ticket_table)
-    promo_created_event = mapper.map_imperatively(
-        PromoCreatedEvent, promo_created_event_table
-    )
-    promo = mapper.map_imperatively(
+    mapper.map_imperatively(TicketSaleCreatedEvent, ticket_sale_created_table)
+    mapper.map_imperatively(TicketSale, ticket_sale_table)
+    mapper.map_imperatively(Ticket, ticket_table)
+    mapper.map_imperatively(PromoCreatedEvent, promo_created_event_table)
+    mapper.map_imperatively(
         Promo,
         promo_table,
     )
-    promo_to_ticket = mapper.map_imperatively(PromoToTicket, promo_to_ticket_table)
+    mapper.map_imperatively(PromoToTicket, promo_to_ticket_table)
+    mapper.map_imperatively(TicketBoughtEvent, ticket_bought_event_table)
     metadata.create_all(engine)

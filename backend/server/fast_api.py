@@ -2,14 +2,14 @@ from dataclasses import dataclass
 import os
 from typing import List, Optional
 from eth_typing import Address
-from web3 import Web3
+from web3 import AsyncWeb3, Web3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
 from web3.types import BlockIdentifier
 
 from domain.promo import Promo, PromoToTicket
-from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
+from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 from services.indexer import NftIndexer, SqlAlchemyRepository
 from config import get_memcache_uri, get_web3_uri
 from orm.tables import start_mappers, get_session
@@ -23,7 +23,7 @@ from contracts.abi import (
 
 app = FastAPI()
 memcache = Client(get_memcache_uri())
-web3 = Web3(Web3.HTTPProvider(get_web3_uri()))
+web3 = AsyncWeb3(Web3.AsyncHTTPProvider(get_web3_uri()))
 start_mappers()
 
 if os.environ.get("ENV") == "DEVELOPMENT":
@@ -37,9 +37,7 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 
 
 @app.post("/index/start")
-async def start_index(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def start_index(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -54,14 +52,13 @@ async def start_index(
         get_promo_factory_abi(),
     )
     # TODO: run async
-    await ticket_indexer.start_index(from_block=from_block, to_block=to_block)
-    await promo_indexer.start_index(from_block=from_block, to_block=to_block)
+    await ticket_indexer.start_index(from_block=from_block)
+    await ticket_indexer.index_ticket_bought_event(from_block, to_block)
+    await promo_indexer.start_index(from_block=from_block)
 
 
 @app.post("/index/ticket")
-async def index_ticket(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def index_ticket(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -73,9 +70,7 @@ async def index_ticket(
 
 
 @app.post("/index/promo")
-async def index_promo(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def index_promo(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     promo_indexer = NftIndexer(
         web3,
@@ -224,6 +219,34 @@ async def all_promos(stream=None, owner=None, offset=0, limit=25):
     else:
         promos = repo.filter(Promo, filter_params, offset, limit)
 
+    return [
+        PromoInfo(
+            owner_address=p.owner,
+            promo_addr=p.promo_addr,
+            token_id=p.token_id,
+            name=p.uri.get("name", ""),
+            description=p.description,
+            cover=p.uri.get("image", ""),
+            link=p.uri.get("link", ""),
+            shopping_link=p.uri.get("shopping_link", ""),
+            start_date=p.start_time,
+            end_date=p.end_time,
+        )
+        for p in promos
+    ]
+
+
+@app.get("/promo/my")
+async def my_promos(buyer, offset=0, limit=25):
+    repo = SqlAlchemyRepository(get_session())
+
+    ticket_bought_events = repo.filter(TicketBoughtEvent, {"buyer": buyer})
+    ticket_addrs = [t.ticket_addr for t in ticket_bought_events]
+    promo_to_tickets = repo.filter_in(
+        PromoToTicket, PromoToTicket.ticket_addr, ticket_addrs
+    )
+    promo_addrs = [p.promo_addr for p in promo_to_tickets]
+    promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs, offset, limit)
     return [
         PromoInfo(
             owner_address=p.owner,

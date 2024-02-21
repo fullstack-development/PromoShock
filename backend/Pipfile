@@ -14,8 +14,9 @@ sqlalchemy = "*"
 pycryptodome = "*"
 psycopg2-binary = "*"
 pyyaml = "*"
+asyncio = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.11"

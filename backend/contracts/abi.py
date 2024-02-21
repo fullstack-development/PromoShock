@@ -1,8 +1,10 @@
 import json
 import os
 
+from eth_typing import Address
 
-def get_ticket_factory_address():
+
+def get_ticket_factory_address() -> Address:
     addr = os.environ.get("TICKET_FACTORY_ADDR", None)
     if addr is None:
         raise Exception("TICKET_FACTORY_ADDR is not set")
@@ -17,7 +19,7 @@ def get_ticket_factory_abi():
         return json.loads(c)["abi"]
 
 
-def get_promo_factory_address():
+def get_promo_factory_address() -> Address:
     addr = os.environ.get("PROMO_FACTORY_ADDR", None)
     if addr is None:
         raise Exception("PROMO_FACTORY_ADDR is not set")

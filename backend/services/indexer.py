@@ -1,5 +1,6 @@
 import abc
 import logging
+import asyncio
 from typing import Any, List, Optional
 from ens.ens import HexBytes
 from eth_typing import Address
@@ -7,12 +8,12 @@ import requests
 from urllib.parse import urlparse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from web3 import Web3
+from web3 import AsyncWeb3
 from web3.types import BlockIdentifier, FilterParams, LogReceipt
 
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from contracts.abi import get_ticket_abi, get_ticket_sale_abi, get_promo_abi
-from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
+from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class AbstractRepository(abc.ABC):
 
 
 # TODO: implement transactions
+# TODO: async methods
 class SqlAlchemyRepository(AbstractRepository):
 
     def __init__(self, session: Session) -> None:
@@ -91,6 +93,10 @@ TESTNET_LOG_EVENTS = {
         "PromotionCreated",
         "(uint256,uint256,address,address[],string)",
     ),
+    "0xa34e6b78e9a990f62e47ba1c3993ff82d0d748e22617d46c5a79c7b86d10e19b": (
+        "MintTicket",
+        ["address"],
+    ),
 }
 
 
@@ -99,7 +105,7 @@ class NftIndexer:
 
     def __init__(
         self,
-        web3_client: Web3,
+        web3_client: AsyncWeb3,
         repository: AbstractRepository,
         contract_addr: Address,
         contract_abi: dict,
@@ -111,7 +117,7 @@ class NftIndexer:
 
         self._contract = self._web3.eth.contract(contract_addr, abi=contract_abi)
 
-    def _index_ticket_sale_created_event(self, log, pattern, data):
+    async def _index_ticket_sale_created_event(self, log, pattern, data):
         owner, ticket_sale_addr, ticket_addr = self.decode_data(pattern, data)
         event = TicketSaleCreatedEvent(
             owner=owner.lower(),
@@ -136,12 +142,13 @@ class NftIndexer:
             self._repository.commit()
         return event
 
-    def _index_ticket_sale(self, ticket_sale_addr, owner):
+    async def _index_ticket_sale(self, ticket_sale_addr, owner):
         contract = self._web3.eth.contract(
-            self._web3.to_checksum_address(ticket_sale_addr), abi=get_ticket_sale_abi()
+            self._web3.to_checksum_address(ticket_sale_addr),
+            abi=get_ticket_sale_abi(),
         )
         start_time, end_time, price, token_payment_addr = (
-            contract.functions.getSaleParams().call()
+            await contract.functions.getSaleParams().call()
         )
 
         ticket_sale = TicketSale(
@@ -162,16 +169,17 @@ class NftIndexer:
             self._repository.commit()
         return ticket_sale
 
-    def _index_ticket(self, ticket_addr):
+    async def _index_ticket(self, ticket_addr):
         contract = self._web3.eth.contract(
             self._web3.to_checksum_address(ticket_addr), abi=get_ticket_abi()
         )
-        name = contract.functions.name().call()
-        cap = contract.functions.CAP().call()
-        symbol = contract.functions.symbol().call()
-        total_supply = contract.functions.totalSupply().call()
+        name = await contract.functions.name().call()
+        cap = await contract.functions.CAP().call()
+        symbol = await contract.functions.symbol().call()
+        total_supply = await contract.functions.totalSupply().call()
         try:
-            uri = self._get_ipfs_data(contract.functions.tokenURI(0).call())
+            url = await contract.functions.tokenURI(0).call()
+            uri = await self._get_ipfs_data(url)
         except requests.JSONDecodeError:
             uri = {}
         ticket = Ticket(
@@ -187,7 +195,7 @@ class NftIndexer:
             self._repository.commit()
         return ticket
 
-    def _index_promo_created_event(self, log: LogReceipt, pattern: tuple[str]):
+    async def _index_promo_created_event(self, log: LogReceipt, pattern: tuple[str]):
         [owner] = self.decode_data(["address"], log["topics"][1])
         start_time, end_time, promo_addr, streams, description = self.decode_data(
             [pattern], log["data"]
@@ -214,13 +222,13 @@ class NftIndexer:
             self._repository.commit()
         return event
 
-    def _index_promo(
+    async def _index_promo(
         self,
         promo_created_event: PromoCreatedEvent,
         from_block: BlockIdentifier = "earliest",
         to_block: BlockIdentifier = "latest",
     ):
-        logs = self._web3.eth.get_logs(
+        logs = await self._web3.eth.get_logs(
             filter_params=FilterParams(
                 address=self._web3.to_checksum_address(promo_created_event.promo_addr),
                 fromBlock=from_block,
@@ -243,7 +251,7 @@ class NftIndexer:
                     self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
                 )
                 try:
-                    uri = self._get_ipfs_data(
+                    uri = await self._get_ipfs_data(
                         contract.functions.tokenURI(tokenId).call()
                     )
                 except requests.JSONDecodeError:
@@ -289,12 +297,60 @@ class NftIndexer:
             except Exception as err:
                 continue
 
-    def _get_ipfs_data(self, url):
+    async def _get_ipfs_data(self, url):
         parsed_url = urlparse(url)
         if parsed_url.scheme == "ipfs":
-            return requests.get(f"https://ipfs.io/ipfs/{parsed_url.netloc}").json()
+            result = await asyncio.to_thread(
+                requests.get, f"https://ipfs.io/ipfs/{parsed_url.netloc}"
+            )
+            return result.json()
         else:
-            return requests.get(url).json()
+            result = await asyncio.to_thread(requests.get, url)
+            return result.json()
+
+    async def index_ticket_bought_event(self, from_block, to_block):
+        tickets: List[Ticket] = self._repository.filter(Ticket, {})
+        for ticket in tickets:
+            logs = await self._web3.eth.get_logs(
+                filter_params=FilterParams(
+                    address=self._web3.to_checksum_address(ticket.ticket_addr),
+                    fromBlock=from_block,
+                    toBlock=to_block,
+                )
+            )
+            for log in logs:
+                topic_name, pattern = self._log_events.get(
+                    log["topics"][0].hex(), (None, None)
+                )
+                if topic_name is None or pattern is None:
+                    continue
+                if topic_name == "MintTicket":
+                    [buyer] = self.decode_data(
+                        pattern, HexBytes(bytes().join(log["topics"][1:]))
+                    )
+                    [token_id] = self.decode_data(["uint256"], log["data"])
+                    event = TicketBoughtEvent(
+                        buyer=buyer.lower(),
+                        token_id=token_id,
+                        ticket_addr=ticket.ticket_addr,
+                        transaction_hash=log["transactionHash"].hex(),
+                        transaction_index=log["transactionIndex"],
+                        block_hash=log["blockHash"].hex(),
+                        block_nmb=log["blockNumber"],
+                    )
+                    if (
+                        self._repository.get(
+                            TicketBoughtEvent,
+                            {
+                                "buyer": buyer.lower(),
+                                "ticket_addr": ticket.ticket_addr,
+                                "token_id": token_id,
+                            },
+                        )
+                        is None
+                    ):
+                        self._repository.add(event)
+                        self._repository.commit()
 
     async def start_index(
         self,
@@ -302,7 +358,7 @@ class NftIndexer:
         to_block: BlockIdentifier = "latest",
     ):
         logger.info(f"Start indexing from block '{from_block}' to block '{to_block}'")
-        logs = self._web3.eth.get_logs(
+        logs = await self._web3.eth.get_logs(
             filter_params=FilterParams(
                 address=self._contract.address, fromBlock=from_block, toBlock=to_block
             )
@@ -315,16 +371,18 @@ class NftIndexer:
                 continue
             topic_bytes = HexBytes(bytes().join(log["topics"][1:]))
             if topic_name == "TicketSaleCreated":
-                ticket_sale_event = self._index_ticket_sale_created_event(
+                ticket_sale_event = await self._index_ticket_sale_created_event(
                     log, pattern, topic_bytes
                 )
-                self._index_ticket_sale(
+                await self._index_ticket_sale(
                     ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner
                 )
-                self._index_ticket(ticket_sale_event.ticket_addr)
+                await self._index_ticket(ticket_sale_event.ticket_addr)
             elif topic_name == "PromotionCreated":
-                promo_created_event = self._index_promo_created_event(log, pattern)
-                self._index_promo(
+                promo_created_event = await self._index_promo_created_event(
+                    log, pattern
+                )
+                await self._index_promo(
                     promo_created_event, from_block=from_block, to_block=to_block
                 )
 
