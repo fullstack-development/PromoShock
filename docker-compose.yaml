@@ -1,29 +1,44 @@
 version: "3"
 
 services:
-  backend:
+  
+  promoshock-api:
+    image: promoshock-api:${GIT_COMMIT_REV}
+    container_name: promoshock-api
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    depends_on:
-      - postgres
-    restart: always
+    env_file: 
+      - .env
     environment:
-      - DB_HOST=postgres
-      - DB_PASSWORD=pass
-      - TICKET_FACTORY_ADDR=0x42C593A0F50321EA473b5fAe6a4b76c212a26F54
-      - PROMO_FACTORY_ADDR=0x3d3E2D37151a812418FB075190f959a6C90C3A38
-      - ENV=DEVELOPMENT
-    volumes:
-      - ./:/code
-      - ../contracts/abi:/contracts/abi
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - TICKET_FACTORY_ADDR=${TICKET_FACTORY_ADDR}
+      - PROMO_FACTORY_ADDR=${PROMO_FACTORY_ADDR}
+      - ENV=${APP_ENV}
+    networks:
+      - promoshock
     ports:
       - "5005:80"
+    depends_on: 
+      - db
+    restart: always
 
-  postgres:
+  db:
     image: postgres:9.6
+    container_name: postgres
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=metastream
-      - POSTGRES_PASSWORD=pass
-    ports:
-      - "54321:5432"
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - promoshock
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  promoshock:
