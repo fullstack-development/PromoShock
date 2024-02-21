@@ -25,9 +25,9 @@ import {
   ImageUploader,
   NumberField,
   RangeDateField,
+  RangeTimeField,
   TextArea,
   TextField,
-  TimeField,
 } from "@promo-shock/ui-kit";
 
 import { errorMap } from "./errors";
@@ -91,9 +91,14 @@ const NewStreamPass: FC = () => {
         name: data.stream_name,
         description: data.stream_description,
         start_time: data.stream_date
-          .set("hour", data.stream_time.hour())
-          .set("minute", data.stream_time.minute())
-          .set("second", data.stream_time.second())
+          .set("hour", data.stream_time[0].hour())
+          .set("minute", data.stream_time[0].minute())
+          .set("second", data.stream_time[0].second())
+          .unix(),
+        end_time: data.stream_date
+          .set("hour", data.stream_time[1].hour())
+          .set("minute", data.stream_time[1].minute())
+          .set("second", data.stream_time[1].second())
           .unix(),
         stream_link: data.stream_link,
         streamer_link: data.streamer_link,
@@ -187,29 +192,31 @@ const NewStreamPass: FC = () => {
               />
             )}
           />
-          <Controller<FormData, "stream_link">
-            name="stream_link"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                disabled={pending}
-                className={classNames(classes.col_1, classes.contents)}
-                label="Link to watch stream:"
-                placeholder="heretowatch.com"
-                prefix="https://"
-                error={errors.stream_link?.message}
-              />
-            )}
-          />
-
           <div
             className={classNames(
-              classes.date_row,
+              classes.link_row,
               classes.contents,
               classes.with_separator,
             )}
           >
+            <Controller<FormData, "stream_link">
+              name="stream_link"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  disabled={pending}
+                  className={classNames(classes.col_1, classes.contents)}
+                  label="Link to watch stream:"
+                  placeholder="heretowatch.com"
+                  prefix="https://"
+                  error={errors.stream_link?.message}
+                />
+              )}
+            />
+          </div>
+
+          <div className={classNames(classes.date_row, classes.contents)}>
             <Controller<FormData, "stream_date">
               name="stream_date"
               control={control}
@@ -217,22 +224,31 @@ const NewStreamPass: FC = () => {
                 <DateField
                   {...field}
                   disabled={pending}
-                  className={classes.contents}
+                  className={classNames(classes.col_1, classes.contents)}
                   label="Date to watch:"
                   placeholder="13.12.2024"
                   error={errors.stream_date?.message}
                 />
               )}
             />
+          </div>
+          <div
+            className={classNames(
+              classes.time_row,
+              classes.contents,
+              classes.with_separator,
+            )}
+          >
             <Controller<FormData, "stream_time">
               name="stream_time"
               control={control}
               render={({ field }) => (
-                <TimeField
+                <RangeTimeField
                   {...field}
                   disabled={pending}
+                  className={classNames(classes.col_1, classes.contents)}
                   label="Time to watch:"
-                  placeholder="15:00:00"
+                  placeholder={["15:00:00", "16:00:00"]}
                   error={errors.stream_time?.message}
                 />
               )}

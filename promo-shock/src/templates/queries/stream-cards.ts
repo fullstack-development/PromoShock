@@ -16,7 +16,9 @@ const ticketToStreamCard = (
   banner: stream.banner,
   price: stream.price,
   startDate: Number(stream.start_date) * 1000,
-  endDate: (Number(stream.start_date) + 60 * 60 * 24) * 1000,
+  endDate:
+    Number(stream.end_date) ||
+    (Number(stream.start_date) + 60 * 60 * 24) * 1000,
   streamLink: stream.stream_link,
   streamerLink: stream.streamer_link,
   saleStartDate: Number(stream.sale_start_date) * 1000,
