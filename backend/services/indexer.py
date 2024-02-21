@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from web3 import Web3
-from web3.types import BlockParams, FilterParams, LogReceipt
+from web3.types import BlockIdentifier, FilterParams, LogReceipt
 
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from contracts.abi import get_ticket_abi, get_ticket_sale_abi, get_promo_abi
@@ -59,7 +59,14 @@ class SqlAlchemyRepository(AbstractRepository):
         )
 
     def filter_in(self, model_name, field, param, filter_params={}, offset=0, limit=25):
-        return self.session.query(model_name).filter(field.in_(param)).filter_by(**filter_params).limit(limit).offset(offset).all()
+        return (
+            self.session.query(model_name)
+            .filter(field.in_(param))
+            .filter_by(**filter_params)
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
 
     def commit(self):
         try:
@@ -118,7 +125,10 @@ class NftIndexer:
         if (
             self._repository.get(
                 TicketSaleCreatedEvent,
-                {"ticket_sale_addr": ticket_sale_addr.lower(), "ticket_addr": ticket_addr.lower()},
+                {
+                    "ticket_sale_addr": ticket_sale_addr.lower(),
+                    "ticket_addr": ticket_addr.lower(),
+                },
             )
             is None
         ):
@@ -130,7 +140,9 @@ class NftIndexer:
         contract = self._web3.eth.contract(
             self._web3.to_checksum_address(ticket_sale_addr), abi=get_ticket_sale_abi()
         )
-        start_time, end_time, price, token_payment_addr = contract.functions.getSaleParams().call()
+        start_time, end_time, price, token_payment_addr = (
+            contract.functions.getSaleParams().call()
+        )
 
         ticket_sale = TicketSale(
             ticket_sale_addr=ticket_sale_addr.lower(),
@@ -141,7 +153,9 @@ class NftIndexer:
             token_payment_addr=token_payment_addr.lower(),
         )
         if (
-            self._repository.get(TicketSale, {"ticket_sale_addr": ticket_sale_addr.lower()})
+            self._repository.get(
+                TicketSale, {"ticket_sale_addr": ticket_sale_addr.lower()}
+            )
             is None
         ):
             self._repository.add(ticket_sale)
@@ -191,7 +205,9 @@ class NftIndexer:
             block_hash=log["blockHash"].hex(),
         )
         if (
-            self._repository.get(PromoCreatedEvent, {"promo_addr": event.promo_addr.lower()})
+            self._repository.get(
+                PromoCreatedEvent, {"promo_addr": event.promo_addr.lower()}
+            )
             is None
         ):
             self._repository.add(event)
@@ -201,8 +217,8 @@ class NftIndexer:
     def _index_promo(
         self,
         promo_created_event: PromoCreatedEvent,
-        from_block: BlockParams = "earliest",
-        to_block: BlockParams = "latest",
+        from_block: BlockIdentifier = "earliest",
+        to_block: BlockIdentifier = "latest",
     ):
         logs = self._web3.eth.get_logs(
             filter_params=FilterParams(
@@ -252,7 +268,9 @@ class NftIndexer:
                     logger.info(f"Promo {promo.promo_addr}#{promo.token_id} was saved")
                 for stream_addr in streams:
                     promo_to_ticket = PromoToTicket(
-                        promo_addr=promo_addr.lower(), ticket_addr=stream_addr.lower(), token_id=tokenId
+                        promo_addr=promo_addr.lower(),
+                        ticket_addr=stream_addr.lower(),
+                        token_id=tokenId,
                     )
                     if (
                         self._repository.get(
@@ -279,7 +297,9 @@ class NftIndexer:
             return requests.get(url).json()
 
     async def start_index(
-        self, from_block: BlockParams = "earliest", to_block: BlockParams = "latest"
+        self,
+        from_block: BlockIdentifier = "earliest",
+        to_block: BlockIdentifier = "latest",
     ):
         logger.info(f"Start indexing from block '{from_block}' to block '{to_block}'")
         logs = self._web3.eth.get_logs(
@@ -298,7 +318,9 @@ class NftIndexer:
                 ticket_sale_event = self._index_ticket_sale_created_event(
                     log, pattern, topic_bytes
                 )
-                self._index_ticket_sale(ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner)
+                self._index_ticket_sale(
+                    ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner
+                )
                 self._index_ticket(ticket_sale_event.ticket_addr)
             elif topic_name == "PromotionCreated":
                 promo_created_event = self._index_promo_created_event(log, pattern)

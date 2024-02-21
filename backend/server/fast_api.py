@@ -6,7 +6,7 @@ from web3 import Web3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
-from web3.types import BlockParams
+from web3.types import BlockIdentifier
 
 from domain.promo import Promo, PromoToTicket
 from domain.ticket import Ticket, TicketSale, TicketSaleCreatedEvent
@@ -37,7 +37,9 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 
 
 @app.post("/index/start")
-async def start_index(from_block=37553211, to_block="latest"):
+async def start_index(
+    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
+):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -57,7 +59,9 @@ async def start_index(from_block=37553211, to_block="latest"):
 
 
 @app.post("/index/ticket")
-async def index_ticket(from_block=37553211, to_block="latest"):
+async def index_ticket(
+    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
+):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -69,7 +73,9 @@ async def index_ticket(from_block=37553211, to_block="latest"):
 
 
 @app.post("/index/promo")
-async def index_promo(from_block=37553211, to_block="latest"):
+async def index_promo(
+    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
+):
     repo = SqlAlchemyRepository(get_session())
     promo_indexer = NftIndexer(
         web3,
