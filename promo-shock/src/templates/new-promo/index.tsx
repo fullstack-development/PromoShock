@@ -23,7 +23,7 @@ import {
 import { withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
-import { api } from "@promo-shock/configs/axios";
+// import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -104,15 +104,15 @@ const NewPromo: FC = () => {
     onLogs: async (logs) => {
       const log = logs[0] || {};
       try {
-        await api.indexPromoIndexPromoPost(
-          Number(log.blockNumber),
-          Number(log.blockNumber),
-        );
+        // await api.indexPromoIndexPromoPost(
+        //   Number(log?.blockNumber),
+        //   Number(log?.blockNumber),
+        // );
       } catch {
       } finally {
         setPending(false);
         router.push(
-          `/profile/my-promos?highlight_address=${log.args?.promotion?.promoAddr.toLowerCase()}`,
+          `/profile/my-promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}`,
         );
       }
     },

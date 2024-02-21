@@ -17,7 +17,7 @@ import {
 } from "@generated/wagmi";
 
 import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
-import { api } from "@promo-shock/configs/axios";
+// import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
   Button,
@@ -69,15 +69,15 @@ const NewStreamPass: FC = () => {
     onLogs: async (logs) => {
       const log = logs[0] || {};
       try {
-        await api.indexTicketIndexTicketPost(
-          Number(log.blockNumber),
-          Number(log.blockNumber),
-        );
+        // await api.indexTicketIndexTicketPost(
+        //   Number(log?.blockNumber),
+        //   Number(log?.blockNumber),
+        // );
       } catch {
       } finally {
         setPending(false);
         router.push(
-          `/profile/my-streams?highlight_address=${log.args?.ticketSaleAddr?.toLowerCase()}`,
+          `/profile/my-streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}`,
         );
       }
     },
@@ -123,7 +123,6 @@ const NewStreamPass: FC = () => {
           const simulatedCreateStream =
             await simulateTicketFactoryCreateTicketSale(config, {
               args,
-
               chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
             });
           const estimatedGas =
