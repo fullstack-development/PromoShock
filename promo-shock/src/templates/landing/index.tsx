@@ -59,7 +59,7 @@ export const Landing: FC<Props> = ({ streams }) => {
         <Button
           theme="secondary"
           size="largeWide"
-          text="I wanna try"
+          text={promoTabs[selected].button}
           href={promoTabs[selected].href}
         />
       </div>

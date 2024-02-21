@@ -6,6 +6,8 @@ const promoTabs = [
       "Watch your fav streamers",
       "Score sweet deals from brands",
     ],
+    button: "I wanna buy a ticket",
+    href: "/streams",
   },
   {
     label: "streamers",
@@ -14,6 +16,7 @@ const promoTabs = [
       "Spread it to your watchers",
       "Score a wave of new fans",
     ],
+    button: "I wanna launch a ticket sale",
     href: "/streams/pass-page",
   },
   {
@@ -23,6 +26,7 @@ const promoTabs = [
       "Whip up a promo",
       "Watch the sales go bananas!",
     ],
+    button: "I wanna launch a promo",
     href: "/promos/new-promo",
   },
 ];
