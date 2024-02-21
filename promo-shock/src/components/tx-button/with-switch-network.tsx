@@ -1,4 +1,5 @@
-import { forwardRef } from "react";
+"use client";
+import { forwardRef, useState } from "react";
 import type { ComponentProps, MouseEventHandler } from "react";
 import { useAccount, useConnections, useSwitchChain } from "wagmi";
 
@@ -15,41 +16,47 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
       const [connection] = useConnections() || [];
       const chainId = connection?.chainId;
       const switchChain = useSwitchChain();
+      const [pending, setPending] = useState(false);
 
       const handleClick: MouseEventHandler<HTMLButtonElement> = async (e) => {
         if (wrongChain) {
           e.preventDefault();
           try {
+            setPending(true);
             await switchChain.switchChainAsync({
               chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
             });
           } catch (e) {
             // TODO :: handle error
             console.error(e);
+          } finally {
+            setPending(false);
           }
         } else {
           await props.onClick?.(e);
         }
       };
 
-      const wrongChain =
-        chainId !== Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID);
-      const loading = props.loading;
-      const pending = switchChain.isPending;
       const disabled = !account.address || props.disabled;
+      const loading = (props.loading || pending) && !disabled;
+      const wrongChain =
+        chainId !== Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID) &&
+        props.error &&
+        !disabled &&
+        !loading;
 
       return (
         <Component
           ref={ref}
           {...props}
           text={
-            (loading || pending) && !disabled
+            loading
               ? "Blockchain magic happening"
-              : wrongChain && !disabled
+              : wrongChain
               ? "Switch network"
               : props.text
           }
-          loading={(loading || pending) && !disabled}
+          loading={loading || pending}
           type={wrongChain ? "button" : props.type}
           disabled={disabled}
           onClick={handleClick}

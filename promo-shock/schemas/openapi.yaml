@@ -13,26 +13,12 @@ paths:
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: latest
           title: To Block
       responses:
@@ -56,26 +42,12 @@ paths:
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: latest
           title: To Block
       responses:
@@ -99,26 +71,12 @@ paths:
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          enum:
-          - latest
-          - earliest
-          - pending
-          - safe
-          - finalized
-          type: string
           default: latest
           title: To Block
       responses:

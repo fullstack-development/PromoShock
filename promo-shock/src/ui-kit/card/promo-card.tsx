@@ -1,3 +1,4 @@
+"use client";
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";

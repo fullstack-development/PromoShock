@@ -12,10 +12,6 @@ import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
 import { useAccount, useClient, useConfig, useReadContracts } from "wagmi";
 
-import type {
-  IndexTicketIndexTicketPostFromBlockEnum,
-  IndexTicketIndexTicketPostToBlockEnum,
-} from "@generated/api";
 import {
   simulatePromoFactoryCreatePromo,
   useReadPromoFactoryGetPaymentTokenAddress,
@@ -109,12 +105,8 @@ const NewPromo: FC = () => {
       const log = logs[0] || {};
       try {
         await api.indexPromoIndexPromoPost(
-          Number(
-            log.blockNumber,
-          ) as unknown as IndexTicketIndexTicketPostFromBlockEnum,
-          Number(
-            log.blockNumber,
-          ) as unknown as IndexTicketIndexTicketPostToBlockEnum,
+          Number(log.blockNumber),
+          Number(log.blockNumber),
         );
       } catch {
       } finally {

@@ -53,7 +53,6 @@ const withBalanceCheck = <T extends ComponentProps<typeof Button>>(
           },
         ],
       });
-      const [tokenSymbol, tokenDecimals] = tokenInfo.data || [];
 
       useWatchBlocks({
         blockTag: "latest",
@@ -68,36 +67,32 @@ const withBalanceCheck = <T extends ComponentProps<typeof Button>>(
         },
       });
 
+      const [tokenSymbol, tokenDecimals] = tokenInfo.data || [];
       const gasCost =
         typeof estimatedGasFee.data?.maxFeePerGas !== "undefined" &&
         typeof props.estimatedGas !== "undefined"
           ? estimatedGasFee.data.maxFeePerGas * props.estimatedGas
           : undefined;
-
       const isZeroBalance =
         typeof balance.data?.value !== "undefined"
           ? balance.data.value === BigInt(0)
           : undefined;
-
       const isZeroTokenBalance =
         typeof tokenBalance?.data !== "undefined"
           ? tokenBalance.data === BigInt(0)
           : undefined;
-
       const isInsufficientBalance =
         typeof isZeroBalance !== "undefined" &&
         typeof balance.data?.value !== "undefined" &&
         typeof gasCost !== "undefined"
           ? isZeroBalance || gasCost > balance.data.value
           : undefined;
-
       const isInsufficientTokenBalance =
         typeof isZeroTokenBalance !== "undefined" &&
         typeof tokenBalance?.data !== "undefined" &&
         typeof props.tokenAmount !== "undefined"
           ? isZeroTokenBalance || props.tokenAmount > tokenBalance.data
           : undefined;
-
       const tokenAmountString =
         typeof props.tokenAmount !== "undefined" &&
         typeof tokenDecimals?.result !== "undefined" &&
@@ -106,32 +101,30 @@ const withBalanceCheck = <T extends ComponentProps<typeof Button>>(
               tokenSymbol.result
             }`
           : undefined;
-
-      const error =
-        props.error || isInsufficientTokenBalance || isInsufficientBalance;
-
-      const loading =
-        props.loading ||
-        tokenBalance.isLoading ||
-        tokenInfo.isLoading ||
-        balance.isLoading;
-
       const disabled = props.disabled || !account.address;
+      const loading =
+        (props.loading ||
+          tokenBalance.isLoading ||
+          tokenInfo.isLoading ||
+          balance.isLoading) &&
+        !disabled;
+      const error =
+        (props.error || isInsufficientTokenBalance || isInsufficientBalance) &&
+        !disabled &&
+        !loading;
 
       return (
         <div className={classes.error_wrap}>
           <Component
             {...props}
             ref={ref}
-            loading={loading && !disabled}
-            text={
-              loading && !disabled ? "Blockchain magic happening" : props.text
-            }
+            loading={loading}
+            text={loading ? "Blockchain magic happening" : props.text}
             disabled={disabled}
-            error={error && !loading && !disabled}
+            error={error}
           />
 
-          {error && !loading && !disabled && (
+          {error && (
             <span className={classes.error_message}>
               {isInsufficientBalance
                 ? "You need some BNB in your wallet to send a transaction."

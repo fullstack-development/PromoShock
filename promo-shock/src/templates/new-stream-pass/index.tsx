@@ -10,10 +10,6 @@ import { Controller, useForm } from "react-hook-form";
 import { estimateContractGas } from "viem/actions";
 import { useAccount, useClient, useConfig } from "wagmi";
 
-import type {
-  IndexTicketIndexTicketPostFromBlockEnum,
-  IndexTicketIndexTicketPostToBlockEnum,
-} from "@generated/api";
 import {
   simulateTicketFactoryCreateTicketSale,
   useWatchTicketFactoryTicketSaleCreatedEvent,
@@ -74,12 +70,8 @@ const NewStreamPass: FC = () => {
       const log = logs[0] || {};
       try {
         await api.indexTicketIndexTicketPost(
-          Number(
-            log.blockNumber,
-          ) as unknown as IndexTicketIndexTicketPostFromBlockEnum,
-          Number(
-            log.blockNumber,
-          ) as unknown as IndexTicketIndexTicketPostToBlockEnum,
+          Number(log.blockNumber),
+          Number(log.blockNumber),
         );
       } catch {
       } finally {

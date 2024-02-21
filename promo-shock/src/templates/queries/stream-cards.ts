@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { api } from "@promo-shock/configs/axios";
 import type { Stream } from "@promo-shock/shared/entities";
 
-const streamToStream = (
+const ticketToStreamCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stream: any,
 ): Stream => ({
@@ -45,7 +45,7 @@ const fetchStreamCard = async ({
       signal,
     });
 
-    return data;
+    return ticketToStreamCard(data);
   } catch (error) {
     if (error instanceof AxiosError && error.response?.status === 404) {
       return null;
@@ -76,7 +76,7 @@ const fetchStreamCards = async ({
     },
   );
 
-  return data.map(streamToStream);
+  return data.map(ticketToStreamCard);
 };
 
 const fetchInfiniteStreamCards = async ({
@@ -102,7 +102,7 @@ const fetchInfiniteStreamCards = async ({
   );
 
   return {
-    pages: data.map(streamToStream),
+    pages: data.map(ticketToStreamCard),
     cursor: data.length ? pageParam + 1 : null,
   };
 };

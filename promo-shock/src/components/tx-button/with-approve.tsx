@@ -65,26 +65,6 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
         },
       });
 
-      const [tokenSymbol, tokenDecimals] = tokenInfo.data || [];
-
-      const loading =
-        props.loading || tokenInfo.isLoading || tokenAllowance.isLoading;
-
-      const amountToApproveString =
-        typeof props.tokenAmount !== "undefined" &&
-        typeof tokenDecimals?.result !== "undefined" &&
-        typeof tokenSymbol?.result !== "undefined"
-          ? `${formatUnits(props.tokenAmount, tokenDecimals.result)} ${
-              tokenSymbol.result
-            }`
-          : undefined;
-
-      const isInsufficientAllowance =
-        typeof props.tokenAmount !== "undefined" &&
-        typeof tokenAllowance.data !== "undefined"
-          ? tokenAllowance.data < props.tokenAmount
-          : undefined;
-
       const handleApprove: MouseEventHandler<HTMLButtonElement> = async (e) => {
         if (isInsufficientAllowance) {
           try {
@@ -113,18 +93,40 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
         }
       };
 
+      const [tokenSymbol, tokenDecimals] = tokenInfo.data || [];
+      const amountToApproveString =
+        typeof props.tokenAmount !== "undefined" &&
+        typeof tokenDecimals?.result !== "undefined" &&
+        typeof tokenSymbol?.result !== "undefined"
+          ? `${formatUnits(props.tokenAmount, tokenDecimals.result)} ${
+              tokenSymbol.result
+            }`
+          : undefined;
       const disabled = !account.address || props.disabled;
+      const loading =
+        (props.loading ||
+          tokenInfo.isLoading ||
+          tokenAllowance.isLoading ||
+          pending) &&
+        !disabled;
+      const isInsufficientAllowance =
+        typeof props.tokenAmount !== "undefined" &&
+        typeof tokenAllowance.data !== "undefined" &&
+        !loading &&
+        !disabled
+          ? tokenAllowance.data < props.tokenAmount
+          : undefined;
 
       return (
         <Component
           {...props}
           ref={ref}
           type={isInsufficientAllowance ? "button" : props.type}
-          loading={(loading || pending) && !disabled}
+          loading={loading}
           text={
-            (loading || pending) && !disabled
+            loading
               ? "Blockchain magic happening"
-              : isInsufficientAllowance && !disabled
+              : isInsufficientAllowance
               ? `Approve ${amountToApproveString}`
               : props.text
           }
