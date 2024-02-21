@@ -8,7 +8,7 @@ import requests
 from urllib.parse import urlparse
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from web3 import Web3
+from web3 import AsyncWeb3
 from web3.types import BlockIdentifier, FilterParams, LogReceipt
 
 from domain.promo import Promo, PromoCreatedEvent, PromoToTicket

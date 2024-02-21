@@ -37,9 +37,7 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 
 
 @app.post("/index/start")
-async def start_index(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def start_index(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -60,9 +58,7 @@ async def start_index(
 
 
 @app.post("/index/ticket")
-async def index_ticket(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def index_ticket(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     ticket_indexer = NftIndexer(
         web3,
@@ -74,9 +70,7 @@ async def index_ticket(
 
 
 @app.post("/index/promo")
-async def index_promo(
-    from_block: BlockIdentifier = 37553211, to_block: BlockIdentifier = "latest"
-):
+async def index_promo(from_block=37553211, to_block="latest"):
     repo = SqlAlchemyRepository(get_session())
     promo_indexer = NftIndexer(
         web3,
