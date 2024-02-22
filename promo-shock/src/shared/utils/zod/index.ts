@@ -3,7 +3,7 @@ import { isAddress } from "viem";
 import { z } from "zod";
 
 // @ts-expect-error Parameter 'dayjs' is constructor function.
-const zDayjs = () => z.instanceof(dayjs);
+const zDayjs = () => z.instanceof(dayjs, { errorMap: () => ({ message: "Please fill the field" }) });
 const zUploadFile = () =>
   z.object({
     originFileObj:
