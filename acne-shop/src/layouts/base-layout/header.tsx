@@ -1,7 +1,7 @@
 "use client";
 import type { FC } from "react";
 
-import { WalletButton, AuthButton } from "@acne-shop/components";
+import { WalletButton } from "@acne-shop/components";
 import { Link } from "@acne-shop/ui-kit";
 
 import classes from "./base-layout.module.scss";
@@ -14,7 +14,7 @@ const Header: FC = () => {
       </Link>
       <div className={classes.auth}>
         <WalletButton size="large" />
-        <AuthButton theme="primary" size="large" />
+        {/* <AuthButton theme="primary" size="large" /> */}
       </div>
     </header>
   );

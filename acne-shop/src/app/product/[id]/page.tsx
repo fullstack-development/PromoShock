@@ -1,10 +1,10 @@
-import { ProductTemplate, RecommendedTemplate } from "@acne-shop/templates";
+import { ProductTemplate } from "@acne-shop/templates";
 
 function ProductPage({ params }: { params: { id: string } }) {
   return (
     <>
       <ProductTemplate productId={params.id} />
-      <RecommendedTemplate productId={params.id} />
+      {/* <RecommendedTemplate productId={params.id} /> */}
     </>
   );
 }
