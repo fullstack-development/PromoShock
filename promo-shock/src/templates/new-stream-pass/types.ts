@@ -19,6 +19,7 @@ type Metadata = {
   image: File;
   banner: File;
   start_time: number;
+  end_time: number;
   stream_link: string;
   streamer_link: string;
 };
@@ -31,7 +32,7 @@ type FormData = {
   stream_description: string;
   stream_link: string;
   stream_date: Dayjs;
-  stream_time: Dayjs;
+  stream_time: [start: Dayjs, end: Dayjs];
   stream_price: number;
   streamer_link: string;
   stream_banner: UploadFile;
