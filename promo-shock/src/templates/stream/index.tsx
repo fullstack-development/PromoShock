@@ -4,9 +4,14 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import type { ComponentProps, FC } from "react";
 import { useHover } from "react-use";
+import type { Address } from "viem";
 import { parseUnits } from "viem";
+import { useAccount } from "wagmi";
 
-import { useWriteTicketSaleBuy } from "@generated/wagmi";
+import {
+  useReadTicketBalanceOf,
+  useWriteTicketSaleBuy,
+} from "@generated/wagmi";
 
 import {
   withApprove,
@@ -18,7 +23,7 @@ import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
 
-type Props = StreamType & {
+type Props = Omit<StreamType, "purchased"> & {
   paymentTokenSymbol: string;
   paymentTokenDecimals: number;
   promos: Array<ComponentProps<typeof PromoCard>>;
@@ -45,7 +50,6 @@ export const Stream: FC<Props> = ({
   totalAmount,
   reservedAmount,
   promos,
-  purchased,
 }) => {
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
@@ -78,6 +82,14 @@ export const Stream: FC<Props> = ({
   const saleHasNotStarted = saleStartDate.isAfter(dayjs());
   const streamHasFinished = endDate.isBefore(dayjs());
   const ongoing = startDate.isBefore(dayjs()) && endDate.isAfter(dayjs());
+
+  const account = useAccount();
+  const accountTicketBalance = useReadTicketBalanceOf({
+    address: ticketAddress,
+    args: [account.address || ("" as Address)],
+  });
+  const purchased =
+    !!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0);
 
   const handleBuy = async () => {
     try {
@@ -156,8 +168,8 @@ export const Stream: FC<Props> = ({
             onClick={handleBuy}
           />
           <span className={styles.sale_period}>
-            Selling period: {saleStartDate.format("DD.MM.YY")} —{" "}
-            {saleEndDate.format("DD.MM.YY")}
+            Selling period: {saleStartDate.format("DD.MM.YY, HH:mm")} —{" "}
+            {saleEndDate.format("DD.MM.YY, HH:mm")}
             {saleHasFinished && <> is over now</>}
             {saleHasNotStarted && <>. Stay tuned!</>}
           </span>

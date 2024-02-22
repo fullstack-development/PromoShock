@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "@wagmi/cli";
 import { actions, react } from "@wagmi/cli/plugins";
 import ticketFactoryAbi from "./abis/ticket-factory.json";
+import ticketAbi from "./abis/ticket.json";
 import ticketSaleAbi from "./abis/ticket-sale.json";
 import promoFactoryAbi from "./abis/promo-factory.json";
 
@@ -28,6 +29,10 @@ export default defineConfig(() => {
       {
         name: "TicketSale",
         abi: ticketSaleAbi
+      },
+      {
+        name: "Ticket",
+        abi: ticketAbi
       }
     ],
     plugins: [
