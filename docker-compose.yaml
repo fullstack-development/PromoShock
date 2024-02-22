@@ -3,7 +3,7 @@ version: "3"
 services:
   
   promoshock-api:
-    image: promoshock-api:${GIT_COMMIT_REV}
+    image: ghcr.io/kelizarov/promoshock-api:latest
     container_name: promoshock-api
     build:
       context: ./backend
