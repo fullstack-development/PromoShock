@@ -9,11 +9,12 @@ type Props = ComponentProps<typeof AutoBreadcrumb>;
 const WithBreadcrumb: FC<PropsWithChildren<Props>> = ({
   children,
   mapTitle,
+  replaceAddressBy,
 }) => {
   return (
     <div className={classes.root}>
       <div className={classes.breadcrumb}>
-        <AutoBreadcrumb mapTitle={mapTitle} />
+        <AutoBreadcrumb mapTitle={mapTitle} replaceAddressBy={replaceAddressBy} />
       </div>
       {children}
     </div>
