@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/promoshock-api:latest
+  IMAGE_NAME: ${{ github.actor }}/promoshockapi:latest
 
 jobs:
   publish:
