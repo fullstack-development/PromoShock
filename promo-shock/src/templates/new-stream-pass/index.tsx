@@ -271,6 +271,7 @@ const NewStreamPass: FC = () => {
                   placeholder="100"
                   suffix="USDT"
                   min={0}
+                  max={10 ** 6}
                   error={errors.stream_price?.message}
                 />
               )}
