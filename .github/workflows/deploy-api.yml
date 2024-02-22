@@ -23,7 +23,7 @@ jobs:
     - name: Build and Publish
       run: |
         docker build backend --tag ${{ env.IMAGE_NAME }}
-        docker save ${{ env.IMAGE_NAME }} | ssh -C ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker load && cd ${{ env.WORKDIR }} && docker-compose up -d && exit" 
+        docker save ${{ env.IMAGE_NAME }} | ssh -C ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker load && cd ${{ secrets.WORKDIR }} && docker-compose up -d && exit" 
     - name: cleanup
       run: rm -rf ~/.ssh
 
