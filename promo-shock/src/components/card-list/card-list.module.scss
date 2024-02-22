@@ -1,0 +1,20 @@
+.root {
+  display: grid;
+  justify-items: center;
+  row-gap: 56px;
+  width: 100%;
+}
+
+.filter {
+  width: 100%;
+  max-width: 360px;
+  justify-self: start;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  justify-content: center;
+  gap: 56px 36px;
+  width: 100%;
+}

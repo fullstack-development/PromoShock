@@ -1,67 +1,51 @@
 "use client";
-
-import type { InfiniteData } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import type { FC } from "react";
+import { useAccount } from "wagmi";
 
-import type { UnwrapPromise } from "@promo-shock/shared/types";
-import { Button, CardList, PromoCard } from "@promo-shock/ui-kit";
+import { CardList } from "@promo-shock/components";
+import type { Promo } from "@promo-shock/shared/entities";
+import type { InferQueryKey } from "@promo-shock/shared/types";
+import { Button, PromoCard } from "@promo-shock/ui-kit";
 
 import styles from "./promos.module.scss";
 import { fetchInfinitePromoCards } from "../queries";
 
 type Props = {
-  initialData?: InfiniteData<
-    UnwrapPromise<ReturnType<typeof fetchInfinitePromoCards>>,
-    number
-  >;
-  queryKey: [string, { limit?: number }];
+  queryKey: InferQueryKey<typeof fetchInfinitePromoCards>;
 };
 
-const Promos: FC<Props> = ({ initialData, queryKey }) => {
-  const promos = useInfiniteQuery({
-    initialData,
-    initialPageParam: 0,
-    queryKey,
-    queryFn: fetchInfinitePromoCards,
-    select: (data) => data.pages.map((item) => item.pages).flat(),
-    getNextPageParam: (lastPage) => lastPage.cursor,
-  });
-
-  const handleGetMore = async () => {
-    try {
-      await promos.fetchNextPage();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+const Promos: FC<Props> = ({ queryKey }) => {
+  const account = useAccount();
 
   return (
     <main className={styles.root}>
-      <h1 className={styles.title}>Promos</h1>
-
-      <Button
-        theme="quaternary"
-        size="big"
-        text="Add my own promo here"
-        href="/promos/new-promo"
-      />
-
-      <CardList>
-        {promos.data?.map((promo) => (
-          <PromoCard key={promo.tokenId} {...promo} />
-        ))}
-      </CardList>
-
-      {promos.hasNextPage && (
+      <div className={styles.header}>
+        <h1 className={styles.title}>Promos</h1>
         <Button
-          text="Get more"
-          size="medium"
-          theme="tertiary"
-          loading={promos.isFetchingNextPage}
-          onClick={handleGetMore}
+          theme="quaternary"
+          size="big"
+          text="Add my own promo here"
+          href="/promos/new-promo"
         />
-      )}
+      </div>
+
+      <CardList
+        queryKey={queryKey}
+        queryFn={fetchInfinitePromoCards}
+        filterOptions={
+          [
+            { label: "All", value: "all" },
+            { label: "I created", value: "owner" },
+            { label: "I bought", value: "buyer" },
+          ] as const
+        }
+        mapKeysToFilter={(filterKeys) => ({
+          owner: filterKeys.includes("owner") ? account.address : undefined,
+          buyer: filterKeys.includes("buyer") ? account.address : undefined,
+        })}
+      >
+        {(promo: Promo) => <PromoCard key={promo.tokenId} {...promo} />}
+      </CardList>
     </main>
   );
 };

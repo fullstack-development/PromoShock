@@ -1,66 +1,53 @@
 "use client";
-import type { InfiniteData } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import type { FC } from "react";
+import { useAccount } from "wagmi";
 
-import type { UnwrapPromise } from "@promo-shock/shared/types";
-import { Button, CardList, StreamCard } from "@promo-shock/ui-kit";
+import { CardList } from "@promo-shock/components";
+import type { Stream } from "@promo-shock/shared/entities";
+import type { InferQueryKey } from "@promo-shock/shared/types";
+import { Button, StreamCard } from "@promo-shock/ui-kit";
 
 import styles from "./streams.module.scss";
 import { fetchInfiniteStreamCards } from "../queries";
 
 type Props = {
-  initialData?: InfiniteData<
-    UnwrapPromise<ReturnType<typeof fetchInfiniteStreamCards>>,
-    number
-  >;
-  queryKey: [string, { limit?: number }];
+  queryKey: InferQueryKey<typeof fetchInfiniteStreamCards>;
 };
 
-export const Streams: FC<Props> = ({ initialData, queryKey }) => {
-  const streams = useInfiniteQuery({
-    initialData,
-    initialPageParam: 0,
-    queryKey,
-    queryFn: fetchInfiniteStreamCards,
-    select: (data) => data.pages.map((item) => item.pages).flat(),
-    getNextPageParam: (lastPage) => lastPage.cursor,
-  });
-
-  const handleGetMore = async () => {
-    try {
-      await streams.fetchNextPage();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+export const Streams: FC<Props> = ({ queryKey }) => {
+  const account = useAccount();
 
   return (
     <main className={styles.root}>
-      <h1 className={styles.title}>Streams</h1>
-
-      <Button
-        theme="quaternary"
-        size="big"
-        text="Add my own stream here"
-        href="/streams/pass-page"
-      />
-
-      <CardList>
-        {streams.data?.map((stream) => (
-          <StreamCard key={stream.saleAddress} {...stream} />
-        ))}
-      </CardList>
-
-      {streams.hasNextPage && (
+      <div className={styles.header}>
+        <h1 className={styles.title}>Streams</h1>
         <Button
-          text="Get more"
-          size="medium"
-          theme="tertiary"
-          loading={streams.isFetchingNextPage}
-          onClick={handleGetMore}
+          theme="quaternary"
+          size="big"
+          text="Add my own stream here"
+          href="/streams/pass-page"
         />
-      )}
+      </div>
+
+      <CardList
+        queryKey={queryKey}
+        queryFn={fetchInfiniteStreamCards}
+        filterOptions={
+          [
+            { label: "All", value: "all" },
+            { label: "I created", value: "owner" },
+            { label: "I bought", value: "buyer" },
+          ] as const
+        }
+        mapKeysToFilter={(filterKeys) => ({
+          owner: filterKeys.includes("owner") ? account.address : undefined,
+          buyer: filterKeys.includes("buyer") ? account.address : undefined,
+        })}
+      >
+        {(stream: Stream) => (
+          <StreamCard key={stream.saleAddress} {...stream} />
+        )}
+      </CardList>
     </main>
   );
 };

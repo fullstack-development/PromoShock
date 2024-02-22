@@ -8,11 +8,15 @@ import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { estimateContractGas } from "viem/actions";
-import { useAccount, useClient, useConfig } from "wagmi";
+import {
+  // useAccount,
+  useClient,
+  useConfig,
+} from "wagmi";
 
 import {
   simulateTicketFactoryCreateTicketSale,
-  useWatchTicketFactoryTicketSaleCreatedEvent,
+  // useWatchTicketFactoryTicketSaleCreatedEvent,
   useWriteTicketFactoryCreateTicketSale,
 } from "@generated/wagmi";
 
@@ -51,7 +55,7 @@ const NewStreamPass: FC = () => {
   const [pending, setPending] = useState(false);
   const config = useConfig();
   const client = useClient();
-  const account = useAccount();
+  // const account = useAccount();
   const metadata = useMutation({
     mutationFn: writeMetadata,
   });
@@ -64,24 +68,23 @@ const NewStreamPass: FC = () => {
     "Are you sure you want to leave the page? Data is not saved",
   );
 
-  useWatchTicketFactoryTicketSaleCreatedEvent({
-    args: { creator: account.address },
-    onLogs: async (logs) => {
-      const log = logs[0] || {};
-      try {
-        // await api.indexTicketIndexTicketPost(
-        //   Number(log?.blockNumber),
-        //   Number(log?.blockNumber),
-        // );
-      } catch {
-      } finally {
-        setPending(false);
-        router.push(
-          `/profile/my-streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}`,
-        );
-      }
-    },
-  });
+  // useWatchTicketFactoryTicketSaleCreatedEvent({
+  //   args: { creator: account.address },
+  //   onLogs: async (logs) => {
+  //     const log = logs[0] || {};
+  //     try {
+  //       await api.indexTicketIndexTicketPost(
+  //         Number(log?.blockNumber),
+  //         Number(log?.blockNumber),
+  //       );
+  //     } catch {
+  //     } finally {
+  //       router.push(
+  //         `/profile/my-streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}`,
+  //       );
+  //     }
+  //   },
+  // });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
@@ -131,6 +134,8 @@ const NewStreamPass: FC = () => {
           setEstimatedGasForCreateStream(estimatedGas);
         })(),
       ]);
+      // TODO:: remove this after the event is fixed
+      router.push("/streams?show_message=Your stream pass has been created");
     } catch (e) {
       setPending(false);
       console.error(e);
