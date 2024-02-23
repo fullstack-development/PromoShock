@@ -107,7 +107,6 @@ class Stream:
 async def all_tickets(
     owner: Optional[str] = None, buyer: Optional[str] = None, offset=0, limit=25
 ) -> List[Stream]:
-    # TODO: cleanup, fix pyright errors
     def make_stream(ticket_sale: TicketSale):
         ticket_sale_created: Optional[TicketSaleCreatedEvent] = repo.get(
             TicketSaleCreatedEvent, {"ticket_sale_addr": ticket_sale.ticket_sale_addr}
