@@ -61,15 +61,16 @@ export const StreamCard: FC<Props> = ({
       />
     </div>
   ));
-  const startDate = dayjs(startDateUnix);
-  const endDate = dayjs(endDateUnix);
+  const now = dayjs.utc();
+  const startDate = dayjs.utc(startDateUnix);
+  const endDate = dayjs.utc(endDateUnix);
   const ongoing =
-    (startDate.isBefore(dayjs()) && endDate.isAfter(dayjs())) || watchOnly;
-  const saleStartDate = dayjs(saleStartDateUnix);
-  const saleEndDate = dayjs(saleEndDateUnix);
+    (startDate.isBefore(now) && endDate.isAfter(now)) || watchOnly;
+  const saleStartDate = dayjs.utc(saleStartDateUnix);
+  const saleEndDate = dayjs.utc(saleEndDateUnix);
   const remainingAmount = totalAmount - reservedAmount;
-  const ticketsAreOut = remainingAmount === 0 && startDate.isAfter(dayjs());
-  const streamHasFinished = endDate.isBefore(dayjs());
+  const ticketsAreOut = remainingAmount === 0 && startDate.isAfter(now);
+  const streamHasFinished = endDate.isBefore(now);
 
   return (
     <div className={styles.wrap}>

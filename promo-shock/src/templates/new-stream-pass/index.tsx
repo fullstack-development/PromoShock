@@ -140,7 +140,7 @@ const NewStreamPass: FC = () => {
         })(),
       ]);
       // TODO:: remove this after the event is fixed
-      router.push("/streams?show_message=Your stream pass has been created");
+      router.push("/streams?show_message");
     } catch (e) {
       setPending(false);
       console.error(e);

@@ -72,22 +72,24 @@ export const Stream: FC<Props> = ({
   ));
   const buy = useWriteTicketSaleBuy();
   const [pending, setPending] = useState(false);
+  const [bought, setBought] = useState(false);
   const account = useAccount();
   const accountTicketBalance = useReadTicketBalanceOf({
     address: ticketAddress,
     args: account.address && [account.address],
   });
 
-  const startDate = dayjs(startDateUnix);
-  const endDate = dayjs(endDateUnix);
-  const saleEndDate = dayjs(saleEndDateUnix);
-  const saleStartDate = dayjs(saleStartDateUnix);
+  const now = dayjs.utc();
+  const startDate = dayjs.utc(startDateUnix);
+  const endDate = dayjs.utc(endDateUnix);
+  const saleEndDate = dayjs.utc(saleEndDateUnix);
+  const saleStartDate = dayjs.utc(saleStartDateUnix);
   const remainingAmount = totalAmount - reservedAmount;
-  const ticketsAreOut = remainingAmount === 0 && startDate.isAfter(dayjs());
-  const saleHasFinished = saleEndDate.isBefore(dayjs());
-  const saleHasNotStarted = saleStartDate.isAfter(dayjs());
-  const streamHasFinished = endDate.isBefore(dayjs());
-  const ongoing = startDate.isBefore(dayjs()) && endDate.isAfter(dayjs());
+  const ticketsAreOut = remainingAmount === 0 && startDate.isAfter(now);
+  const saleHasFinished = saleEndDate.isBefore(now);
+  const saleHasNotStarted = saleStartDate.isAfter(now);
+  const streamHasFinished = endDate.isBefore(now);
+  const ongoing = startDate.isBefore(now) && endDate.isAfter(now);
 
   const handleBuy = async () => {
     try {
@@ -96,6 +98,7 @@ export const Stream: FC<Props> = ({
         address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
       });
+      setBought(true);
     } catch (e) {
       console.error(e);
     } finally {
@@ -104,7 +107,8 @@ export const Stream: FC<Props> = ({
   };
 
   const purchased =
-    !!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0);
+    (!!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0)) ||
+    bought;
   const disabled =
     saleHasFinished || saleHasNotStarted || ticketsAreOut || purchased;
   const loading = accountTicketBalance.isLoading && !disabled;
@@ -134,7 +138,7 @@ export const Stream: FC<Props> = ({
               </span>
             </span>
 
-            {remainingAmount > 0 && startDate.isAfter(dayjs()) && (
+            {remainingAmount > 0 && startDate.isAfter(now) && (
               <span className={styles.subtitle}>
                 {remainingAmount < 5 ? (
                   <span className={styles.fire}>🔥</span>

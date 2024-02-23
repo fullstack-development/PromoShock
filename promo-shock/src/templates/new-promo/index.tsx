@@ -162,7 +162,7 @@ const NewPromo: FC = () => {
         })(),
       ]);
       // TODO:: remove this after the event is fixed
-      router.push("/promos?show_message=Your promo has been created");
+      router.push("/promos?show_message");
     } catch (error) {
       setPending(false);
       console.error(error);

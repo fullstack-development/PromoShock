@@ -75,12 +75,20 @@
   transform: rotate(2deg);
 }
 
-.previewsContainer {
+.card_title {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  justify-content: space-around;
-  gap: 60px;
+  justify-items: end;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  transform: rotate(2deg);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  justify-content: center;
+  gap: 56px 36px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;

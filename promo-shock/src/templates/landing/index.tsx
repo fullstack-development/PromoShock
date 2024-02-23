@@ -81,7 +81,7 @@ export const Landing: FC<Props> = ({ streams }) => {
           </div>
         </div>
 
-        <div className={styles.previewsContainer}>
+        <div className={styles.card_title}>
           <TextLink
             title="See all shows"
             underline
@@ -90,7 +90,7 @@ export const Landing: FC<Props> = ({ streams }) => {
           />
         </div>
 
-        <div className={styles.previewsContainer}>
+        <div className={styles.cards}>
           {streams.map((stream) => (
             <StreamCard key={stream.saleAddress} {...stream} />
           ))}
