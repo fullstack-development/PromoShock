@@ -1,6 +1,6 @@
 "use client";
 import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { ReactElement } from "react";
@@ -61,6 +61,7 @@ export const CardList = <
   const cards = useInfiniteQuery({
     initialData,
     initialPageParam: 0,
+    placeholderData: keepPreviousData,
     queryKey: [
       key,
       {
@@ -76,7 +77,7 @@ export const CardList = <
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("filters", filterKeys.join(","));
-    router.replace(pathname + "?" + params.toString());
+    router.replace(pathname + "?" + params.toString(), { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKeys, router, pathname]);
 
