@@ -16,6 +16,7 @@ import {
 import {
   withApprove,
   withBalanceCheck,
+  withConnect,
   withSwitchNetwork,
 } from "@promo-shock/components";
 import type { Stream as StreamType } from "@promo-shock/shared/entities";
@@ -29,7 +30,9 @@ type Props = Omit<StreamType, "purchased"> & {
   promos: Array<ComponentProps<typeof PromoCard>>;
 };
 
-const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
+const TxButton = withApprove(
+  withBalanceCheck(withSwitchNetwork(withConnect(Button))),
+);
 
 export const Stream: FC<Props> = ({
   name,

@@ -53,7 +53,7 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
             loading
               ? "Blockchain magic happening"
               : wrongChain
-              ? "Switch network"
+              ? "Switch network to proceed"
               : props.text
           }
           loading={loading || pending}

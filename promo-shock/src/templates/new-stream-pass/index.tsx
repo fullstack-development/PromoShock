@@ -20,7 +20,11 @@ import {
   useWriteTicketFactoryCreateTicketSale,
 } from "@generated/wagmi";
 
-import { withBalanceCheck, withSwitchNetwork } from "@promo-shock/components";
+import {
+  withBalanceCheck,
+  withConnect,
+  withSwitchNetwork,
+} from "@promo-shock/components";
 // import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave } from "@promo-shock/services";
 import {
@@ -40,7 +44,7 @@ import classes from "./new-stream-pass.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
 
-const TxButton = withBalanceCheck(withSwitchNetwork(Button));
+const TxButton = withBalanceCheck(withSwitchNetwork(withConnect(Button)));
 
 const NewStreamPass: FC = () => {
   const {

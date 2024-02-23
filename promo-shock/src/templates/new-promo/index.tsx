@@ -25,7 +25,7 @@ import {
   useWritePromoFactoryCreatePromo,
 } from "@generated/wagmi";
 
-import { withSwitchNetwork } from "@promo-shock/components";
+import { withConnect, withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
@@ -45,7 +45,9 @@ import classes from "./new-promo.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
 
-const TxButton = withApprove(withBalanceCheck(withSwitchNetwork(Button)));
+const TxButton = withApprove(
+  withBalanceCheck(withSwitchNetwork(withConnect(Button))),
+);
 
 const NewPromo: FC = () => {
   const router = useRouter();
