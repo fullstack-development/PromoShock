@@ -1,7 +1,8 @@
 "use client";
 import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ReactElement } from "react";
 
 import { Button, Multiselect } from "@promo-shock/ui-kit";
@@ -51,6 +52,9 @@ export const CardList = <
   QueryFn
 >): ReactElement => {
   const [key, filters] = queryKey;
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [filterKeys, setFilterKeys] = useState(
     defaultFilters || (["all"] as (TFilterKeys | "all")[]),
   );
@@ -69,6 +73,13 @@ export const CardList = <
     getNextPageParam: (lastPage) => lastPage.cursor,
   });
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("filters", filterKeys.join(","));
+    router.replace(pathname + "?" + params.toString());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterKeys, router, pathname]);
+
   const handleGetMore = async () => {
     try {
       await cards.fetchNextPage();
@@ -78,9 +89,13 @@ export const CardList = <
   };
 
   const handleFilter = (value: (TFilterKeys | "all")[]) => {
-    if (value.length === 0 || value[value.length - 1] === "all")
-      setFilterKeys(["all"]);
-    else setFilterKeys(value.filter((v) => v !== "all"));
+    if (value.length === 0 || value[value.length - 1] === "all") {
+      const filters = ["all" as const];
+      setFilterKeys(filters);
+    } else {
+      const filters = value.filter((v) => v !== "all");
+      setFilterKeys(filters);
+    }
   };
 
   return (
