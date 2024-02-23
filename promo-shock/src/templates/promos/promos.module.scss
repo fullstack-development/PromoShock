@@ -1,9 +1,6 @@
 @import 'src/shared/styles/mixins.scss';
 
 .root {
-  display: grid;
-  justify-items: center;
-  gap: 32px;
   position: relative;
   overflow-x: hidden;
   width: 100%;
@@ -11,6 +8,13 @@
   padding: 0px 120px 0 120px;
   margin: 0 auto;
   z-index: 1;
+}
+
+.header {
+  display: grid;
+  justify-items: center;
+  row-gap: 32px;
+  padding-bottom: 96px;
 }
 
 .title {

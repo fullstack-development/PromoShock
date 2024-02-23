@@ -1,4 +1,4 @@
-import type { QueryFunctionContext } from "@tanstack/react-query";
+import type { QueryFunction } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
 import { api } from "@promo-shock/configs/axios";
@@ -16,7 +16,9 @@ const ticketToStreamCard = (
   banner: stream.banner,
   price: stream.price,
   startDate: Number(stream.start_date) * 1000,
-  endDate: (Number(stream.start_date) + 60 * 60 * 24) * 1000,
+  endDate:
+    Number(stream.end_date) ||
+    (Number(stream.start_date) + 60 * 60 * 24) * 1000,
   streamLink: stream.stream_link,
   streamerLink: stream.streamer_link,
   saleStartDate: Number(stream.sale_start_date) * 1000,
@@ -27,15 +29,15 @@ const ticketToStreamCard = (
 });
 
 type Filters = {
-  account?: string;
+  buyer?: string;
   owner?: string;
   limit?: number;
 };
 
-const fetchStreamCard = async ({
+const fetchStreamCard: QueryFunction<Stream | null, [string, string]> = async ({
   queryKey: [, address],
   signal,
-}: QueryFunctionContext<[string, address: string]>) => {
+}) => {
   // FIXME :: codegen parameters
   try {
     const { data } = await api.getStreamTicketTicketAddrGet(address, {
@@ -55,10 +57,10 @@ const fetchStreamCard = async ({
   }
 };
 
-const fetchStreamCards = async ({
+const fetchStreamCards: QueryFunction<Stream[], [string, Filters]> = async ({
   queryKey: [, filters],
   signal,
-}: QueryFunctionContext<[string, filters?: Filters]>) => {
+}) => {
   const offset = 0;
   const limit = filters?.limit;
   const owner = filters?.owner?.toLowerCase();
@@ -79,11 +81,11 @@ const fetchStreamCards = async ({
   return data.map(ticketToStreamCard);
 };
 
-const fetchInfiniteStreamCards = async ({
-  queryKey: [, filters],
-  pageParam,
-  signal,
-}: QueryFunctionContext<[string, filters?: Filters], number>) => {
+const fetchInfiniteStreamCards: QueryFunction<
+  { items: Stream[]; cursor: number | null },
+  [string, Filters],
+  number
+> = async ({ queryKey: [, filters], pageParam, signal }) => {
   const limit = filters?.limit;
   const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
@@ -102,7 +104,7 @@ const fetchInfiniteStreamCards = async ({
   );
 
   return {
-    pages: data.map(ticketToStreamCard),
+    items: data.map(ticketToStreamCard),
     cursor: data.length ? pageParam + 1 : null,
   };
 };

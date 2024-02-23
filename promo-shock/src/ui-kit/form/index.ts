@@ -6,3 +6,4 @@ export * from "./number-field";
 export * from "./range-date-field";
 export * from "./dynamic-fieldset";
 export * from "./uploader";
+export * from "./range-time-field";

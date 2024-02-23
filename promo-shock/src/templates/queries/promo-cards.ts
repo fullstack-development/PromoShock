@@ -1,10 +1,10 @@
-import type { QueryFunctionContext } from "@tanstack/react-query";
+import type { QueryFunction } from "@tanstack/react-query";
 
 import { api } from "@promo-shock/configs/axios";
 import type { Promo } from "@promo-shock/shared/entities";
 
 type Filters = {
-  account?: string;
+  buyer?: string;
   owner?: string;
   stream?: string;
   limit?: number;
@@ -24,10 +24,10 @@ const promoToPromoCard = (
   shoppingLink: promo.shopping_link,
 });
 
-const fetchPromoCards = async ({
+const fetchPromoCards: QueryFunction<Promo[], [string, Filters]> = async ({
   queryKey: [, filters],
   signal,
-}: QueryFunctionContext<[string, filters?: Filters]>) => {
+}) => {
   const limit = filters?.limit;
   const offset = 0;
   const owner = filters?.owner?.toLowerCase();
@@ -50,11 +50,11 @@ const fetchPromoCards = async ({
   return (data as []).map(promoToPromoCard);
 };
 
-const fetchInfinitePromoCards = async ({
-  queryKey: [, filters],
-  pageParam,
-  signal,
-}: QueryFunctionContext<[string, filters?: Filters], number>) => {
+const fetchInfinitePromoCards: QueryFunction<
+  { items: Promo[]; cursor: number | null },
+  [string, Filters],
+  number
+> = async ({ queryKey: [, filters], pageParam, signal }) => {
   const limit = filters?.limit;
   const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
@@ -75,7 +75,7 @@ const fetchInfinitePromoCards = async ({
   );
   return {
     // FIXME :: codegen return type
-    pages: (data as []).map(promoToPromoCard),
+    items: (data as []).map(promoToPromoCard),
     cursor: data.length ? pageParam + 1 : null,
   };
 };
