@@ -177,10 +177,11 @@ class NftIndexer:
         cap = await contract.functions.CAP().call()
         symbol = await contract.functions.symbol().call()
         total_supply = await contract.functions.totalSupply().call()
+        url = await contract.functions.tokenURI(0).call()
         try:
-            url = await contract.functions.tokenURI(0).call()
             uri = await self._get_ipfs_data(url)
-        except requests.JSONDecodeError:
+        except Exception:
+            logger.warn(f"Failed to parse IFPS url {url}")
             uri = {}
         ticket = Ticket(
             ticket_addr=ticket_addr.lower(),
@@ -250,11 +251,11 @@ class NftIndexer:
                 contract = self._web3.eth.contract(
                     self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
                 )
+                url = await contract.functions.tokenURI(tokenId).call()
                 try:
-                    uri = await self._get_ipfs_data(
-                        contract.functions.tokenURI(tokenId).call()
-                    )
-                except requests.JSONDecodeError:
+                    uri = await self._get_ipfs_data(url)
+                except Exception:
+                    logger.warn(f"Failed to parse IPFS url {url}")
                     uri = {}
                 promo = Promo(
                     owner=promo_created_event.owner.lower(),
@@ -310,6 +311,9 @@ class NftIndexer:
 
     async def index_ticket_bought_event(self, from_block, to_block):
         tickets: List[Ticket] = self._repository.filter(Ticket, {})
+        logger.info(
+            f"Indexing TicketBoughtEvent for {len(tickets)} tickets from '{from_block}' to '{to_block}'"
+        )
         for ticket in tickets:
             logs = await self._web3.eth.get_logs(
                 filter_params=FilterParams(
@@ -351,13 +355,18 @@ class NftIndexer:
                     ):
                         self._repository.add(event)
                         self._repository.commit()
+                    logger.info(
+                        f"Indexed TicketBoughtEvent for {ticket.ticket_addr} ticket"
+                    )
 
     async def start_index(
         self,
         from_block: BlockIdentifier = "earliest",
         to_block: BlockIdentifier = "latest",
     ):
-        logger.info(f"Start indexing from block '{from_block}' to block '{to_block}'")
+        logger.info(
+            f"Start indexing from block '{from_block}' to block '{to_block}' for {self._contract.address} factory"
+        )
         logs = await self._web3.eth.get_logs(
             filter_params=FilterParams(
                 address=self._contract.address, fromBlock=from_block, toBlock=to_block
@@ -378,6 +387,7 @@ class NftIndexer:
                     ticket_sale_event.ticket_sale_addr, ticket_sale_event.owner
                 )
                 await self._index_ticket(ticket_sale_event.ticket_addr)
+                logger.info(f"Indexed ticket {ticket_sale_event.ticket_addr}")
             elif topic_name == "PromotionCreated":
                 promo_created_event = await self._index_promo_created_event(
                     log, pattern
@@ -385,6 +395,7 @@ class NftIndexer:
                 await self._index_promo(
                     promo_created_event, from_block=from_block, to_block=to_block
                 )
+                logger.info(f"Indexed promo {promo_created_event.promo_addr}")
 
         logger.info("Index complete")
 

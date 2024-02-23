@@ -6,7 +6,6 @@ from web3 import AsyncWeb3, Web3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
-from web3.types import BlockIdentifier
 
 from domain.promo import Promo, PromoToTicket
 from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
@@ -37,8 +36,9 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 
 
 @app.post("/index/start")
-async def start_index(from_block=37553211, to_block="latest"):
+async def start_index(from_block: int = 37553211, to_block: Optional[int] = None):
     repo = SqlAlchemyRepository(get_session())
+    toBlock = "latest" if to_block is None else to_block
     ticket_indexer = NftIndexer(
         web3,
         repo,
@@ -52,33 +52,35 @@ async def start_index(from_block=37553211, to_block="latest"):
         get_promo_factory_abi(),
     )
     # TODO: run async
-    await ticket_indexer.start_index(from_block=from_block)
-    await ticket_indexer.index_ticket_bought_event(from_block, to_block)
-    await promo_indexer.start_index(from_block=from_block)
+    await ticket_indexer.start_index(from_block=from_block, to_block=toBlock)
+    await ticket_indexer.index_ticket_bought_event(from_block, to_block=toBlock)
+    await promo_indexer.start_index(from_block=from_block, to_block=toBlock)
 
 
 @app.post("/index/ticket")
-async def index_ticket(from_block=37553211, to_block="latest"):
+async def index_ticket(from_block: int = 37553211, to_block: Optional[int] = None):
     repo = SqlAlchemyRepository(get_session())
+    toBlock = "latest" if to_block is None else to_block
     ticket_indexer = NftIndexer(
         web3,
         repo,
         get_ticket_factory_address(),
         get_ticket_factory_abi(),
     )
-    await ticket_indexer.start_index(from_block=from_block, to_block=to_block)
+    await ticket_indexer.start_index(from_block=from_block, to_block=toBlock)
 
 
 @app.post("/index/promo")
-async def index_promo(from_block=37553211, to_block="latest"):
+async def index_promo(from_block: int = 37553211, to_block: Optional[int] = None):
     repo = SqlAlchemyRepository(get_session())
+    toBlock = "latest" if to_block is None else to_block
     promo_indexer = NftIndexer(
         web3,
         repo,
         get_promo_factory_address(),
         get_promo_factory_abi(),
     )
-    await promo_indexer.start_index(from_block=from_block, to_block=to_block)
+    await promo_indexer.start_index(from_block=from_block, to_block=toBlock)
 
 
 @dataclass(frozen=True)
