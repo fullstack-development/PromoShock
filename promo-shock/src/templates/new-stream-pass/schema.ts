@@ -10,7 +10,7 @@ const formSchema = z.object({
   stream_description: z.string().min(1).max(100),
   stream_link: z.string().min(1),
   stream_date: zDayjs(),
-  stream_time: zDayjs(),
+  stream_time: z.tuple([zDayjs(), zDayjs()]),
   stream_price: z.number().min(1),
   streamer_link: z.string().min(1),
   stream_banner: zUploadFile(),

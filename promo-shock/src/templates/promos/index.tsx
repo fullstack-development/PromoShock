@@ -1,4 +1,5 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import type { FC } from "react";
 import { useAccount } from "wagmi";
 
@@ -16,6 +17,14 @@ type Props = {
 
 const Promos: FC<Props> = ({ queryKey }) => {
   const account = useAccount();
+  const params = useSearchParams();
+  const filters = params.get("filters");
+  const highlightAddress = params.get("highlight_address");
+  const defaultFilters = filters?.split(",");
+  const isValidFilters = defaultFilters?.every(
+    (filter): filter is "owner" | "buyer" =>
+      ["owner", "buyer"].includes(filter),
+  );
 
   return (
     <main className={styles.root}>
@@ -32,6 +41,7 @@ const Promos: FC<Props> = ({ queryKey }) => {
       <CardList
         queryKey={queryKey}
         queryFn={fetchInfinitePromoCards}
+        defaultFilters={isValidFilters ? defaultFilters : undefined}
         filterOptions={
           [
             { label: "All", value: "all" },
@@ -44,7 +54,13 @@ const Promos: FC<Props> = ({ queryKey }) => {
           buyer: filterKeys.includes("buyer") ? account.address : undefined,
         })}
       >
-        {(promo: Promo) => <PromoCard key={promo.tokenId} {...promo} />}
+        {(promo: Promo) => (
+          <PromoCard
+            key={promo.tokenId}
+            highlighted={promo.promoAddress === highlightAddress}
+            {...promo}
+          />
+        )}
       </CardList>
     </main>
   );

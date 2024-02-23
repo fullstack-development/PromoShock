@@ -21,6 +21,7 @@ type Props<
   children: (item: TValue) => ReactElement;
   initialData?: InfiniteData<QueryValue, number>;
   filterOptions?: { label: string; value: TFilterKeys | "all" }[];
+  defaultFilters?: TFilterKeys[];
   mapKeysToFilter?: QueryKey extends [string, filters: infer Filters]
     ? (filterKeys: (TFilterKeys | "all")[]) => Filters
     : never;
@@ -39,6 +40,7 @@ export const CardList = <
   queryKey,
   initialData,
   mapKeysToFilter,
+  defaultFilters,
   filterOptions,
 }: Props<
   TValue,
@@ -49,10 +51,9 @@ export const CardList = <
   QueryFn
 >): ReactElement => {
   const [key, filters] = queryKey;
-  const [filterKeys, setFilterKeys] = useState(["all"] as (
-    | TFilterKeys
-    | "all"
-  )[]);
+  const [filterKeys, setFilterKeys] = useState(
+    defaultFilters || (["all"] as (TFilterKeys | "all")[]),
+  );
   const cards = useInfiniteQuery({
     initialData,
     initialPageParam: 0,

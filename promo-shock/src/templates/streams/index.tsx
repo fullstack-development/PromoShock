@@ -1,4 +1,5 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import type { FC } from "react";
 import { useAccount } from "wagmi";
 
@@ -16,6 +17,14 @@ type Props = {
 
 export const Streams: FC<Props> = ({ queryKey }) => {
   const account = useAccount();
+  const params = useSearchParams();
+  const filters = params.get("filters");
+  const highlightAddress = params.get("highlight_address");
+  const defaultFilters = filters?.split(",");
+  const isValidFilters = defaultFilters?.every(
+    (filter): filter is "owner" | "buyer" =>
+      ["owner", "buyer"].includes(filter),
+  );
 
   return (
     <main className={styles.root}>
@@ -32,6 +41,7 @@ export const Streams: FC<Props> = ({ queryKey }) => {
       <CardList
         queryKey={queryKey}
         queryFn={fetchInfiniteStreamCards}
+        defaultFilters={isValidFilters ? defaultFilters : undefined}
         filterOptions={
           [
             { label: "All", value: "all" },
@@ -45,7 +55,11 @@ export const Streams: FC<Props> = ({ queryKey }) => {
         })}
       >
         {(stream: Stream) => (
-          <StreamCard key={stream.saleAddress} {...stream} />
+          <StreamCard
+            key={stream.saleAddress}
+            highlight={stream.saleAddress === highlightAddress}
+            {...stream}
+          />
         )}
       </CardList>
     </main>

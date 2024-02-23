@@ -10,18 +10,13 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { erc20Abi, formatUnits } from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
-import {
-  // useAccount,
-  useClient,
-  useConfig,
-  useReadContracts,
-} from "wagmi";
+import { useAccount, useClient, useConfig, useReadContracts } from "wagmi";
 
 import {
   simulatePromoFactoryCreatePromo,
   useReadPromoFactoryGetPaymentTokenAddress,
   useReadPromoFactoryGetPromoCreationPrice,
-  // useWatchPromoFactoryPromotionCreatedEvent,
+  useWatchPromoFactoryPromotionCreatedEvent,
   useWritePromoFactoryCreatePromo,
 } from "@generated/wagmi";
 
@@ -51,7 +46,7 @@ const TxButton = withApprove(
 
 const NewPromo: FC = () => {
   const router = useRouter();
-  // const account = useAccount();
+  const account = useAccount();
   const config = useConfig();
   const client = useClient();
   const {
@@ -106,23 +101,28 @@ const NewPromo: FC = () => {
     "Are you sure you want to leave the page? Data is not saved",
   );
 
-  // useWatchPromoFactoryPromotionCreatedEvent({
-  //   args: { marketer: account.address },
-  //   onLogs: async (logs) => {
-  //     const log = logs[0] || {};
-  //     try {
-  //       await api.indexPromoIndexPromoPost(
-  //         Number(log?.blockNumber),
-  //         Number(log?.blockNumber),
-  //       );
-  //     } catch {
-  //     } finally {
-  //       router.push(
-  //         `/profile/my-promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}`,
-  //       );
-  //     }
-  //   },
-  // });
+  useWatchPromoFactoryPromotionCreatedEvent({
+    args: { marketer: account.address },
+    onLogs:
+      account.address &&
+      (async (logs) => {
+        const [log] = logs;
+        // try {
+        //   await api.indexPromoIndexPromoPost(
+        //     Number(log?.blockNumber),
+        //     Number(log?.blockNumber),
+        //   );
+        // } catch {
+        // } finally {
+        //   router.push(
+        //     `/profile/my-promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}`,
+        //   );
+        // }
+        router.push(
+          `/promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}&filters=owner`,
+        );
+      }),
+  });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
@@ -163,8 +163,6 @@ const NewPromo: FC = () => {
           setEstimatedGasForCreatePromo(estimatedGas);
         })(),
       ]);
-      // TODO:: remove this after the event is fixed
-      router.push("/promos?show_message");
     } catch (error) {
       setPending(false);
       console.error(error);
