@@ -2,11 +2,16 @@
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
+import { useState } from "react";
 import type { ComponentProps, FC } from "react";
 import { useHover } from "react-use";
 import { parseUnits } from "viem";
+import { useAccount } from "wagmi";
 
-import { useWriteTicketSaleBuy } from "@generated/wagmi";
+import {
+  useReadTicketBalanceOf,
+  useWriteTicketSaleBuy,
+} from "@generated/wagmi";
 
 import {
   withApprove,
@@ -18,7 +23,7 @@ import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
 
-type Props = StreamType & {
+type Props = Omit<StreamType, "purchased"> & {
   paymentTokenSymbol: string;
   paymentTokenDecimals: number;
   promos: Array<ComponentProps<typeof PromoCard>>;
@@ -45,7 +50,6 @@ export const Stream: FC<Props> = ({
   totalAmount,
   reservedAmount,
   promos,
-  purchased,
 }) => {
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
@@ -66,8 +70,14 @@ export const Stream: FC<Props> = ({
       />
     </div>
   ));
-
   const buy = useWriteTicketSaleBuy();
+  const [pending, setPending] = useState(false);
+  const account = useAccount();
+  const accountTicketBalance = useReadTicketBalanceOf({
+    address: ticketAddress,
+    args: account.address && [account.address],
+  });
+
   const startDate = dayjs(startDateUnix);
   const endDate = dayjs(endDateUnix);
   const saleEndDate = dayjs(saleEndDateUnix);
@@ -81,16 +91,23 @@ export const Stream: FC<Props> = ({
 
   const handleBuy = async () => {
     try {
+      setPending(true);
       await buy.writeContractAsync({
         address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
       });
     } catch (e) {
       console.error(e);
+    } finally {
+      setPending(false);
     }
   };
 
-  const disabled = saleHasFinished || saleHasNotStarted || ticketsAreOut;
+  const purchased =
+    !!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0);
+  const disabled =
+    saleHasFinished || saleHasNotStarted || ticketsAreOut || purchased;
+  const loading = accountTicketBalance.isLoading && !disabled;
 
   return (
     <main className={styles.root}>
@@ -150,15 +167,16 @@ export const Stream: FC<Props> = ({
                 ? "You already have access"
                 : `Pay ${price} ${paymentTokenSymbol} and buy access`
             }
+            loading={loading || pending}
             tokenAddress={paymentTokenAddress}
             tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
             recipientAddress={saleAddress}
-            disabled={disabled || purchased}
+            disabled={disabled}
             onClick={handleBuy}
           />
           <span className={styles.sale_period}>
-            Selling period: {saleStartDate.format("DD.MM.YY")} —{" "}
-            {saleEndDate.format("DD.MM.YY")}
+            Selling period: {saleStartDate.format("DD.MM.YY, HH:mm")} —{" "}
+            {saleEndDate.format("DD.MM.YY, HH:mm")}
             {saleHasFinished && <> is over now</>}
             {saleHasNotStarted && <>. Stay tuned!</>}
           </span>

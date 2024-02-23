@@ -1,7 +1,6 @@
 "use client";
 import { Breadcrumb as AntdBreadcrumb } from "antd";
 import classNames from "classnames";
-import { useState, useEffect } from "react";
 import type { FC } from "react";
 
 import classes from "./breadcrumb.module.scss";
@@ -9,34 +8,13 @@ import { Link } from "../link";
 
 type Props = {
   paths: Array<{ href: string; title: string }>;
-  mapTitle?: (title: string) => string | Promise<string>;
 };
 
 const Item: FC<{
   href: string;
   title: string;
-  mapTitle?: (title: string) => string | Promise<string>;
   last?: boolean;
-}> = ({ href, title, last, mapTitle = (x) => x }) => {
-  const [_title, setTitle] = useState(title);
-
-  useEffect(() => {
-    let canceled = false;
-    const mappedTitle = mapTitle(title);
-
-    if (mappedTitle instanceof Promise) {
-      mappedTitle.then((res) => {
-        if (!canceled) setTitle(res);
-      });
-    } else {
-      setTitle(mappedTitle);
-    }
-
-    return () => {
-      canceled = true;
-    };
-  }, [title, mapTitle]);
-
+}> = ({ href, title, last }) => {
   return last ? (
     <span
       className={classNames(classes.item, {
@@ -44,7 +22,7 @@ const Item: FC<{
         [classes.link]: !last,
       })}
     >
-      {_title}
+      {title}
     </span>
   ) : (
     <Link
@@ -54,18 +32,23 @@ const Item: FC<{
         [classes.link]: !last,
       })}
     >
-      {_title}
+      {title}
     </Link>
   );
 };
 
-const Breadcrumb: FC<Props> = ({ paths, mapTitle }) => {
+const Breadcrumb: FC<Props> = ({ paths }) => {
   return (
     <AntdBreadcrumb
       className={classes.root}
-      items={paths.map((path, i) => ({
+      items={paths.map(({ title, href }, i) => ({
         title: (
-          <Item {...path} last={i === paths.length - 1} mapTitle={mapTitle} />
+          <Item
+            key={i + href}
+            href={href}
+            title={title}
+            last={i === paths.length - 1}
+          />
         ),
       }))}
     />
