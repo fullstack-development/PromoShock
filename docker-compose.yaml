@@ -3,7 +3,7 @@ version: "3"
 services:
   
   promoshock-api:
-    image: ghcr.io/kelizarov/promoshock-api:latest
+    image: promoshock-api:latest
     container_name: promoshock-api
     build:
       context: ./backend
@@ -17,6 +17,8 @@ services:
       - ENV=${APP_ENV}
     networks:
       - promoshock
+    volumes:
+      - ./backend:/code
     ports:
       - "5005:80"
     depends_on: 
