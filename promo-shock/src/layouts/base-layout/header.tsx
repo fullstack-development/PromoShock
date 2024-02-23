@@ -47,12 +47,12 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
           <nav className={styles.nav}>
             <TabLink
               active={pathname.includes("/streams")}
-              href="/streams"
+              href="/streams?filters=all"
               text="Streams"
             />
             <TabLink
               active={pathname.includes("/promos")}
-              href="/promos"
+              href="/promos?filters=all"
               text="Promo"
             />
             {isMirror && (

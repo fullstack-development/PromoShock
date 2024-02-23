@@ -7,7 +7,7 @@ const promoTabs = [
       "Score sweet deals from brands",
     ],
     button: "I wanna buy a ticket",
-    href: "/streams",
+    href: "/streams?filters=all",
   },
   {
     label: "streamers",

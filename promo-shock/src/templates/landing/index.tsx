@@ -85,7 +85,7 @@ export const Landing: FC<Props> = ({ streams }) => {
           <TextLink
             title="See all shows"
             underline
-            href="/streams"
+            href="/streams?filters=all"
             className={styles.seeAllShowsLink}
           />
         </div>
