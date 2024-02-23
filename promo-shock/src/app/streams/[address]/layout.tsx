@@ -1,12 +1,15 @@
-import type { FC, PropsWithChildren } from "react";
-
-import { WithBreadcrumb } from "@promo-shock/layouts";
-import { Address, isAddress } from "viem";
 import { notFound } from "next/navigation";
+import type { FC, PropsWithChildren } from "react";
+import type { Address } from "viem";
+import { isAddress } from "viem";
+
 import { queryClient } from "@promo-shock/configs/query";
+import { WithBreadcrumb } from "@promo-shock/layouts";
 import { fetchStreamCard } from "@promo-shock/templates";
 
-const StreamLayout: FC<PropsWithChildren<{ params: { address: Address } }>> = async ({ children, params: { address } }) => {
+const StreamLayout: FC<
+  PropsWithChildren<{ params: { address: Address } }>
+> = async ({ children, params: { address } }) => {
   if (!isAddress(address)) notFound();
 
   const stream = await queryClient.fetchQuery({
@@ -16,7 +19,7 @@ const StreamLayout: FC<PropsWithChildren<{ params: { address: Address } }>> = as
 
   if (!stream) notFound();
 
-  return <WithBreadcrumb replaceAddressBy={stream.name}>{children}</WithBreadcrumb>;
+  return <WithBreadcrumb tailTitle={stream.name}>{children}</WithBreadcrumb>;
 };
 
 export default StreamLayout;

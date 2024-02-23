@@ -1,16 +1,15 @@
 "use client";
-import { isAddress } from "viem";
 import { usePathname } from "next/navigation";
-import type { ComponentProps, FC } from "react";
+import type { FC } from "react";
 import React from "react";
 
 import { Breadcrumb } from "@promo-shock/ui-kit";
 
-type Props = Pick<ComponentProps<typeof Breadcrumb>, "mapTitle"> & {
-  replaceAddressBy?: string;
+type Props = {
+  tailTitle?: string;
 };
 
-const AutoBreadcrumb: FC<Props> = ({ mapTitle, replaceAddressBy }) => {
+const AutoBreadcrumb: FC<Props> = ({ tailTitle }) => {
   const pathname = usePathname();
   const paths = pathname.split("/").filter((path) => path);
 
@@ -18,14 +17,13 @@ const AutoBreadcrumb: FC<Props> = ({ mapTitle, replaceAddressBy }) => {
     <Breadcrumb
       paths={paths.map((path, index) => {
         const href = `/${paths.slice(0, index + 1).join("/")}`;
-
-        if (replaceAddressBy && isAddress(path)) {
-          return { href, title: replaceAddressBy }
-        }
-
-        return { href, title: path.split("-").join(" ") };
+        return {
+          href,
+          title: (index === paths.length - 1 && tailTitle ? tailTitle : path)
+            .split("-")
+            .join(" "),
+        };
       })}
-      mapTitle={mapTitle}
     />
   );
 };

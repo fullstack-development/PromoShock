@@ -2,9 +2,9 @@
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
+import { useState } from "react";
 import type { ComponentProps, FC } from "react";
 import { useHover } from "react-use";
-import type { Address } from "viem";
 import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 
@@ -70,8 +70,14 @@ export const Stream: FC<Props> = ({
       />
     </div>
   ));
-
   const buy = useWriteTicketSaleBuy();
+  const [pending, setPending] = useState(false);
+  const account = useAccount();
+  const accountTicketBalance = useReadTicketBalanceOf({
+    address: ticketAddress,
+    args: account.address && [account.address],
+  });
+
   const startDate = dayjs(startDateUnix);
   const endDate = dayjs(endDateUnix);
   const saleEndDate = dayjs(saleEndDateUnix);
@@ -83,26 +89,25 @@ export const Stream: FC<Props> = ({
   const streamHasFinished = endDate.isBefore(dayjs());
   const ongoing = startDate.isBefore(dayjs()) && endDate.isAfter(dayjs());
 
-  const account = useAccount();
-  const accountTicketBalance = useReadTicketBalanceOf({
-    address: ticketAddress,
-    args: [account.address || ("" as Address)],
-  });
-  const purchased =
-    !!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0);
-
   const handleBuy = async () => {
     try {
+      setPending(true);
       await buy.writeContractAsync({
         address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
       });
     } catch (e) {
       console.error(e);
+    } finally {
+      setPending(false);
     }
   };
 
-  const disabled = saleHasFinished || saleHasNotStarted || ticketsAreOut;
+  const purchased =
+    !!accountTicketBalance.data && accountTicketBalance.data !== BigInt(0);
+  const disabled =
+    saleHasFinished || saleHasNotStarted || ticketsAreOut || purchased;
+  const loading = accountTicketBalance.isLoading && !disabled;
 
   return (
     <main className={styles.root}>
@@ -162,10 +167,11 @@ export const Stream: FC<Props> = ({
                 ? "You already have access"
                 : `Pay ${price} ${paymentTokenSymbol} and buy access`
             }
+            loading={loading || pending}
             tokenAddress={paymentTokenAddress}
             tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
             recipientAddress={saleAddress}
-            disabled={disabled || purchased}
+            disabled={disabled}
             onClick={handleBuy}
           />
           <span className={styles.sale_period}>
