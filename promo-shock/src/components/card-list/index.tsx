@@ -2,7 +2,7 @@
 import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
 
 import { Button, Multiselect } from "@promo-shock/ui-kit";
@@ -22,7 +22,7 @@ type Props<
   children: (item: TValue) => ReactElement;
   initialData?: InfiniteData<QueryValue, number>;
   filterOptions?: { label: string; value: TFilterKeys | "all" }[];
-  defaultFilters?: TFilterKeys[];
+  defaultFilterKeys?: TFilterKeys[];
   mapKeysToFilter?: QueryKey extends [string, filters: infer Filters]
     ? (filterKeys: (TFilterKeys | "all")[]) => Filters
     : never;
@@ -41,7 +41,7 @@ export const CardList = <
   queryKey,
   initialData,
   mapKeysToFilter,
-  defaultFilters,
+  defaultFilterKeys,
   filterOptions,
 }: Props<
   TValue,
@@ -56,7 +56,7 @@ export const CardList = <
   const router = useRouter();
   const pathname = usePathname();
   const [filterKeys, setFilterKeys] = useState(
-    defaultFilters || (["all"] as (TFilterKeys | "all")[]),
+    defaultFilterKeys || (["all"] as (TFilterKeys | "all")[]),
   );
   const cards = useInfiniteQuery({
     initialData,
@@ -74,13 +74,6 @@ export const CardList = <
     getNextPageParam: (lastPage) => lastPage.cursor,
   });
 
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("filters", filterKeys.join(","));
-    router.replace(pathname + "?" + params.toString(), { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterKeys, router, pathname]);
-
   const handleGetMore = async () => {
     try {
       await cards.fetchNextPage();
@@ -90,13 +83,16 @@ export const CardList = <
   };
 
   const handleFilter = (value: (TFilterKeys | "all")[]) => {
+    const params = new URLSearchParams(searchParams.toString());
+    let filterKeys: (TFilterKeys | "all")[];
     if (value.length === 0 || value[value.length - 1] === "all") {
-      const filters = ["all" as const];
-      setFilterKeys(filters);
+      filterKeys = ["all" as const];
     } else {
-      const filters = value.filter((v) => v !== "all");
-      setFilterKeys(filters);
+      filterKeys = value.filter((v) => v !== "all");
     }
+    setFilterKeys(filterKeys);
+    params.set("filters", filterKeys.join(","));
+    router.replace(pathname + "?" + params.toString(), { scroll: false });
   };
 
   return (

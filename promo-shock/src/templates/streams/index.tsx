@@ -18,10 +18,9 @@ type Props = {
 export const Streams: FC<Props> = ({ queryKey }) => {
   const account = useAccount();
   const params = useSearchParams();
-  const filters = params.get("filters");
   const highlightAddress = params.get("highlight_address");
-  const defaultFilters = filters?.split(",");
-  const isValidFilters = defaultFilters?.every(
+  const searchParamsFilterKeys = params.get("filters")?.split(",");
+  const isValidFilterKeys = searchParamsFilterKeys?.every(
     (filter): filter is "owner" | "buyer" =>
       ["owner", "buyer"].includes(filter),
   );
@@ -41,7 +40,9 @@ export const Streams: FC<Props> = ({ queryKey }) => {
       <CardList
         queryKey={queryKey}
         queryFn={fetchInfiniteStreamCards}
-        defaultFilters={isValidFilters ? defaultFilters : undefined}
+        defaultFilterKeys={
+          isValidFilterKeys ? searchParamsFilterKeys : undefined
+        }
         filterOptions={
           [
             { label: "All", value: "all" },
