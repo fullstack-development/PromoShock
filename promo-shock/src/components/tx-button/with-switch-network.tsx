@@ -38,10 +38,14 @@ const withSwitchNetwork = <T extends ComponentProps<typeof Button>>(
       };
 
       const disabled = !account.address || props.disabled;
-      const loading = (props.loading || pending) && !disabled;
+      const loading =
+        ((!!account.address && typeof chainId === "undefined") ||
+          props.loading ||
+          pending) &&
+        !disabled;
       const wrongChain =
+        typeof chainId !== "undefined" &&
         chainId !== Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID) &&
-        props.error &&
         !disabled &&
         !loading;
 

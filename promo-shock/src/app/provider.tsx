@@ -11,6 +11,7 @@ import { WagmiProvider } from "wagmi";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
+import { MessageProvider } from "@promo-shock/services";
 import { useInitIsMounted } from "@promo-shock/shared/hooks";
 
 type Props = {
@@ -32,7 +33,9 @@ const RootProvider: FC<PropsWithChildren<Props>> = ({
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary state={dehydratedState}>
           <RainbowKitProvider modalSize="compact">
-            <AntdRegistry>{children}</AntdRegistry>
+            <AntdRegistry>
+              <MessageProvider>{children}</MessageProvider>
+            </AntdRegistry>
           </RainbowKitProvider>
         </HydrationBoundary>
       </QueryClientProvider>

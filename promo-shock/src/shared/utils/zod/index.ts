@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import type { Address } from "viem";
 import { isAddress } from "viem";
 import { z } from "zod";
 
@@ -13,6 +14,8 @@ const zUploadFile = () =>
       typeof window === "undefined" ? z.custom(() => true) : z.instanceof(File),
   });
 const zAddress = () =>
-  z.custom((value) => typeof value === "string" && isAddress(value));
+  z.custom(
+    (value): value is Address => typeof value === "string" && isAddress(value),
+  );
 
 export { zDayjs, zUploadFile, zAddress };

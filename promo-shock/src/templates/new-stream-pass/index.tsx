@@ -22,7 +22,7 @@ import {
   withSwitchNetwork,
 } from "@promo-shock/components";
 // import { api } from "@promo-shock/configs/axios";
-import { useConfirmLeave } from "@promo-shock/services";
+import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   Button,
   DateField,
@@ -43,6 +43,7 @@ import type { FormData } from "./types";
 const TxButton = withBalanceCheck(withSwitchNetwork(withConnect(Button)));
 
 const NewStreamPass: FC = () => {
+  const showSuccessMessage = useSuccessMessage();
   const {
     control,
     formState: { errors, isDirty },
@@ -88,13 +89,16 @@ const NewStreamPass: FC = () => {
         router.push(
           `/streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}&filters=owner`,
         );
+        showSuccessMessage(
+          "Congratulations! Your stream pass has been created and will be available for everyone to enjoy soon.",
+        );
       }),
   });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
+    setPending(true);
     try {
-      setPending(true);
       const metadataCid = await metadata.mutateAsync({
         name: data.stream_name,
         description: data.stream_description,

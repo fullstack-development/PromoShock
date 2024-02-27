@@ -24,7 +24,7 @@ import { withConnect, withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
-import { useConfirmLeave } from "@promo-shock/services";
+import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   RangeDateField,
   TextArea,
@@ -45,6 +45,7 @@ const TxButton = withApprove(
 );
 
 const NewPromo: FC = () => {
+  const showSuccessMessage = useSuccessMessage();
   const router = useRouter();
   const account = useAccount();
   const config = useConfig();
@@ -121,13 +122,16 @@ const NewPromo: FC = () => {
         router.push(
           `/promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}&filters=owner`,
         );
+        showSuccessMessage(
+          "Congratulations! Your promo has been successfully created and will be listed shortly.",
+        );
       }),
   });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
+    setPending(true);
     try {
-      setPending(true);
       const metadataCid = await metadata.mutateAsync({
         name: data.promo_name,
         description: data.promo_description,
