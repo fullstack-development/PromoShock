@@ -260,7 +260,6 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Time to watch:"
-                  placeholder={["15:00:00", "16:00:00"]}
                   error={errors.stream_time?.message}
                 />
               )}

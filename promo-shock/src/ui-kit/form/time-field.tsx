@@ -19,6 +19,7 @@ type Props = {
   min?: Dayjs;
   error?: string;
   disabled?: boolean;
+  ref?: Ref<HTMLInputElement>;
   onChange?(value: Dayjs): void;
 };
 

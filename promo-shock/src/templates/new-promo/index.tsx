@@ -285,7 +285,7 @@ const NewPromo: FC = () => {
         </div>
 
         <div className={classNames(classes.column, classes.contents)}>
-          <div className={classes.col_2}>
+          <div className={classNames(classes.col_2, classes.gap)}>
             <span className={classes.caption}>
               Your promotion will be targeted to these addresses. You can enter
               one or more addresses.
