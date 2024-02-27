@@ -25,6 +25,8 @@ createWeb3Modal({
   wagmiConfig: web3Config,
   projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
   enableAnalytics: false,
+  featuredWalletIds: [],
+  allWallets: "ONLY_MOBILE",
   themeMode: "light",
   themeVariables: {
     "--w3m-border-radius-master": "2px",

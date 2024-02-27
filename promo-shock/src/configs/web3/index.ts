@@ -25,7 +25,11 @@ const web3Config = defaultWagmiConfig({
     ),
   },
   ssr: true,
-  enableEIP6963: false,
+  enableEIP6963: true,
+  enableCoinbase: true,
+  enableWalletConnect: true,
+  enableInjected: false,
+  enableEmail: false,
   storage: createStorage({
     storage: cookieStorage,
   }),
