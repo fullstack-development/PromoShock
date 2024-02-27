@@ -1,8 +1,8 @@
 "use client";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import type { DehydratedState } from "@tanstack/react-query";
 import { QueryClientProvider, HydrationBoundary } from "@tanstack/react-query";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
 import dayjs from "dayjs";
 import utcPlugin from "dayjs/plugin/utc";
 import type { FC, PropsWithChildren } from "react";
@@ -21,6 +21,17 @@ type Props = {
 
 dayjs.extend(utcPlugin);
 
+createWeb3Modal({
+  wagmiConfig: web3Config,
+  projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  enableAnalytics: false,
+  themeMode: "light",
+  themeVariables: {
+    "--w3m-border-radius-master": "2px",
+    "--w3m-accent": "#F759AB",
+  },
+});
+
 const RootProvider: FC<PropsWithChildren<Props>> = ({
   dehydratedState,
   web3InitialState,
@@ -32,11 +43,9 @@ const RootProvider: FC<PropsWithChildren<Props>> = ({
     <WagmiProvider config={web3Config} initialState={web3InitialState}>
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary state={dehydratedState}>
-          <RainbowKitProvider modalSize="compact">
-            <AntdRegistry>
-              <MessageProvider>{children}</MessageProvider>
-            </AntdRegistry>
-          </RainbowKitProvider>
+          <AntdRegistry>
+            <MessageProvider>{children}</MessageProvider>
+          </AntdRegistry>
         </HydrationBoundary>
       </QueryClientProvider>
     </WagmiProvider>

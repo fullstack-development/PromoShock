@@ -1,0 +1,11 @@
+w3m-modal:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, symbol *)) {
+  z-index: var(--w3m-z-index);
+  display: block;
+  backface-visibility: hidden;
+  will-change: opacity;
+  position: fixed;
+  inset: 0px;
+  pointer-events: none;
+  opacity: 0;
+  background-color: var(--wui-cover);
+}

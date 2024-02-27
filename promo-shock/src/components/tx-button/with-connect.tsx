@@ -1,5 +1,5 @@
 "use client";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import type { ComponentProps, FC, MouseEventHandler } from "react";
 import { forwardRef } from "react";
 import { useAccount } from "wagmi";
@@ -15,11 +15,11 @@ const withConnect = <T extends ComponentProps<typeof Button>>(
     function WithConnect(props, ref) {
       const account = useAccount();
       const connected = !!account.address;
-      const { openConnectModal = () => void 0 } = useConnectModal();
+      const { open } = useWeb3Modal();
 
       const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
         if (!connected) {
-          openConnectModal();
+          open();
         } else {
           props.onClick?.(e);
         }

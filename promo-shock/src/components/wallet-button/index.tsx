@@ -1,30 +1,19 @@
 "use client";
-import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import type { ComponentProps, FC } from "react";
-import { useAccount, useAccountEffect } from "wagmi";
+import { useAccount } from "wagmi";
 
-import { useAuthStore } from "@promo-shock/services";
 import { trim } from "@promo-shock/shared/utils";
 import { Button } from "@promo-shock/ui-kit";
 
 type Props = Pick<ComponentProps<typeof Button>, "size" | "theme">;
 
 const WalletButton: FC<Props> = (props) => {
-  const authStore = useAuthStore();
   const { address } = useAccount();
-  const { openConnectModal = () => void 0 } = useConnectModal();
-  const { openAccountModal = () => void 0 } = useAccountModal();
-
-  useAccountEffect({
-    onDisconnect: authStore.signOut,
-  });
+  const { open } = useWeb3Modal();
 
   const handleClickWalletButton = () => {
-    if (address) {
-      openAccountModal();
-    } else {
-      openConnectModal();
-    }
+    open();
   };
 
   return (

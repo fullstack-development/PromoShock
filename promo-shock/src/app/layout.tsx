@@ -1,6 +1,5 @@
 /* eslint-disable import/no-unassigned-import */
 import "the-new-css-reset";
-import "@rainbow-me/rainbowkit/styles.css";
 import { dehydrate } from "@tanstack/react-query";
 import cn from "classnames";
 import type { Metadata } from "next";
@@ -15,6 +14,7 @@ import { web3Config } from "@promo-shock/configs/web3";
 import { BaseLayout } from "@promo-shock/layouts";
 
 import { RootProvider } from "./provider";
+import "./index.css";
 
 const bowlbyOne = Bowlby_One({
   weight: "400",
