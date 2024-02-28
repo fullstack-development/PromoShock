@@ -1,0 +1,57 @@
+@import "src/shared/styles/vars.scss";
+
+.root {
+  display: grid;
+  grid-template-rows: max-content 1fr;
+  height: max-content;
+  min-height: 100%;
+  width: 100%;
+}
+
+.image {
+  width: 100%;
+  object-fit: cover;
+  border: 2px dashed $gray5;
+  border-radius: 16px;
+  border-bottom: none;
+}
+
+.info {
+  display: grid;
+  grid-template-rows: max-content max-content 1fr;
+  justify-items: center;
+  height: max-content;
+  min-height: 100%;
+  border: 2px dashed $gray5;
+  border-radius: 16px;
+  background: #FFF;
+  text-align: center;
+  padding: 16px 24px 32px;
+}
+
+.title {
+  font-family: var(--font-bowlby-one);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0em;
+  text-align: left;
+  color: $goldenPurple;
+}
+
+.description {
+  font-family: var(--font-georama);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #141414;
+}
+
+.link {
+  align-self: end;
+  font-size: 20px;
+  line-height: 20px;
+  margin-top: 16px;
+}

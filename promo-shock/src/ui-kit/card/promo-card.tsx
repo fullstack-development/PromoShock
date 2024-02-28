@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
 
-import styles from "./streamCard.module.scss";
+import styles from "./card.module.scss";
 import { Button } from "../button";
 
 type Props = {

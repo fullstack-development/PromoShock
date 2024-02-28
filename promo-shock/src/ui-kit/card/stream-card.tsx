@@ -9,7 +9,7 @@ import { useReadContract } from "wagmi";
 
 import type { Stream } from "@promo-shock/shared/entities";
 
-import styles from "./streamCard.module.scss";
+import styles from "./card.module.scss";
 import { Button } from "../button";
 import { CopyToClipboard } from "../copy-to-clipboard";
 

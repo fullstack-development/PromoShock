@@ -13,3 +13,11 @@
   font-family: var(--font-bowlby-one);
   line-height: 57.6px;
 }
+
+@mixin h4 {
+  font-family: var(--font-bowlby-one);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 48px;
+  color: $goldenPurple;
+}

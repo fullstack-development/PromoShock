@@ -5,6 +5,7 @@ import { QueryClientProvider, HydrationBoundary } from "@tanstack/react-query";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import dayjs from "dayjs";
 import utcPlugin from "dayjs/plugin/utc";
+import NextTopLoader from "nextjs-toploader";
 import type { FC, PropsWithChildren } from "react";
 import type { State } from "wagmi";
 import { WagmiProvider } from "wagmi";
@@ -42,15 +43,18 @@ const RootProvider: FC<PropsWithChildren<Props>> = ({
   useInitIsMounted();
 
   return (
-    <WagmiProvider config={web3Config} initialState={web3InitialState}>
-      <QueryClientProvider client={queryClient}>
-        <HydrationBoundary state={dehydratedState}>
-          <AntdRegistry>
-            <MessageProvider>{children}</MessageProvider>
-          </AntdRegistry>
-        </HydrationBoundary>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <>
+      <WagmiProvider config={web3Config} initialState={web3InitialState}>
+        <QueryClientProvider client={queryClient}>
+          <HydrationBoundary state={dehydratedState}>
+            <AntdRegistry>
+              <MessageProvider>{children}</MessageProvider>
+            </AntdRegistry>
+          </HydrationBoundary>
+        </QueryClientProvider>
+      </WagmiProvider>
+      <NextTopLoader color="#F759AB" showSpinner={false} />
+    </>
   );
 };
 
