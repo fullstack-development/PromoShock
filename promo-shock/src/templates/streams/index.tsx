@@ -32,7 +32,7 @@ export const Streams: FC<Props> = ({ queryKey }) => {
         <Button
           theme="quaternary"
           size="big"
-          text="Add my own stream here"
+          text="Launch a ticket sale for my stream"
           href="/streams/pass-page"
         />
       </div>

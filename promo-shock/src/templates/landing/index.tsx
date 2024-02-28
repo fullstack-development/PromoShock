@@ -15,6 +15,7 @@ import {
 import { promoTabs } from "./constants";
 import { DoubleTriangle } from "./img/DoubleTriangle";
 import backgroundIcons from "./img/icons.svg";
+import quoteImg from "./img/quote.svg";
 import { Star } from "./img/Star";
 import styles from "./landing.module.scss";
 import type { fetchStreamCards } from "../queries";
@@ -47,8 +48,13 @@ export const Landing: FC<Props> = ({ streams }) => {
           setSelected={handleSelect}
           tabList={promoTabs}
         />
+        <div className={styles.description}>
+          {promoTabs[selected].description}
+        </div>
         <div className={styles.panels}>
-          <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
+          <span className={styles.leftPanel}>
+            {promoTabs[selected].panel[0]}
+          </span>
           <DoubleTriangle />
           <span className={styles.middlePanel}>
             {promoTabs[selected].panel[1]}
@@ -118,20 +124,54 @@ export const Landing: FC<Props> = ({ streams }) => {
       </h2>
 
       <div className={styles.tabs}>
-        <div className={styles.panels}>
-          <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
-          <DoubleTriangle />
-          <span className={styles.middlePanel}>
-            {promoTabs[selected].panel[1]}
-          </span>
-          <DoubleTriangle />
-          <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
+        <TabList
+          selected={selected}
+          setSelected={handleSelect}
+          tabList={promoTabs}
+        />
+        <div className={styles.description}>
+          {promoTabs[selected].description}
         </div>
         <Button
           theme="secondary"
           size="largeWide"
           text="I wanna try"
           href={promoTabs[selected].href}
+        />
+      </div>
+
+      <div className={styles.plans}>
+        <Image
+          className={styles.quoteBackground}
+          width={1126}
+          height={475}
+          src={quoteImg.src}
+          alt="background"
+        />
+
+        <h3 className={styles.h3}>We do have plans</h3>
+
+        <div className={styles.points}>
+          <div>
+            To team up with the heavy hitters of streaming—think Twitch, KICK,
+            Patreon, or X—and show them why blockchain is the real deal.
+          </div>
+          <div>
+            We&apos;re aiming to charm both brands and streamers, and as for
+            PromoShock — we’re gonna make it super user-friendly!
+          </div>
+          <div>
+            To buddy up with DeSoc services gearing up for streaming
+            launch—we&apos;ve got their back with any tech support they need.
+          </div>
+        </div>
+
+        <Button
+          theme="tertiary"
+          size="small"
+          text="Find out more about plans"
+          href="/about"
+          className={styles.readMore}
         />
       </div>
     </main>

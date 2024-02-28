@@ -133,7 +133,7 @@ export const Stream: FC<Props> = ({
         <div className={styles.streamInfo}>
           {imageElement}
           <div className={styles.row}>
-            <span>
+            <span className={styles.streamStartLabel}>
               <div className={styles.streamStarts}>Stream starts</div>
               <span className={styles.subtitle}>
                 {startDate.format("DD.MM.YY, HH:MM")} —{" "}
