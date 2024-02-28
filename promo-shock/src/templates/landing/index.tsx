@@ -47,8 +47,13 @@ export const Landing: FC<Props> = ({ streams }) => {
           setSelected={handleSelect}
           tabList={promoTabs}
         />
+        <div className={styles.description}>
+          {promoTabs[selected].description}
+        </div>
         <div className={styles.panels}>
-          <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
+          <span className={styles.leftPanel}>
+            {promoTabs[selected].panel[0]}
+          </span>
           <DoubleTriangle />
           <span className={styles.middlePanel}>
             {promoTabs[selected].panel[1]}
@@ -118,14 +123,13 @@ export const Landing: FC<Props> = ({ streams }) => {
       </h2>
 
       <div className={styles.tabs}>
-        <div className={styles.panels}>
-          <span className={styles.panel}>{promoTabs[selected].panel[0]}</span>
-          <DoubleTriangle />
-          <span className={styles.middlePanel}>
-            {promoTabs[selected].panel[1]}
-          </span>
-          <DoubleTriangle />
-          <span className={styles.panel}>{promoTabs[selected].panel[2]}</span>
+        <TabList
+          selected={selected}
+          setSelected={handleSelect}
+          tabList={promoTabs}
+        />
+        <div className={styles.description}>
+          {promoTabs[selected].description}
         </div>
         <Button
           theme="secondary"
