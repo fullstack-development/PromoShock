@@ -33,7 +33,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Oleg",
-    description: "Frontend boss too... but joined later",
+    description: "Frontend boss too...\nbut joined later",
     image: oleg_image,
     link: {
       title: "GitHub",
@@ -42,7 +42,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Roman",
-    description: "Delivered VERY smart contracts",
+    description: "Delivered VERY\nsmart contracts",
     image: roman_image,
     link: {
       title: "Link",
@@ -51,7 +51,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Masha",
-    description: "The first reason why promoshock looks awesome",
+    description: "The first reason why promoshock\nlooks awesome",
     image: masha_image,
     link: {
       title: "Link",
@@ -60,7 +60,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Julia",
-    description: "The second reason why promoshock looks awesome",
+    description: "The second reason why\npromoshock looks awesome",
     image: lulllia_image,
     link: {
       title: "Link",
@@ -69,7 +69,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Nico",
-    description: "will be fired if we won’t win hackathon",
+    description: "Will be fired if we won’t win\nhackathon",
     image: nico_image,
     link: {
       title: "Link",

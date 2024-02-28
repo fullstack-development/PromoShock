@@ -1,21 +1,22 @@
+import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import type { Address } from "viem";
 import { isAddress } from "viem";
+import type { RawCreateParams, CustomErrorParams } from "zod";
 import { z } from "zod";
 
-const zDayjs = () =>
-  // @ts-expect-error Parameter 'dayjs' is constructor function.
-  z.instanceof(dayjs, {
-    errorMap: () => ({ message: "Please fill the field" }),
-  });
-const zUploadFile = () =>
-  z.object({
-    originFileObj:
-      typeof window === "undefined" ? z.custom(() => true) : z.instanceof(File),
-  });
-const zAddress = () =>
-  z.custom(
-    (value): value is Address => typeof value === "string" && isAddress(value),
+const zDayjs = (params?: CustomErrorParams) =>
+  z.instanceof(dayjs as unknown as typeof Dayjs, params);
+const zUploadFile = (params?: RawCreateParams) =>
+  z.object(
+    {
+      originFileObj:
+        typeof window === "undefined"
+          ? z.custom(() => true)
+          : z.instanceof(File),
+    },
+    params,
   );
+const zAddress = (params?: RawCreateParams, path?: Array<string>) =>
+  z.string(params).refine(isAddress, { path, message: "Invalid address" });
 
 export { zDayjs, zUploadFile, zAddress };
