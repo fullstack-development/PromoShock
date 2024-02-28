@@ -32,12 +32,14 @@
 }
 
 .description {
-  min-height: 73px;
+  min-height: 100px;
   max-width: 960px;
   text-align: center;
   font-family: var(--font-georama);
   font-size: 20px;
+  line-height: 32px;
   margin-top: 40px;
+  margin-bottom: 32px;
 }
 
 .panels {
@@ -49,7 +51,6 @@
   font-weight: 700;
   font-size: 20px;
   font-family: var(--font-georama);
-  margin-top: 32px;
   margin-bottom: 56px;
 }
 
@@ -128,4 +129,44 @@
   gap: 4px;
   width: 100%;
   transform: translate3d(-400px, 0, 0);
+}
+
+.plans {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  gap: 30px;
+  min-height: 450px;
+}
+
+.quoteBackground {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.h3 {
+  @include h3;
+  z-index: 2;
+  margin-top: 50px;
+  text-transform: uppercase;
+}
+
+.points {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  z-index: 2;
+  max-width: 1126px;
+  padding: 0 80px;
+  font-size: 20px;
+  line-height: 32px;
+  font-family: var(--font-georama);
+}
+
+.readMore {
+  font-size: 20px !important;
+  padding: 6px 24px !important;
 }
