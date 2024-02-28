@@ -180,3 +180,12 @@
   max-width: 480px;
   margin: 0 auto;
 }
+
+.utcLabel {
+  margin-right: auto;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  margin-left: 120px;
+  font-family: var(--font-georama);
+}

@@ -1,4 +1,5 @@
 "use client";
+import { DeleteOutlined } from "@ant-design/icons";
 import type { ReactElement } from "react";
 import type {
   FieldArrayPath,
@@ -11,10 +12,10 @@ import type { PropsWithClassName } from "@promo-shock/shared/types";
 
 import classes from "./dynamic-fieldset.module.scss";
 import { ErrorWrapper } from "./error-wrapper";
-import { IconDelete } from "./icons";
 import { LabelWrapper } from "./label-wrapper";
 import { TextField } from "./text-field";
 import { Button } from "../button";
+import { IconTooltip } from "../tooltips";
 
 type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   control: UseFormReturn<T>["control"];
@@ -30,6 +31,8 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   placeholder?: string;
   caption?: string;
 };
+
+const TOOLTIP_TEXT = `For targeted promos, just enter the stream ticket address your audience hit up. Hover over the stream, click "Copy ticket address", and paste it here. All streams are listed on this page.`;
 
 const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   control,
@@ -64,51 +67,48 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
             <Controller
               name={`${name}.${index}.value`}
               control={control}
-              render={({ field }) =>
-                index === fieldset.fields.length - 1 ? (
-                  <>
-                    <ErrorWrapper message={errors?.[errors.length - 1]}>
-                      <TextField
-                        placeholder={placeholder}
-                        labelPosition="top"
-                        disabled={disabled}
-                        {...field}
-                      />
-                    </ErrorWrapper>
-                    <div className={classes.append}>
-                      <Button
-                        text="Add more"
-                        theme="tertiary"
-                        onClick={handleAppend}
-                        disabled={disabled}
-                      />
-                      <span className={classes.caption}>{caption}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <ErrorWrapper message={errors?.[index]}>
-                      <TextField
-                        placeholder={placeholder}
-                        labelPosition="top"
-                        disabled={disabled}
-                        {...field}
-                      />
-                    </ErrorWrapper>
-                    <button
-                      type="button"
-                      onClick={mkHandleRemove(index)}
-                      className={classes.remove}
+              render={({ field }) => (
+                <>
+                  <ErrorWrapper message={errors?.[index]}>
+                    <TextField
+                      placeholder={placeholder}
+                      labelPosition="top"
                       disabled={disabled}
-                    >
-                      <IconDelete />
-                    </button>
-                  </>
-                )
-              }
+                      {...field}
+                    />
+                  </ErrorWrapper>
+                  <button
+                    type="button"
+                    onClick={mkHandleRemove(index)}
+                    className={classes.remove}
+                    disabled={disabled}
+                  >
+                    <DeleteOutlined />
+                  </button>
+                </>
+              )}
             />
           </li>
         ))}
+
+        <div className={classes.controls}>
+          <div className={classes.buttonWithTooltip}>
+            <div className={classes.append}>
+              <Button
+                text="Add address"
+                theme="tertiary"
+                onClick={handleAppend}
+                disabled={disabled}
+              />
+              <span className={classes.caption}>{caption}</span>
+            </div>
+            <IconTooltip
+              icon="info"
+              placement="bottomRight"
+              title={TOOLTIP_TEXT}
+            />
+          </div>
+        </div>
       </ul>
     </LabelWrapper>
   );

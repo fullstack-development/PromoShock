@@ -1,3 +1,5 @@
+@import 'src/shared/styles/vars.scss';
+
 .root {
   display: grid;
   row-gap: 24px;
@@ -14,6 +16,15 @@
   cursor: pointer;
   &:disabled {
     cursor: not-allowed;
+  }
+
+  & svg {
+    color: $mainPink;
+    width: 36px;
+
+    &:hover {
+      color: $boldPink;
+    }
   }
 }
 
@@ -37,3 +48,12 @@
   color: #000000D9;
 }
 
+.controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttonWithTooltip {
+  display: flex;
+  gap: 16px;
+}
