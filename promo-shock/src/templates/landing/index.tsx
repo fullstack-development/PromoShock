@@ -141,21 +141,28 @@ export const Landing: FC<Props> = ({ streams }) => {
       </div>
 
       <div className={styles.plans}>
-        <Image className={styles.quoteBackground} width={1126} height={475} src={quoteImg.src} alt="background" />
+        <Image
+          className={styles.quoteBackground}
+          width={1126}
+          height={475}
+          src={quoteImg.src}
+          alt="background"
+        />
 
-        <h3 className={styles.h3}>
-          We do have plans
-        </h3>
+        <h3 className={styles.h3}>We do have plans</h3>
 
         <div className={styles.points}>
           <div>
-            To team up with the heavy hitters of streaming—think Twitch, KICK, Patreon, or X—and show them why blockchain is the real deal.
+            To team up with the heavy hitters of streaming—think Twitch, KICK,
+            Patreon, or X—and show them why blockchain is the real deal.
           </div>
           <div>
-            We're aiming to charm both brands and streamers, and as for PromoShock — we’re gonna make it super user-friendly!
+            We&apos;re aiming to charm both brands and streamers, and as for
+            PromoShock — we’re gonna make it super user-friendly!
           </div>
           <div>
-            To buddy up with DeSoc services gearing up for streaming launch—we've got their back with any tech support they need.
+            To buddy up with DeSoc services gearing up for streaming
+            launch—we&apos;ve got their back with any tech support they need.
           </div>
         </div>
 

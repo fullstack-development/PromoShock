@@ -15,6 +15,7 @@ import { ErrorWrapper } from "./error-wrapper";
 import { LabelWrapper } from "./label-wrapper";
 import { TextField } from "./text-field";
 import { Button } from "../button";
+import { TextLink } from "../link";
 import { IconTooltip } from "../tooltips";
 
 type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
@@ -32,8 +33,19 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   caption?: string;
 };
 
-const TOOLTIP_TEXT = `For targeted promos, just enter the stream ticket address your audience hit up. Hover over the stream, click "Copy ticket address", and paste it here. All streams are listed on this page.`;
-
+const TOOLTIP_TEXT = (
+  <span>
+    For targeted promos, just enter the stream ticket address your audience hit
+    up. Hover over the stream, click &quot;Copy ticket address&quot;, and paste
+    it here. All streams are listed on{" "}
+    <TextLink
+      className={classes.thisLink}
+      title="this"
+      href="/streams?filters=all"
+    />{" "}
+    page.
+  </span>
+);
 const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   control,
   name,

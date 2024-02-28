@@ -9,3 +9,7 @@ w3m-modal:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, sy
   opacity: 0;
   background-color: var(--wui-cover);
 }
+
+html {
+  overflow-y: scroll;
+}

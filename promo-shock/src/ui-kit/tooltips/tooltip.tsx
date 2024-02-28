@@ -1,11 +1,11 @@
 import { Tooltip as AntdTooltip } from "antd";
-import type { FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren, ReactNode } from "react";
 
 import type { TooltipPlacement } from "../types";
 
 type Props = {
   placement: TooltipPlacement;
-  title: string;
+  title: ReactNode;
 };
 
 const Tooltip: FC<PropsWithChildren<Props>> = ({
