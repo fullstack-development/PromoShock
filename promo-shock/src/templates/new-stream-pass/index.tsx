@@ -243,6 +243,8 @@ const NewStreamPass: FC = () => {
                 />
               )}
             />
+
+            <span className={classes.utcLabel}>UTC time zone</span>
           </div>
           <div
             className={classNames(
