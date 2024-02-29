@@ -103,20 +103,32 @@ class Stream:
     price: str
     total_amount: int
     reserved_amount: int
-    purchased: bool
+    purchased: Optional[bool]
 
 
 @app.get("/ticket")
-async def all_tickets(owner=None, offset=0, limit=25) -> List[Stream]:
-    # TODO: cleanup, fix pyright errors
+async def all_tickets(
+    owner: Optional[str] = None, buyer: Optional[str] = None, offset=0, limit=25
+) -> List[Stream]:
     def make_stream(ticket_sale: TicketSale):
-        ticket_sale_created = repo.get(
+        ticket_sale_created: Optional[TicketSaleCreatedEvent] = repo.get(
             TicketSaleCreatedEvent, {"ticket_sale_addr": ticket_sale.ticket_sale_addr}
         )
         if ticket_sale_created is None:
             return None
-        ticket = repo.get(Ticket, {"ticket_addr": ticket_sale_created.ticket_addr})
+        ticket: Optional[Ticket] = repo.get(
+            Ticket, {"ticket_addr": ticket_sale_created.ticket_addr}
+        )
         if ticket is None:
+            return None
+        ticket_bought_event: Optional[TicketBoughtEvent] = repo.get(
+            TicketBoughtEvent,
+            {
+                "ticket_addr": ticket.ticket_addr,
+                "buyer": buyer,
+            },
+        )
+        if ticket_bought_event is None and buyer is not None:
             return None
         return Stream(
             owner_address=ticket_sale.owner,
@@ -134,8 +146,7 @@ async def all_tickets(owner=None, offset=0, limit=25) -> List[Stream]:
             price=ticket_sale.price,
             total_amount=ticket.cap,
             reserved_amount=ticket.total_supply,
-            # TODO: unmock this
-            purchased=False,
+            purchased=None,
         )
 
     filter_params = {}
@@ -154,19 +165,24 @@ async def all_tickets(owner=None, offset=0, limit=25) -> List[Stream]:
 
 
 @app.get("/ticket/{ticket_addr}")
-async def get_stream(ticket_addr: str) -> Optional[Stream]:
+async def get_stream(ticket_addr: str, buyer: Optional[str] = None) -> Optional[Stream]:
     repo = SqlAlchemyRepository(get_session())
-    ticket = repo.get(Ticket, {"ticket_addr": ticket_addr})
+    ticket: Optional[Ticket] = repo.get(Ticket, {"ticket_addr": ticket_addr.lower()})
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    ticket_sale_created = repo.get(TicketSaleCreatedEvent, {"ticket_addr": ticket_addr})
+    ticket_sale_created: Optional[TicketSaleCreatedEvent] = repo.get(
+        TicketSaleCreatedEvent, {"ticket_addr": ticket_addr}
+    )
     if ticket_sale_created is None:
         raise HTTPException(status_code=404, detail="Ticket Sale Event not found")
-    ticket_sale = repo.get(
+    ticket_sale: Optional[TicketSale] = repo.get(
         TicketSale, {"ticket_sale_addr": ticket_sale_created.ticket_sale_addr}
     )
     if ticket_sale is None:
         raise HTTPException(status_code=404, detail="Ticket Sale not found")
+    ticket_bought_event: Optional[TicketBoughtEvent] = repo.get(
+        TicketBoughtEvent, {"ticket_addr": ticket_addr, "buyer": buyer}
+    )
 
     return Stream(
         owner_address=ticket_sale.owner,
@@ -184,8 +200,7 @@ async def get_stream(ticket_addr: str) -> Optional[Stream]:
         price=ticket_sale.price,
         total_amount=ticket.cap,
         reserved_amount=ticket.total_supply,
-        # TODO: unmock this
-        purchased=False,
+        purchased=False if ticket_bought_event is None else True,
     )
 
 
