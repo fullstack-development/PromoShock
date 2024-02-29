@@ -66,6 +66,7 @@ const NewPromo: FC = () => {
     defaultValues: {
       promo_stream_addresses: [{ value: "" as Address }],
     },
+    mode: "onChange",
     shouldFocusError: false,
   });
   const createPromo = useWritePromoFactoryCreatePromo();
@@ -113,8 +114,7 @@ const NewPromo: FC = () => {
     args: { marketer: account.address },
     onLogs:
       account.address &&
-      (async (logs) => {
-        const [log] = logs;
+      (async () => {
         // try {
         //   await api.indexPromoIndexPromoPost(
         //     Number(log?.blockNumber),
@@ -126,9 +126,9 @@ const NewPromo: FC = () => {
         //     `/profile/my-promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}`,
         //   );
         // }
-        router.push(
-          `/promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}&filters=owner`,
-        );
+
+        //TODO :: Need id for the created promo hightlight
+        router.push("/promos?filters=owner");
         showSuccessMessage(
           "Congratulations! Your promo has been successfully created and will be listed shortly.",
         );
