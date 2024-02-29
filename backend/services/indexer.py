@@ -3,6 +3,7 @@ import logging
 import asyncio
 from typing import Any, List, Optional
 from ens.ens import HexBytes
+from eth_abi.decoding import InsufficientDataBytes
 from eth_typing import Address
 import requests
 from urllib.parse import urlparse
@@ -95,6 +96,10 @@ TESTNET_LOG_EVENTS = {
     ),
     "0xa34e6b78e9a990f62e47ba1c3993ff82d0d748e22617d46c5a79c7b86d10e19b": (
         "MintTicket",
+        ["address"],
+    ),
+    "0xe20902879f47c9f734b76d32be336010f7b3255d44e1564663803fac43d06cf5": (
+        "MintPromo",
         ["address"],
     ),
 }
@@ -223,80 +228,95 @@ class NftIndexer:
             self._repository.commit()
         return event
 
-    async def _index_promo(
+    async def index_promo(
         self,
-        promo_created_event: PromoCreatedEvent,
         from_block: BlockIdentifier = "earliest",
         to_block: BlockIdentifier = "latest",
     ):
-        logs = await self._web3.eth.get_logs(
-            filter_params=FilterParams(
-                address=self._web3.to_checksum_address(promo_created_event.promo_addr),
-                fromBlock=from_block,
-                toBlock=to_block,
-            )
+        promo_created_events = self._repository.filter(PromoCreatedEvent, {})
+        logger.info(
+            f"Indexing promo for {len(promo_created_events)} PromoCreatedEvents from '{from_block}' to '{to_block}' blocks"
         )
-
-        for log in logs:
-            try:
-                # TODO: parse MintPromo event
-                payment_token_addr, tokenId = self.decode_data(
-                    ("address", "uint256"), HexBytes(bytes().join(log["topics"][1:]))
+        for event in promo_created_events:
+            logger.info(f"Indexing promos for {event.promo_addr} collection")
+            logs = await self._web3.eth.get_logs(
+                filter_params=FilterParams(
+                    address=self._web3.to_checksum_address(event.promo_addr),
+                    fromBlock=from_block,
+                    toBlock=to_block,
                 )
-                start_time, end_time, promo_addr, streams, description = (
-                    self.decode_data(
-                        ["(uint256,uint256,address,address[],string)"], log["data"]
-                    )[0]
+            )
+            for log in logs:
+                topic_name, topic_pattern = self._log_events.get(
+                    log["topics"][0].hex(), (None, None)
                 )
-                contract = self._web3.eth.contract(
-                    self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
-                )
-                url = await contract.functions.tokenURI(tokenId).call()
-                try:
-                    uri = await self._get_ipfs_data(url)
-                except Exception:
-                    logger.warn(f"Failed to parse IPFS url {url}")
-                    uri = {}
-                promo = Promo(
-                    owner=promo_created_event.owner.lower(),
-                    payment_token_addr=payment_token_addr.lower(),
-                    token_id=tokenId,
-                    start_time=start_time,
-                    end_time=end_time,
-                    promo_addr=promo_addr.lower(),
-                    description=description,
-                    uri=uri,
-                )
-                if (
-                    self._repository.get(
-                        Promo, {"promo_addr": promo_addr.lower(), "token_id": tokenId}
+                if topic_name == "MintPromo":
+                    [payment_token_addr] = self.decode_data(
+                        topic_pattern, HexBytes(bytes().join(log["topics"][1:]))
                     )
-                ) is None:
-                    self._repository.add(promo)
-                    self._repository.commit()
-                    logger.info(f"Promo {promo.promo_addr}#{promo.token_id} was saved")
-                for stream_addr in streams:
-                    promo_to_ticket = PromoToTicket(
+                    try:
+                        (
+                            token_id,
+                            (start_time, end_time, promo_addr, streams, description),
+                        ) = self.decode_data(
+                            ["uint256", "(uint256,uint256,address,address[],string)"],
+                            log["data"],
+                        )
+                    except InsufficientDataBytes as err:
+                        logger.error(
+                            f"Error when decoding MintPromo event for {log['transactionHash'].hex()}#{log['blockNumber']} transaction. Reason: {err}"
+                        )
+                        continue
+                    contract = self._web3.eth.contract(
+                        self._web3.to_checksum_address(promo_addr), abi=get_promo_abi()
+                    )
+                    url = await contract.functions.tokenURI(token_id).call()
+                    try:
+                        uri = await self._get_ipfs_data(url)
+                    except Exception:
+                        logger.warn(f"Failed to parse IPFS url {url}")
+                        uri = {}
+                    promo = Promo(
+                        owner=event.owner.lower(),
+                        payment_token_addr=payment_token_addr.lower(),
+                        token_id=token_id,
+                        start_time=start_time,
+                        end_time=end_time,
                         promo_addr=promo_addr.lower(),
-                        ticket_addr=stream_addr.lower(),
-                        token_id=tokenId,
+                        description=description,
+                        uri=uri,
                     )
                     if (
                         self._repository.get(
-                            PromoToTicket,
-                            {
-                                "promo_addr": promo_addr.lower(),
-                                "ticket_addr": stream_addr.lower(),
-                                "token_id": tokenId,
-                            },
+                            Promo,
+                            {"promo_addr": promo_addr.lower(), "token_id": token_id},
                         )
-                        is None
-                    ):
-                        self._repository.add(promo_to_ticket)
+                    ) is None:
+                        self._repository.add(promo)
                         self._repository.commit()
-                return promo
-            except Exception as err:
-                continue
+                        logger.info(
+                            f"Promo {promo.promo_addr}#{promo.token_id} was saved"
+                        )
+                    for stream_addr in streams:
+                        promo_to_ticket = PromoToTicket(
+                            promo_addr=promo_addr.lower(),
+                            ticket_addr=stream_addr.lower(),
+                            token_id=token_id,
+                        )
+                        if (
+                            self._repository.get(
+                                PromoToTicket,
+                                {
+                                    "promo_addr": promo_addr.lower(),
+                                    "ticket_addr": stream_addr.lower(),
+                                    "token_id": token_id,
+                                },
+                            )
+                            is None
+                        ):
+                            self._repository.add(promo_to_ticket)
+                            self._repository.commit()
+                    return promo
 
     async def _get_ipfs_data(self, url):
         parsed_url = urlparse(url)
@@ -392,10 +412,6 @@ class NftIndexer:
                 promo_created_event = await self._index_promo_created_event(
                     log, pattern
                 )
-                await self._index_promo(
-                    promo_created_event, from_block=from_block, to_block=to_block
-                )
-                logger.info(f"Indexed promo {promo_created_event.promo_addr}")
 
         logger.info("Index complete")
 

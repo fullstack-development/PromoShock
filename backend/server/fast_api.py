@@ -55,6 +55,7 @@ async def start_index(from_block: int = 37553211, to_block: Optional[int] = None
     await ticket_indexer.start_index(from_block=from_block, to_block=toBlock)
     await ticket_indexer.index_ticket_bought_event(from_block, to_block=toBlock)
     await promo_indexer.start_index(from_block=from_block, to_block=toBlock)
+    await promo_indexer.index_promo(from_block=from_block, to_block=toBlock)
 
 
 @app.post("/index/ticket")
@@ -68,6 +69,7 @@ async def index_ticket(from_block: int = 37553211, to_block: Optional[int] = Non
         get_ticket_factory_abi(),
     )
     await ticket_indexer.start_index(from_block=from_block, to_block=toBlock)
+    await ticket_indexer.index_ticket_bought_event(from_block, to_block=toBlock)
 
 
 @app.post("/index/promo")
@@ -81,6 +83,7 @@ async def index_promo(from_block: int = 37553211, to_block: Optional[int] = None
         get_promo_factory_abi(),
     )
     await promo_indexer.start_index(from_block=from_block, to_block=toBlock)
+    await promo_indexer.index_promo(from_block=from_block, to_block=toBlock)
 
 
 @dataclass(frozen=True)
