@@ -1,6 +1,6 @@
 "use client";
 import { DeleteOutlined } from "@ant-design/icons";
-import type { ReactElement } from "react";
+import type { ReactElement, Ref } from "react";
 import type {
   FieldArrayPath,
   FieldValues,
@@ -31,6 +31,9 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
   disabled?: boolean;
   placeholder?: string;
   caption?: string;
+  refs?: {
+    addButtonRef?: Ref<HTMLButtonElement>;
+  };
 };
 
 const TOOLTIP_TEXT = (
@@ -56,6 +59,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   disabled,
   className,
   caption,
+  refs,
 }: PropsWithClassName<Props<T, K>>): ReactElement => {
   const fieldset = useFieldArray({ control, name });
 
@@ -107,6 +111,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
           <div className={classes.buttonWithTooltip}>
             <div className={classes.append}>
               <Button
+                ref={refs?.addButtonRef}
                 text="Add address"
                 theme="tertiary"
                 onClick={handleAppend}

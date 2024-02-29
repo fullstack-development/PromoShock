@@ -56,22 +56,16 @@ const formSchema = z.object({
         : { message: issue.message || "Invalid value" },
   }),
   promo_stream_addresses: z.array(
-    z
-      .object({
-        value: zAddress(
-          {
-            errorMap: (issue) =>
-              issue.code === z.ZodIssueCode.invalid_type
-                ? { message: "Address is required" }
-                : { message: issue.message || "Invalid value" },
-          },
-          ["value"],
-        ),
-      })
-      .refine(({ value }) => supportsInterface(value as Address), {
+    z.object({
+      value: zAddress({
+        errorMap: (issue) =>
+          issue.code === z.ZodIssueCode.invalid_type
+            ? { message: "Address is required" }
+            : { message: issue.message || "Invalid value" },
+      }).refine(supportsInterface, {
         message: "Given address is not a ticket",
-        path: ["value"],
       }),
+    }),
   ),
 });
 

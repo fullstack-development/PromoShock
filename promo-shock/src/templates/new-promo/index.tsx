@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -36,6 +36,7 @@ import {
 } from "@promo-shock/ui-kit";
 
 import { writeMetadata } from "./mutations";
+import { NewPromoOnboarding } from "./new-promo-onboarding";
 import classes from "./new-promo.module.scss";
 import { formSchema } from "./schema";
 import type { FormData } from "./types";
@@ -45,6 +46,11 @@ const TxButton = withApprove(
 );
 
 const NewPromo: FC = () => {
+  const [startOnboarding, setStartOnboarding] = useState(false);
+  const actionButtonElRef = useRef<HTMLButtonElement | null>(null);
+  const addressesElRef = useRef<HTMLDivElement | null>(null);
+  const addMoreElRef = useRef<HTMLButtonElement | null>(null);
+  const fieldsElRef = useRef<HTMLDivElement | null>(null);
   const showSuccessMessage = useSuccessMessage();
   const router = useRouter();
   const account = useAccount();
@@ -53,6 +59,7 @@ const NewPromo: FC = () => {
   const {
     control,
     handleSubmit,
+    trigger,
     formState: { errors, isDirty },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -178,6 +185,14 @@ const NewPromo: FC = () => {
     }
   };
 
+  const handleStartOnboarding = () => {
+    setStartOnboarding(true);
+  };
+
+  const handleStopOnboarding = () => {
+    setStartOnboarding(false);
+  };
+
   const [tokenDecimals, tokenSymbol] = tokenInfo.data || [];
 
   const creationPriceSum =
@@ -210,87 +225,115 @@ const NewPromo: FC = () => {
     tokenAddress.isLoading;
 
   return (
-    <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
-      <h1 className={classes.title}>New Promo</h1>
-      <div className={classes.grid}>
-        <div className={classNames(classes.column, classes.contents)}>
-          <Controller<FormData, "promo_cover">
-            name="promo_cover"
-            control={control}
-            render={({ field }) => (
-              <div className={classNames(classes.col_1, classes.contents)}>
-                <div />
-                <ImageUploader
-                  aspectRatio="416/307"
-                  placeholder="Upload promo cover"
-                  error={errors.promo_cover?.message}
+    <>
+      <NewPromoOnboarding
+        actionButtonElRef={actionButtonElRef}
+        addMoreElRef={addMoreElRef}
+        addressesElRef={addressesElRef}
+        fieldsElRef={fieldsElRef}
+        creationPriceString={creationPriceString}
+        open={startOnboarding}
+        onClose={handleStopOnboarding}
+      />
+      <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
+        <h1 className={classes.title}>New Promo</h1>
+        <span className={classes.description}>
+          Target multiple stream viewers with a single ad without needing users
+          wallet address. Just drop the promo. Users will visit your shop,
+          connect their wallet, and make purchases — voilà.{" "}
+          <button type="button" onClick={handleStartOnboarding}>
+            More
+          </button>
+          .
+        </span>
+        <div className={classes.grid}>
+          <div
+            className={classNames(classes.column, classes.column_1)}
+            ref={fieldsElRef}
+          >
+            <Controller<FormData, "promo_cover">
+              name="promo_cover"
+              control={control}
+              render={({ field }) => (
+                <div className={classes.column_1_field}>
+                  <div />
+                  <ImageUploader
+                    aspectRatio="416/307"
+                    placeholder="Upload promo cover"
+                    error={errors.promo_cover?.message}
+                    disabled={pending}
+                    {...field}
+                  />
+                </div>
+              )}
+            />
+            <Controller<FormData, "promo_name">
+              name="promo_name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Promo name:"
+                  placeholder="Study with the HARVARD STUDY"
+                  className={classes.column_1_field}
+                  error={errors.promo_name?.message}
                   disabled={pending}
                   {...field}
                 />
-              </div>
-            )}
-          />
-          <Controller<FormData, "promo_name">
-            name="promo_name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Promo name:"
-                placeholder="Study with the HARVARD STUDY"
-                className={classNames(classes.col_1, classes.contents)}
-                error={errors.promo_name?.message}
-                disabled={pending}
-                {...field}
-              />
-            )}
-          />
-          <Controller<FormData, "promo_description">
-            name="promo_description"
-            control={control}
-            render={({ field }) => (
-              <TextArea
-                label="More about:"
-                className={classNames(classes.col_1, classes.contents)}
-                placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
-                maxLength={100}
-                error={errors.promo_description?.message}
-                disabled={pending}
-                {...field}
-              />
-            )}
-          />
-          <Controller<FormData, "promo_shopping_link">
-            name="promo_shopping_link"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Link to shopping:"
-                placeholder="heretowatch.com"
-                className={classNames(classes.col_1, classes.contents)}
-                error={errors.promo_shopping_link?.message}
-                disabled={pending}
-                {...field}
-              />
-            )}
-          />
-          <Controller<FormData, "promo_sale_time">
-            name="promo_sale_time"
-            control={control}
-            render={({ field }) => (
-              <RangeDateField
-                label="Promotional period"
-                className={classNames(classes.col_1, classes.contents)}
-                placeholder={["13.12.2024", "24.12.2042"]}
-                error={errors.promo_sale_time?.message}
-                disabled={pending}
-                {...field}
-              />
-            )}
-          />
-        </div>
+              )}
+            />
+            <Controller<FormData, "promo_description">
+              name="promo_description"
+              control={control}
+              render={({ field }) => (
+                <TextArea
+                  label="More about:"
+                  className={classes.column_1_field}
+                  placeholder="Description. E.g. stream about the importance of renaissance art from the Master of Art Michelangelo Buonarroti"
+                  maxLength={100}
+                  error={errors.promo_description?.message}
+                  disabled={pending}
+                  {...field}
+                />
+              )}
+            />
+            <Controller<FormData, "promo_shopping_link">
+              name="promo_shopping_link"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Link to shopping:"
+                  placeholder="heretowatch.com"
+                  className={classes.column_1_field}
+                  error={errors.promo_shopping_link?.message}
+                  disabled={pending}
+                  {...field}
+                />
+              )}
+            />
+            <Controller<FormData, "promo_sale_time">
+              name="promo_sale_time"
+              control={control}
+              render={({ field }) => (
+                <RangeDateField
+                  label="Promotional period"
+                  className={classes.column_1_field}
+                  placeholder={["13.12.2024", "24.12.2042"]}
+                  error={errors.promo_sale_time?.message}
+                  disabled={pending}
+                  {...field}
+                />
+              )}
+            />
+          </div>
 
-        <div className={classNames(classes.column, classes.contents)}>
-          <div className={classNames(classes.col_2, classes.gap)}>
+          <div
+            className={classNames(
+              classes.column,
+              classes.column_2,
+              classes.gap,
+            )}
+            ref={addressesElRef}
+          >
             <span className={classes.caption}>
               Your promotion will be targeted to these addresses. You can enter
               one or more addresses.
@@ -305,27 +348,32 @@ const NewPromo: FC = () => {
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
+              refs={{
+                addButtonRef: addMoreElRef,
+              }}
               disabled={pending}
               caption={creationPriceString && `+${creationPriceString}`}
             />
           </div>
         </div>
-      </div>
 
-      <div className={classes.action}>
-        <TxButton
-          type="submit"
-          text={`Pay ${creationPriceSumString} and create promo`}
-          size="large"
-          theme="secondary"
-          loading={loading}
-          estimatedGas={estimatedGasForCreatePromo}
-          tokenAddress={tokenAddress.data}
-          tokenAmount={creationPriceSum}
-          recipientAddress={process.env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}
-        />
-      </div>
-    </form>
+        <div className={classes.action}>
+          <TxButton
+            ref={actionButtonElRef}
+            type="submit"
+            text={`Pay ${creationPriceSumString} and create promo`}
+            size="large"
+            theme="secondary"
+            loading={loading}
+            estimatedGas={estimatedGasForCreatePromo}
+            tokenAddress={tokenAddress.data}
+            tokenAmount={creationPriceSum}
+            recipientAddress={process.env.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}
+            formTrigger={trigger}
+          />
+        </div>
+      </form>
+    </>
   );
 };
 

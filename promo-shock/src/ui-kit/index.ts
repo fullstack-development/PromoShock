@@ -12,3 +12,4 @@ export * from "./popconfirm";
 export * from "./popover";
 export * from "./copy-to-clipboard";
 export * from "./multiselect";
+export * from "./onboarding";
