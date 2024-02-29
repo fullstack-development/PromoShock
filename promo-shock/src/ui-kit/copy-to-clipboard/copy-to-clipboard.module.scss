@@ -1,10 +1,10 @@
 .root {
-  display: flex;
+  display: grid;
   align-items: center;
+  grid-template-columns: max-content 0fr;
   padding: 8px 12px;
   border-radius: 16px;
   border: 2px solid #9254DE;
-  gap: 8px;
   background: linear-gradient(0deg, #F9F0FF, #F9F0FF), linear-gradient(0deg, #9254DE, #9254DE);
   color:  #9254DE;
   font-family: inherit;
@@ -14,4 +14,21 @@
   letter-spacing: 0em;
   text-align: center;
   cursor: pointer;
+  transition: grid-template-columns 0.3s ease-in-out;
+  overflow: hidden;
+
+  &:hover {
+    column-gap: 8px;
+    grid-template-columns: max-content 1fr;
+
+    .message {
+      opacity: 1;
+    }
+  }
+}
+
+.message {
+  opacity: 0;
+  min-width: 0;
+  white-space: nowrap;
 }

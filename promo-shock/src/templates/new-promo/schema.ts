@@ -48,9 +48,6 @@ const formSchema = z.object({
     })
     .refine(([start, end]) => end.diff(start, "day") !== 0, {
       message: "Sale time must be at least 1 day",
-    })
-    .refine(([start, end]) => end.diff(start, "day") <= 30, {
-      message: "Sale time must be at most 30 days",
     }),
   promo_shopping_link: z.string({
     errorMap: (issue) =>

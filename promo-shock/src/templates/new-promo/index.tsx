@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
@@ -137,12 +138,15 @@ const NewPromo: FC = () => {
         image: data.promo_cover.originFileObj!,
         shopping_link: data.promo_shopping_link,
       });
+      const now = dayjs();
       const args = [
         {
           startTime: BigInt(
-            data.promo_sale_time[0].utc().add(5, "minute").unix(),
+            data.promo_sale_time[0].isBefore(now)
+              ? now.add(5, "minute").utc(false).unix()
+              : data.promo_sale_time[0].utc(false).unix(),
           ),
-          endTime: BigInt(data.promo_sale_time[1].utc().unix()),
+          endTime: BigInt(data.promo_sale_time[1].utc(false).unix()),
           promoAddr: process.env.NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS,
           streams: data.promo_stream_addresses.map((address) => address.value),
           description: data.promo_description,

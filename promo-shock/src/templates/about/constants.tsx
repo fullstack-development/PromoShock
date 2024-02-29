@@ -45,8 +45,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
     description: "Delivered VERY\nsmart contracts",
     image: roman_image,
     link: {
-      title: "Link",
-      href: "",
+      title: "Linkedin",
+      href: "https://www.linkedin.com/in/yarlykovrv",
     },
   },
   {

@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FC } from "react";
@@ -105,25 +106,28 @@ const NewStreamPass: FC = () => {
           .set("hour", data.stream_time[0].hour())
           .set("minute", data.stream_time[0].minute())
           .set("second", data.stream_time[0].second())
-          .utc()
+          .utc(false)
           .unix(),
         end_time: data.stream_date
           .set("hour", data.stream_time[1].hour())
           .set("minute", data.stream_time[1].minute())
           .set("second", data.stream_time[1].second())
-          .utc()
+          .utc(false)
           .unix(),
         stream_link: data.stream_link,
         streamer_link: data.streamer_link,
         image: data.stream_image.originFileObj!,
         banner: data.stream_banner.originFileObj!,
       });
+      const now = dayjs();
       const args = [
         {
           startTime: BigInt(
-            data.stream_sale_time[0].utc().add(5, "minute").unix(),
+            data.stream_sale_time[0].isBefore(now)
+              ? now.utc(false).add(5, "minute").unix()
+              : data.stream_sale_time[0].utc(false).unix(),
           ),
-          endTime: BigInt(data.stream_sale_time[1].utc().unix()),
+          endTime: BigInt(data.stream_sale_time[1].utc(false).unix()),
           price: BigInt(data.stream_price),
           paymentToken: process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS,
         },

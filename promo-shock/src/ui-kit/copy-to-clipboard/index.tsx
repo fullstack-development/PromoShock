@@ -22,10 +22,12 @@ const CopyToClipboard: FC<Props> = ({ message, text }) => {
     }
   };
 
-  const [children, hovered] = useHover((hovered) => (
+  const [children, hovered] = useHover(() => (
     <button type="button" onClick={handleCopy} className={classes.root}>
       <IconCopy />
-      {hovered && (copied ? "Copied to clipboard" : message)}
+      <span className={classes.message}>
+        {copied ? "Copied to clipboard" : message}
+      </span>
     </button>
   ));
 
