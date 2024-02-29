@@ -100,7 +100,7 @@ class Stream:
     price: str
     total_amount: int
     reserved_amount: int
-    purchased: bool
+    purchased: Optional[bool]
 
 
 @app.get("/ticket")
@@ -125,6 +125,8 @@ async def all_tickets(
                 "buyer": buyer,
             },
         )
+        if ticket_bought_event is None and buyer is not None:
+            return None
         return Stream(
             owner_address=ticket_sale.owner,
             sale_address=ticket_sale.ticket_sale_addr,
@@ -141,7 +143,7 @@ async def all_tickets(
             price=ticket_sale.price,
             total_amount=ticket.cap,
             reserved_amount=ticket.total_supply,
-            purchased=False if ticket_bought_event is None else True,
+            purchased=None,
         )
 
     filter_params = {}
