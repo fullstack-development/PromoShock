@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
 
-from domain.promo import Promo, PromoToTicket
+from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 from services.indexer import NftIndexer, SqlAlchemyRepository
 from config import get_memcache_uri, get_web3_uri
@@ -93,6 +93,7 @@ class Stream:
     owner_address: Address
     sale_address: Address
     ticket_address: Address
+    created: int
     payment_token_address: Address
     name: str
     description: str
@@ -149,6 +150,7 @@ async def all_tickets(
             total_amount=ticket.cap,
             reserved_amount=ticket.total_supply,
             purchased=None,
+            created=ticket_sale_created.block_nmb,
         )
 
     filter_params = {}
@@ -163,7 +165,7 @@ async def all_tickets(
         if s is not None:
             streams.append(s)
 
-    return sorted(streams, key=lambda s: s.start_date, reverse=True)
+    return sorted(streams, key=lambda s: s.created, reverse=True)
 
 
 @app.get("/ticket/{ticket_addr}")
@@ -203,6 +205,7 @@ async def get_stream(ticket_addr: str, buyer: Optional[str] = None) -> Optional[
         total_amount=ticket.cap,
         reserved_amount=ticket.total_supply,
         purchased=False if ticket_bought_event is None else True,
+        created=ticket_sale_created.block_nmb,
     )
 
 
@@ -220,6 +223,7 @@ class PromoInfo:
     end_date: int
     ticket_sales: List[TicketSale]
     tickets: List[Ticket]
+    created: Optional[int]
 
 
 @app.get("/promo")
@@ -257,6 +261,9 @@ async def all_promos(
         ticket_sales = repo.filter_in(
             TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
         )
+        promo_created_event = repo.get(
+            PromoCreatedEvent, {"promo_addr": promo.promo_addr}
+        )
         promo_info_result.append(
             PromoInfo(
                 owner_address=promo.owner,
@@ -273,9 +280,10 @@ async def all_promos(
                     ticket_sales, key=lambda t: t.start_time, reverse=True
                 ),
                 tickets=tickets,
+                created=promo_created_event.block_nmb if promo_created_event else None,
             )
         )
-    return sorted(promo_info_result, key=lambda p: p.start_date, reverse=True)
+    return sorted(promo_info_result, key=lambda p: p.created, reverse=True)
 
 
 @app.get("/promo/my")
@@ -301,6 +309,9 @@ async def my_promos(buyer, offset=0, limit=25):
         ticket_sales = repo.filter_in(
             TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
         )
+        promo_created_event = repo.get(
+            PromoCreatedEvent, {"promo_addr": promo.promo_addr}
+        )
         promo_info_result.append(
             PromoInfo(
                 owner_address=promo.owner,
@@ -317,6 +328,7 @@ async def my_promos(buyer, offset=0, limit=25):
                     ticket_sales, key=lambda t: t.start_time, reverse=True
                 ),
                 tickets=tickets,
+                created=promo_created_event.block_nmb if promo_created_event else None,
             )
         )
-    return sorted(promo_info_result, key=lambda p: p.start_date, reverse=True)
+    return sorted(promo_info_result, key=lambda p: p.created, reverse=True)
