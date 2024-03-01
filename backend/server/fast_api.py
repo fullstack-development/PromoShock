@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymemcache.client import Client
 
-from domain.promo import Promo, PromoToTicket
+from domain.promo import Promo, PromoCreatedEvent, PromoToTicket
 from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreatedEvent
 from services.indexer import NftIndexer, SqlAlchemyRepository
 from config import get_memcache_uri, get_web3_uri
@@ -93,6 +93,7 @@ class Stream:
     owner_address: Address
     sale_address: Address
     ticket_address: Address
+    created: int
     payment_token_address: Address
     name: str
     description: str
@@ -149,6 +150,7 @@ async def all_tickets(
             total_amount=ticket.cap,
             reserved_amount=ticket.total_supply,
             purchased=None,
+            created=ticket_sale_created.block_nmb,
         )
 
     filter_params = {}
@@ -163,7 +165,7 @@ async def all_tickets(
         if s is not None:
             streams.append(s)
 
-    return streams
+    return sorted(streams, key=lambda s: s.created, reverse=True)
 
 
 @app.get("/ticket/{ticket_addr}")
@@ -203,6 +205,7 @@ async def get_stream(ticket_addr: str, buyer: Optional[str] = None) -> Optional[
         total_amount=ticket.cap,
         reserved_amount=ticket.total_supply,
         purchased=False if ticket_bought_event is None else True,
+        created=ticket_sale_created.block_nmb,
     )
 
 
@@ -220,6 +223,7 @@ class PromoInfo:
     end_date: int
     ticket_sales: List[TicketSale]
     tickets: List[Ticket]
+    created: Optional[int]
 
 
 @app.get("/promo")
@@ -257,6 +261,9 @@ async def all_promos(
         ticket_sales = repo.filter_in(
             TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
         )
+        promo_created_event = repo.get(
+            PromoCreatedEvent, {"promo_addr": promo.promo_addr}
+        )
         promo_info_result.append(
             PromoInfo(
                 owner_address=promo.owner,
@@ -269,11 +276,14 @@ async def all_promos(
                 shopping_link=promo.uri.get("shopping_link", ""),
                 start_date=promo.start_time,
                 end_date=promo.end_time,
-                ticket_sales=ticket_sales,
+                ticket_sales=sorted(
+                    ticket_sales, key=lambda t: t.start_time, reverse=True
+                ),
                 tickets=tickets,
+                created=promo_created_event.block_nmb if promo_created_event else None,
             )
         )
-    return promo_info_result
+    return sorted(promo_info_result, key=lambda p: p.created, reverse=True)
 
 
 @app.get("/promo/my")
@@ -286,7 +296,9 @@ async def my_promos(buyer, offset=0, limit=25):
         PromoToTicket, PromoToTicket.ticket_addr, ticket_addrs
     )
     promo_addrs = [p.promo_addr for p in promo_to_tickets]
-    promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs, offset, limit)
+    promos = repo.filter_in(
+        Promo, Promo.promo_addr, promo_addrs, offset=offset, limit=limit
+    )
     promo_info_result = []
     for promo in promos:
         promo_to_tickets = repo.filter(PromoToTicket, {"promo_addr": promo.promo_addr})
@@ -298,6 +310,9 @@ async def my_promos(buyer, offset=0, limit=25):
         ticket_sale_addrs = [t.ticket_sale_addr for t in ticket_sale_created_events]
         ticket_sales = repo.filter_in(
             TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
+        )
+        promo_created_event = repo.get(
+            PromoCreatedEvent, {"promo_addr": promo.promo_addr}
         )
         promo_info_result.append(
             PromoInfo(
@@ -311,8 +326,11 @@ async def my_promos(buyer, offset=0, limit=25):
                 shopping_link=promo.uri.get("shopping_link", ""),
                 start_date=promo.start_time,
                 end_date=promo.end_time,
-                ticket_sales=ticket_sales,
+                ticket_sales=sorted(
+                    ticket_sales, key=lambda t: t.start_time, reverse=True
+                ),
                 tickets=tickets,
+                created=promo_created_event.block_nmb if promo_created_event else None,
             )
         )
-    return promo_info_result
+    return sorted(promo_info_result, key=lambda p: p.created, reverse=True)
