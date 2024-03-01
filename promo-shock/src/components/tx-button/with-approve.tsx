@@ -20,6 +20,7 @@ type Props<T extends ComponentProps<typeof Button>> = {
   tokenAddress?: Address;
   tokenAmount?: bigint;
   recipientAddress?: Address;
+  formTrigger?: () => Promise<boolean>;
 } & T;
 
 const withApprove = <T extends ComponentProps<typeof Button>>(
@@ -68,6 +69,11 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
       const handleApprove: MouseEventHandler<HTMLButtonElement> = async (e) => {
         if (isInsufficientAllowance) {
           try {
+            if (props.formTrigger) {
+              if (!(await props.formTrigger())) {
+                return;
+              }
+            }
             setPending(true);
             const hash = await contract.writeContractAsync({
               abi: erc20Abi,

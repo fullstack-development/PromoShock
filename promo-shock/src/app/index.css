@@ -11,5 +11,5 @@ w3m-modal:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, sy
 }
 
 html {
-  overflow-y: scroll;
+  /* WHY?? overflow-y: scroll; */
 }

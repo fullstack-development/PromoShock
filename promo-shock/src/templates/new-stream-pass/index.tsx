@@ -50,6 +50,7 @@ const NewStreamPass: FC = () => {
     handleSubmit,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     shouldFocusError: false,
   });
   const router = useRouter();
