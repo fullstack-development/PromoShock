@@ -6,6 +6,7 @@ import type { FC } from "react";
 
 import styles from "./card.module.scss";
 import { Button } from "../button";
+import { Link } from "../link";
 
 type Props = {
   tokenId: string;
@@ -15,7 +16,7 @@ type Props = {
   cover: string;
   startDate: number;
   endDate: number;
-  shoppingLink?: string;
+  shoppingLink: string;
   highlighted?: boolean;
 };
 
@@ -33,23 +34,20 @@ export const PromoCard: FC<Props> = ({
   return (
     <div className={styles.wrap}>
       {highlighted && <div className={styles.highlight}></div>}
-      <a
-        target="_blank"
+      <div
         className={cn(styles.root, {
-          [styles.root_disabled]: !shoppingLink,
           [styles.root_highlighted]: highlighted,
         })}
-        href={shoppingLink}
       >
-        <Image
-          className={cn(styles.image, {
-            [styles.image_disabled]: !shoppingLink,
-          })}
-          width={360}
-          height={255}
-          src={cover}
-          alt="stream cover"
-        />
+        <Link external href={shoppingLink}>
+          <Image
+            className={cn(styles.image)}
+            width={360}
+            height={255}
+            src={cover}
+            alt="stream cover"
+          />
+        </Link>
         <div className={styles.row}>
           <span className={styles.subtitle}>
             {startDate.format("DD.MM.YYYY")} - {endDate.format("DD.MM.YYYY")}
@@ -57,7 +55,9 @@ export const PromoCard: FC<Props> = ({
         </div>
 
         <div className={styles.description}>
-          <h5 className={styles.title}>{name}</h5>
+          <Link external href={shoppingLink} className={styles.title}>
+            {name}
+          </Link>
           <p>{description}</p>
         </div>
 
@@ -66,10 +66,10 @@ export const PromoCard: FC<Props> = ({
             text="Go shopping"
             theme="primary"
             size="medium"
-            disabled={!shoppingLink}
+            href={shoppingLink}
           />
         </div>
-      </a>
+      </div>
     </div>
   );
 };

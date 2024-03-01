@@ -12,6 +12,7 @@ import type { Stream } from "@promo-shock/shared/entities";
 import styles from "./card.module.scss";
 import { Button } from "../button";
 import { CopyToClipboard } from "../copy-to-clipboard";
+import { Link } from "../link";
 
 type Props = Omit<
   Stream,
@@ -67,13 +68,15 @@ export const StreamCard: FC<Props> = ({
         <CopyToClipboard text={ticketAddress} message="Copy ticket address" />
       </div>
 
-      <Image
-        className={styles.image}
-        fill
-        sizes="33vw"
-        src={banner || ""}
-        alt="stream banner"
-      />
+      <Link href={`/stream/${ticketAddress}`}>
+        <Image
+          className={styles.image}
+          fill
+          sizes="33vw"
+          src={banner || ""}
+          alt="stream banner"
+        />
+      </Link>
     </div>
   ));
   const now = dayjs.utc();
@@ -126,7 +129,9 @@ export const StreamCard: FC<Props> = ({
         </div>
 
         <div className={styles.description}>
-          <h5 className={styles.title}>{name}</h5>
+          <Link href={`/streams/${ticketAddress}`} className={styles.title}>
+            {name}
+          </Link>
           <p>{description}</p>
         </div>
 
