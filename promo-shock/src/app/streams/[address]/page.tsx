@@ -6,11 +6,8 @@ import { readContracts } from "wagmi/actions";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
-import {
-  Stream,
-  fetchPromoCards,
-  fetchStreamCard,
-} from "@promo-shock/templates";
+import { fetchPromoCards, fetchStreamCard } from "@promo-shock/shared/queries";
+import { Stream } from "@promo-shock/templates";
 
 const StreamPage: FC<{ params: { address: Address } }> = async ({
   params: { address },

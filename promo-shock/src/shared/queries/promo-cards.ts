@@ -32,22 +32,32 @@ const fetchPromoCards: QueryFunction<Promo[], [string, Filters]> = async ({
   const offset = 0;
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
+  const buyer = filters?.buyer?.toLowerCase();
   // TODO :: uncomment when FastAPI will be correctly generated
   // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
   //   signal,
   // });
-  const { data } = await api.allPromosPromoGet(
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      params: { stream, owner, offset, limit },
+  if (buyer) {
+    const { data } = await api.myPromosPromoMyGet("", undefined, undefined, {
+      params: { buyer, offset, limit },
       signal,
-    },
-  );
-  // FIXME :: codegen return type
-  return (data as []).map(promoToPromoCard);
+    });
+    // FIXME :: codegen return type
+    return (data as []).map(promoToPromoCard);
+  } else {
+    const { data } = await api.allPromosPromoGet(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      {
+        params: { stream, owner, offset, limit },
+        signal,
+      },
+    );
+    // FIXME :: codegen return type
+    return (data as []).map(promoToPromoCard);
+  }
 };
 
 const fetchInfinitePromoCards: QueryFunction<
@@ -59,25 +69,39 @@ const fetchInfinitePromoCards: QueryFunction<
   const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
+  const buyer = filters?.buyer?.toLowerCase();
   // TODO :: uncomment when FastAPI will be correctly generated
   // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
   //   signal,
   // });
-  const { data } = await api.allPromosPromoGet(
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      params: { stream, owner, offset, limit },
+  if (buyer) {
+    const { data } = await api.myPromosPromoMyGet("", undefined, undefined, {
+      params: { buyer, offset, limit },
       signal,
-    },
-  );
-  return {
-    // FIXME :: codegen return type
-    items: (data as []).map(promoToPromoCard),
-    cursor: data.length ? pageParam + 1 : null,
-  };
+    });
+
+    return {
+      // FIXME :: codegen return type
+      items: (data as []).map(promoToPromoCard),
+      cursor: data.length ? pageParam + 1 : null,
+    };
+  } else {
+    const { data } = await api.allPromosPromoGet(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      {
+        params: { stream, owner, offset, limit },
+        signal,
+      },
+    );
+    return {
+      // FIXME :: codegen return type
+      items: (data as []).map(promoToPromoCard),
+      cursor: data.length ? pageParam + 1 : null,
+    };
+  }
 };
 
 export { fetchPromoCards, fetchInfinitePromoCards };

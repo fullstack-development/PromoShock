@@ -8,8 +8,9 @@ import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
+import { erc20Abi, parseUnits } from "viem";
 import { estimateContractGas } from "viem/actions";
-import { useAccount, useClient, useConfig } from "wagmi";
+import { useAccount, useClient, useConfig, useReadContract } from "wagmi";
 
 import {
   simulateTicketFactoryCreateTicketSale,
@@ -23,6 +24,7 @@ import {
   withSwitchNetwork,
 } from "@promo-shock/components";
 // import { api } from "@promo-shock/configs/axios";
+import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   Button,
@@ -65,6 +67,16 @@ const NewStreamPass: FC = () => {
   const [estimatedGasForCreateStream, setEstimatedGasForCreateStream] =
     useState<bigint>();
 
+  const tokenDecimals = useReadContract({
+    chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+    abi: erc20Abi,
+    address: process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS,
+    functionName: "decimals",
+    query: {
+      staleTime: Infinity,
+    },
+  });
+
   useConfirmLeave(
     isDirty,
     "Are you sure you want to leave the page? Data is not saved",
@@ -73,27 +85,25 @@ const NewStreamPass: FC = () => {
   useWatchTicketFactoryTicketSaleCreatedEvent({
     args: { creator: account.address },
     onLogs:
-      account.address &&
-      (async (logs) => {
-        const [log] = logs;
-        // try {
-        //   await api.indexTicketIndexTicketPost(
-        //     Number(log?.blockNumber),
-        //     Number(log?.blockNumber),
-        //   );
-        // } catch {
-        // } finally {
-        //   router.push(
-        //     `/profile/my-streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}`,
-        //   );
-        // }
-        router.push(
-          `/streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}&filters=owner`,
-        );
-        showSuccessMessage(
-          "Congratulations! Your stream pass has been created and will be available for everyone to enjoy soon.",
-        );
-      }),
+      account.address && pending
+        ? async (logs) => {
+            const [log] = logs;
+            router.push(
+              `/streams?highlight_address=${log?.args?.ticketSaleAddr?.toLowerCase()}&filters=owner`,
+            );
+            showSuccessMessage(
+              "Congratulations! Your stream pass has been created and will be available for everyone to enjoy soon.",
+            );
+            try {
+              return api.indexTicketIndexTicketPost(undefined, undefined, {
+                params: {
+                  fromBlock: Number(log.blockNumber - BigInt(5)),
+                  toBlock: Number(log.blockNumber),
+                },
+              });
+            } catch {}
+          }
+        : undefined,
   });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
@@ -129,7 +139,7 @@ const NewStreamPass: FC = () => {
               : data.stream_sale_time[0].utc(false).unix(),
           ),
           endTime: BigInt(data.stream_sale_time[1].utc(false).unix()),
-          price: BigInt(data.stream_price),
+          price: parseUnits(data.stream_price.toString(), tokenDecimals.data!),
           paymentToken: process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS,
         },
         {
@@ -161,6 +171,9 @@ const NewStreamPass: FC = () => {
       console.error(e);
     }
   };
+
+  const loading = tokenDecimals.isLoading || pending;
+  console.log(loading);
 
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
@@ -385,7 +398,7 @@ const NewStreamPass: FC = () => {
           text="Drop the pass"
           size="large"
           theme="secondary"
-          loading={pending}
+          loading={loading}
           estimatedGas={estimatedGasForCreateStream}
         />
       </div>

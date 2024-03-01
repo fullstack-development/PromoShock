@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { FC } from "react";
 
+import type { fetchStreamCards } from "@promo-shock/shared/queries";
 import type { UnwrapPromise } from "@promo-shock/shared/types";
 import {
   Button,
@@ -18,7 +19,6 @@ import backgroundIcons from "./img/icons.svg";
 import quoteImg from "./img/quote.svg";
 import { Star } from "./img/Star";
 import styles from "./landing.module.scss";
-import type { fetchStreamCards } from "../queries";
 
 type Props = {
   streams: UnwrapPromise<ReturnType<typeof fetchStreamCards>>;

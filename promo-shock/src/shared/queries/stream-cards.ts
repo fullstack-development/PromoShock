@@ -64,6 +64,7 @@ const fetchStreamCards: QueryFunction<Stream[], [string, Filters]> = async ({
   const offset = 0;
   const limit = filters?.limit;
   const owner = filters?.owner?.toLowerCase();
+  const buyer = filters?.buyer?.toLowerCase();
   // TODO :: uncomment when FastAPI will be correctly generated
   // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
   //   signal,
@@ -72,8 +73,9 @@ const fetchStreamCards: QueryFunction<Stream[], [string, Filters]> = async ({
     undefined,
     undefined,
     undefined,
+    undefined,
     {
-      params: { owner, offset, limit },
+      params: { owner, offset, limit, buyer },
       signal,
     },
   );
@@ -89,6 +91,7 @@ const fetchInfiniteStreamCards: QueryFunction<
   const limit = filters?.limit;
   const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
+  const buyer = filters?.buyer?.toLowerCase();
   // TODO :: uncomment when FastAPI will be correctly generated
   // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
   //   signal,
@@ -97,8 +100,9 @@ const fetchInfiniteStreamCards: QueryFunction<
     undefined,
     undefined,
     undefined,
+    undefined,
     {
-      params: { owner, offset, limit },
+      params: { owner, buyer, offset, limit },
       signal,
     },
   );

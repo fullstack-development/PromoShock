@@ -1,7 +1,8 @@
 import type { FC } from "react";
 
 import { queryClient } from "@promo-shock/configs/query";
-import { Landing, fetchStreamCards } from "@promo-shock/templates";
+import { fetchStreamCards } from "@promo-shock/shared/queries";
+import { Landing } from "@promo-shock/templates";
 
 const RootPage: FC = async () => {
   const streams = await queryClient.fetchQuery({

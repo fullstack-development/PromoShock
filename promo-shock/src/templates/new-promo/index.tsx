@@ -25,6 +25,7 @@ import { withConnect, withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
+import { api } from "@promo-shock/configs/axios";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -113,26 +114,26 @@ const NewPromo: FC = () => {
   useWatchPromoFactoryPromotionCreatedEvent({
     args: { marketer: account.address },
     onLogs:
-      account.address &&
-      (async () => {
-        // try {
-        //   await api.indexPromoIndexPromoPost(
-        //     Number(log?.blockNumber),
-        //     Number(log?.blockNumber),
-        //   );
-        // } catch {
-        // } finally {
-        //   router.push(
-        //     `/profile/my-promos?highlight_address=${log?.args?.promotion?.promoAddr.toLowerCase()}`,
-        //   );
-        // }
+      account.address && pending
+        ? async (logs) => {
+            const [log] = logs;
+            router.push(
+              `/streams?highlight_address=${log?.args?.promotion?.promoAddr?.toLowerCase()}&filters=owner`,
+            );
+            showSuccessMessage(
+              "Congratulations! Your promo has been successfully created and will be listed shortly.",
+            );
 
-        //TODO :: Need id for the created promo hightlight
-        router.push("/promos?filters=owner");
-        showSuccessMessage(
-          "Congratulations! Your promo has been successfully created and will be listed shortly.",
-        );
-      }),
+            try {
+              return api.indexPromoIndexPromoPost(undefined, undefined, {
+                params: {
+                  fromBlock: Number(log.blockNumber - BigInt(5)),
+                  toBlock: Number(log.blockNumber),
+                },
+              });
+            } catch {}
+          }
+        : undefined,
   });
 
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
