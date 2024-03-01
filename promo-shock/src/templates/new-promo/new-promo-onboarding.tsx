@@ -51,7 +51,7 @@ const NewPromoOnboarding: FC<Props> = ({
               and copy the ticket address
             </>
           ),
-          target: () => addMoreElRef.current!,
+          target: () => addressesElRef.current!,
         },
         {
           title: "Step 2",
@@ -62,7 +62,7 @@ const NewPromoOnboarding: FC<Props> = ({
               {creationPriceString || "(loading...)"}.
             </>
           ),
-          target: () => addressesElRef.current!,
+          target: () => addMoreElRef.current!,
         },
         {
           title: "Step 3",
