@@ -1,0 +1,19 @@
+{
+    "name": "metastream-subgraph",
+    "license": "UNLICENSED",
+    "scripts": {
+        "codegen": "graph codegen",
+        "build": "graph clean && graph codegen && graph build",
+        "deploy": "graph deploy --product hosted-service rlkvrv/promoshock",
+        "create-local": "graph create --node http://127.0.0.1:8020 rlkvrv/promoshock",
+        "remove-local": "graph remove --node http://127.0.0.1:8020 rlkvrv/promoshock",
+        "deploy-local": "graph deploy --node http://127.0.0.1:8020 --ipfs http://localhost:5001 rlkvrv/promoshock",
+        "test": "graph test",
+        "coverage": "graph test -- -c"
+    },
+    "dependencies": {
+        "@graphprotocol/graph-cli": "0.68.0",
+        "@graphprotocol/graph-ts": "0.32.0",
+        "matchstick-as": "^0.6.0"
+    }
+}
