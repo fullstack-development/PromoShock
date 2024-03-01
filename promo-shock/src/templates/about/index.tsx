@@ -15,9 +15,7 @@ export const About: FC = () => {
         <h3 className={styles.h3}>
           Promo<span className={styles.titleAccent}>Shockers!</span>
         </h3>
-        <span className={styles.h4}>
-          The squad behind this masterpiece (lol)
-        </span>
+        <span className={styles.h4}>The squad behind this masterpiece</span>
         <div className={styles.cardList}>
           {TEAM_LIST.map((options, i) => (
             <div
@@ -33,7 +31,7 @@ export const About: FC = () => {
         </div>
       </section>
 
-      <section>
+      <section id="reason">
         {ABOUT_LIST.map((item, index) => (
           <div key={index} className={styles.about_list_item}>
             <span className={classNames(styles.about_list_title)}>

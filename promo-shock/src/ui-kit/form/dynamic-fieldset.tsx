@@ -1,5 +1,4 @@
 "use client";
-import { DeleteOutlined } from "@ant-design/icons";
 import type { ReactElement, Ref } from "react";
 import type {
   FieldArrayPath,
@@ -12,6 +11,7 @@ import type { PropsWithClassName } from "@promo-shock/shared/types";
 
 import classes from "./dynamic-fieldset.module.scss";
 import { ErrorWrapper } from "./error-wrapper";
+import { IconDelete } from "./icons/icon-delete";
 import { LabelWrapper } from "./label-wrapper";
 import { TextField } from "./text-field";
 import { Button } from "../button";
@@ -99,7 +99,7 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
                     className={classes.remove}
                     disabled={disabled}
                   >
-                    <DeleteOutlined />
+                    <IconDelete />
                   </button>
                 </>
               )}
@@ -108,6 +108,16 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
         ))}
 
         <div className={classes.controls}>
+          <div className={classes.buttonWithTooltip}>
+            <div className={classes.append}>
+              <Button text="Upload.csv" theme="tertiary" disabled />
+            </div>
+            <IconTooltip
+              icon="info"
+              placement="bottomRight"
+              title="Next version: easy-peasy address upload from a CSV file!"
+            />
+          </div>
           <div className={classes.buttonWithTooltip}>
             <div className={classes.append}>
               <Button

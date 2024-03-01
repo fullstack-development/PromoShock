@@ -169,8 +169,8 @@ export const Landing: FC<Props> = ({ streams }) => {
         <Button
           theme="tertiary"
           size="small"
-          text="Find out more about plans"
-          href="/about"
+          text="Tell me more about PromoShock!"
+          href="/about#reason"
           className={styles.readMore}
         />
       </div>

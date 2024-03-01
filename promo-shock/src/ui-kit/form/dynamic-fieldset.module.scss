@@ -20,7 +20,7 @@
 
   & svg {
     color: $mainPink;
-    width: 36px;
+    width: 37px;
 
     &:hover {
       color: $boldPink;
@@ -50,7 +50,7 @@
 
 .controls {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .buttonWithTooltip {
