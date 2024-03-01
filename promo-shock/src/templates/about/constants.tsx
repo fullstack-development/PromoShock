@@ -15,7 +15,7 @@ import type { TeamMember } from "./team-member";
 const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   {
     title: "Kirill",
-    description: "Backend guy",
+    description: `Backend maestro who always answers: "Why not? We can do this!"`,
     image: kirill_image,
     link: {
       title: "Twitch",
@@ -24,7 +24,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Pavel",
-    description: "Frontend boss",
+    description:
+      "Frontend wizard who can bring any designer’s dream to life, for real",
     image: pavel_image,
     link: {
       title: "Linkedin",
@@ -33,7 +34,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Oleg",
-    description: "Frontend boss too...\nbut joined later",
+    description: "Pixel-perfect style warrior who's been through every change",
     image: oleg_image,
     link: {
       title: "GitHub",
@@ -42,7 +43,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Roman",
-    description: "Delivered VERY\nsmart contracts",
+    description: "Blockchain guru writing VERY smart contracts",
     image: roman_image,
     link: {
       title: "Linkedin",
@@ -51,7 +52,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Masha",
-    description: "The first reason why promoshock\nlooks awesome",
+    description: "UX/UI designer who nails the smooth flow and rocks the style",
     image: masha_image,
     link: {
       title: "Link",
@@ -60,7 +61,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Julia",
-    description: "The second reason why\npromoshock looks awesome",
+    description: "UX/UI designer with a keen eye for texts and prioritization",
     image: lulllia_image,
     link: {
       title: "Link",
@@ -69,7 +70,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
   },
   {
     title: "Nico",
-    description: "Will be fired if we won’t win\nhackathon",
+    description:
+      "Boss and crypto enthusiast. Faces firing if we don't win the hackathon.",
     image: nico_image,
     link: {
       title: "Link",
