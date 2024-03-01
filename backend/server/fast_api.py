@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import os
+import logging
 from typing import List, Optional
 from eth_typing import Address
 from web3 import AsyncWeb3, Web3
@@ -20,6 +21,7 @@ from contracts.abi import (
 )
 
 
+logger = logging.getLogger(__name__)
 app = FastAPI()
 memcache = Client(get_memcache_uri())
 web3 = AsyncWeb3(Web3.AsyncHTTPProvider(get_web3_uri()))
@@ -216,10 +218,14 @@ class PromoInfo:
     shopping_link: str
     start_date: int
     end_date: int
+    ticket_sales: List[TicketSale]
+    tickets: List[Ticket]
 
 
 @app.get("/promo")
-async def all_promos(stream=None, owner=None, offset=0, limit=25):
+async def all_promos(
+    stream: Optional[str] = None, owner: Optional[str] = None, offset=0, limit=25
+):
     repo = SqlAlchemyRepository(get_session())
     filter_params = {}
     if owner:
@@ -237,23 +243,37 @@ async def all_promos(stream=None, owner=None, offset=0, limit=25):
             limit=limit,
         )
     else:
-        promos = repo.filter(Promo, filter_params, offset, limit)
+        promos: List[Promo] = repo.filter(Promo, filter_params, offset, limit)
 
-    return [
-        PromoInfo(
-            owner_address=p.owner,
-            promo_addr=p.promo_addr,
-            token_id=p.token_id,
-            name=p.uri.get("name", ""),
-            description=p.description,
-            cover=p.uri.get("image", ""),
-            link=p.uri.get("link", ""),
-            shopping_link=p.uri.get("shopping_link", ""),
-            start_date=p.start_time,
-            end_date=p.end_time,
+    promo_info_result = []
+    for promo in promos:
+        promo_to_tickets = repo.filter(PromoToTicket, {"promo_addr": promo.promo_addr})
+        ticket_addrs = [p.ticket_addr for p in promo_to_tickets]
+        tickets = repo.filter_in(Ticket, Ticket.ticket_addr, ticket_addrs)
+        ticket_sale_created_events = repo.filter_in(
+            TicketSaleCreatedEvent, TicketSaleCreatedEvent.ticket_addr, ticket_addrs
         )
-        for p in promos
-    ]
+        ticket_sale_addrs = [t.ticket_sale_addr for t in ticket_sale_created_events]
+        ticket_sales = repo.filter_in(
+            TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
+        )
+        promo_info_result.append(
+            PromoInfo(
+                owner_address=promo.owner,
+                promo_addr=promo.promo_addr,
+                token_id=promo.token_id,
+                name=promo.uri.get("name", ""),
+                description=promo.description,
+                cover=promo.uri.get("image", ""),
+                link=promo.uri.get("link", ""),
+                shopping_link=promo.uri.get("shopping_link", ""),
+                start_date=promo.start_time,
+                end_date=promo.end_time,
+                ticket_sales=ticket_sales,
+                tickets=tickets,
+            )
+        )
+    return promo_info_result
 
 
 @app.get("/promo/my")
@@ -267,18 +287,32 @@ async def my_promos(buyer, offset=0, limit=25):
     )
     promo_addrs = [p.promo_addr for p in promo_to_tickets]
     promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs, offset, limit)
-    return [
-        PromoInfo(
-            owner_address=p.owner,
-            promo_addr=p.promo_addr,
-            token_id=p.token_id,
-            name=p.uri.get("name", ""),
-            description=p.description,
-            cover=p.uri.get("image", ""),
-            link=p.uri.get("link", ""),
-            shopping_link=p.uri.get("shopping_link", ""),
-            start_date=p.start_time,
-            end_date=p.end_time,
+    promo_info_result = []
+    for promo in promos:
+        promo_to_tickets = repo.filter(PromoToTicket, {"promo_addr": promo.promo_addr})
+        ticket_addrs = [p.ticket_addr for p in promo_to_tickets]
+        tickets = repo.filter_in(Ticket, Ticket.ticket_addr, ticket_addrs)
+        ticket_sale_created_events = repo.filter_in(
+            TicketSaleCreatedEvent, TicketSaleCreatedEvent.ticket_addr, ticket_addrs
         )
-        for p in promos
-    ]
+        ticket_sale_addrs = [t.ticket_sale_addr for t in ticket_sale_created_events]
+        ticket_sales = repo.filter_in(
+            TicketSale, TicketSale.ticket_sale_addr, ticket_sale_addrs
+        )
+        promo_info_result.append(
+            PromoInfo(
+                owner_address=promo.owner,
+                promo_addr=promo.promo_addr,
+                token_id=promo.token_id,
+                name=promo.uri.get("name", ""),
+                description=promo.description,
+                cover=promo.uri.get("image", ""),
+                link=promo.uri.get("link", ""),
+                shopping_link=promo.uri.get("shopping_link", ""),
+                start_date=promo.start_time,
+                end_date=promo.end_time,
+                ticket_sales=ticket_sales,
+                tickets=tickets,
+            )
+        )
+    return promo_info_result
