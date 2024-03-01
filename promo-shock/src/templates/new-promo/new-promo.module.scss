@@ -17,6 +17,10 @@
   grid-auto-rows: max-content;
 }
 
+.thisLink {
+  color: $fadedPink;
+}
+
 .description {
   display: inline-block;
   font-family: var(--font-georama);

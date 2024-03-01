@@ -47,7 +47,10 @@ const NewPromoOnboarding: FC<Props> = ({
           description: (
             <>
               Choose the audience you want to target for your promo. To do this,
-              go to the <Link href="/streams?filters=all">streams page</Link>{" "}
+              go to the{" "}
+              <Link external href="/streams?filters=all">
+                streams page
+              </Link>{" "}
               and copy the ticket address
             </>
           ),
@@ -58,7 +61,7 @@ const NewPromoOnboarding: FC<Props> = ({
           description: (
             <>
               You can add up to 10 audiences. To do this click the &quot;Add
-              more button&quot;. 1 audience costs{" "}
+              address&quot; button. 1 audience costs{" "}
               {creationPriceString || "(loading...)"}.
             </>
           ),
