@@ -163,7 +163,7 @@ async def all_tickets(
         if s is not None:
             streams.append(s)
 
-    return streams
+    return sorted(streams, key=lambda s: s.start_date, reverse=True)
 
 
 @app.get("/ticket/{ticket_addr}")
