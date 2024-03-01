@@ -1,0 +1,20 @@
+{
+  "chapel": {
+    "TicketFactory": {
+      "address": "0x6659C55820Cc259cD9115Db24A95E7fa9c1c1302",
+      "startBlock": 37672034
+    },
+    "PromoFactory": {
+      "address": "0xcdF48190e750A3167e61ffbfD7f5Fa3FB9af7fD1"
+    },
+    "Promo": {
+      "address": "0xd9D7867F2D034C1225Bb0cFc7da180f680374ca2"
+    },
+    "Ticket": {
+      "address": "0x9F0b96F89FB93F42F86fd7b56ec671B026248f12"
+    },
+    "TicketSale": {
+      "address": "0x14c16d27B2Cd98B2Cf37271EEE139D76AdB622de"
+    }
+  }
+}
