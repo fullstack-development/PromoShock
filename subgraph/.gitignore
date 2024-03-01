@@ -1,0 +1,20 @@
+# Matchstick binaries
+tests/.*
+matchstick
+
+# Test coverage tools
+tests/.tools/
+
+# Graph CLI
+generated/
+build/
+.postgres
+/graph-node
+
+# Packages
+node_modules/
+
+.DS_Store
+
+# Config
+.idea
