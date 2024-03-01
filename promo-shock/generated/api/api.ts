@@ -26,6 +26,13 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface Buyer
+ */
+export interface Buyer {
+}
+/**
+ * 
+ * @export
  * @interface HTTPValidationError
  */
 export interface HTTPValidationError {
@@ -35,6 +42,20 @@ export interface HTTPValidationError {
      * @memberof HTTPValidationError
      */
     'detail'?: Array<ValidationError>;
+}
+/**
+ * 
+ * @export
+ * @interface Owner
+ */
+export interface Owner {
+}
+/**
+ * 
+ * @export
+ * @interface Purchased
+ */
+export interface Purchased {
 }
 /**
  * 
@@ -60,6 +81,12 @@ export interface ResponseGetStreamTicketTicketAddrGet {
      * @memberof ResponseGetStreamTicketTicketAddrGet
      */
     'ticket_address': any;
+    /**
+     * 
+     * @type {any}
+     * @memberof ResponseGetStreamTicketTicketAddrGet
+     */
+    'created': any;
     /**
      * 
      * @type {any}
@@ -134,10 +161,10 @@ export interface ResponseGetStreamTicketTicketAddrGet {
     'reserved_amount': any;
     /**
      * 
-     * @type {any}
+     * @type {Purchased}
      * @memberof ResponseGetStreamTicketTicketAddrGet
      */
-    'purchased': any;
+    'purchased': Purchased;
 }
 /**
  * 
@@ -163,6 +190,12 @@ export interface Stream {
      * @memberof Stream
      */
     'ticket_address': File;
+    /**
+     * 
+     * @type {number}
+     * @memberof Stream
+     */
+    'created': number;
     /**
      * 
      * @type {File}
@@ -237,10 +270,24 @@ export interface Stream {
     'reserved_amount': number;
     /**
      * 
-     * @type {boolean}
+     * @type {Purchased}
      * @memberof Stream
      */
-    'purchased': boolean;
+    'purchased': Purchased;
+}
+/**
+ * 
+ * @export
+ * @interface Stream1
+ */
+export interface Stream1 {
+}
+/**
+ * 
+ * @export
+ * @interface ToBlock
+ */
+export interface ToBlock {
 }
 /**
  * 
@@ -284,14 +331,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary All Promos
-         * @param {any} [stream] 
-         * @param {any} [owner] 
+         * @param {Stream1} [stream] 
+         * @param {Owner} [owner] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        allPromosPromoGet: async (stream?: any, owner?: any, offset?: any, limit?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        allPromosPromoGet: async (stream?: Stream1, owner?: Owner, offset?: any, limit?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/promo`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -342,13 +389,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary All Tickets
-         * @param {any} [owner] 
+         * @param {Owner} [owner] 
+         * @param {Buyer} [buyer] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        allTicketsTicketGet: async (owner?: any, offset?: any, limit?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        allTicketsTicketGet: async (owner?: Owner, buyer?: Buyer, offset?: any, limit?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/ticket`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -363,6 +411,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (owner !== undefined) {
                 for (const [key, value] of Object.entries(owner)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            if (buyer !== undefined) {
+                for (const [key, value] of Object.entries(buyer)) {
                     localVarQueryParameter[key] = value;
                 }
             }
@@ -394,10 +448,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Get Stream
          * @param {string} ticketAddr 
+         * @param {Buyer} [buyer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStreamTicketTicketAddrGet: async (ticketAddr: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStreamTicketTicketAddrGet: async (ticketAddr: string, buyer?: Buyer, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ticketAddr' is not null or undefined
             assertParamExists('getStreamTicketTicketAddrGet', 'ticketAddr', ticketAddr)
             const localVarPath = `/ticket/{ticket_addr}`
@@ -413,6 +468,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            if (buyer !== undefined) {
+                for (const [key, value] of Object.entries(buyer)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -427,12 +488,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Index Promo
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        indexPromoIndexPromoPost: async (fromBlock?: any, toBlock?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        indexPromoIndexPromoPost: async (fromBlock?: number, toBlock?: ToBlock, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/index/promo`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -446,9 +507,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarQueryParameter = {} as any;
 
             if (fromBlock !== undefined) {
-                for (const [key, value] of Object.entries(fromBlock)) {
-                    localVarQueryParameter[key] = value;
-                }
+                localVarQueryParameter['from_block'] = fromBlock;
             }
 
             if (toBlock !== undefined) {
@@ -471,12 +530,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Index Ticket
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        indexTicketIndexTicketPost: async (fromBlock?: any, toBlock?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        indexTicketIndexTicketPost: async (fromBlock?: number, toBlock?: ToBlock, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/index/ticket`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -490,9 +549,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarQueryParameter = {} as any;
 
             if (fromBlock !== undefined) {
-                for (const [key, value] of Object.entries(fromBlock)) {
-                    localVarQueryParameter[key] = value;
-                }
+                localVarQueryParameter['from_block'] = fromBlock;
             }
 
             if (toBlock !== undefined) {
@@ -514,13 +571,66 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Start Index
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @summary My Promos
+         * @param {any} buyer 
+         * @param {any} [offset] 
+         * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startIndexIndexStartPost: async (fromBlock?: any, toBlock?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        myPromosPromoMyGet: async (buyer: any, offset?: any, limit?: any, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'buyer' is not null or undefined
+            assertParamExists('myPromosPromoMyGet', 'buyer', buyer)
+            const localVarPath = `/promo/my`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (buyer !== undefined) {
+                for (const [key, value] of Object.entries(buyer)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            if (offset !== undefined) {
+                for (const [key, value] of Object.entries(offset)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            if (limit !== undefined) {
+                for (const [key, value] of Object.entries(limit)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Start Index
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startIndexIndexStartPost: async (fromBlock?: number, toBlock?: ToBlock, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/index/start`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -534,9 +644,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarQueryParameter = {} as any;
 
             if (fromBlock !== undefined) {
-                for (const [key, value] of Object.entries(fromBlock)) {
-                    localVarQueryParameter[key] = value;
-                }
+                localVarQueryParameter['from_block'] = fromBlock;
             }
 
             if (toBlock !== undefined) {
@@ -569,14 +677,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary All Promos
-         * @param {any} [stream] 
-         * @param {any} [owner] 
+         * @param {Stream1} [stream] 
+         * @param {Owner} [owner] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async allPromosPromoGet(stream?: any, owner?: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async allPromosPromoGet(stream?: Stream1, owner?: Owner, offset?: any, limit?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.allPromosPromoGet(stream, owner, offset, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.allPromosPromoGet']?.[localVarOperationServerIndex]?.url;
@@ -585,14 +693,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary All Tickets
-         * @param {any} [owner] 
+         * @param {Owner} [owner] 
+         * @param {Buyer} [buyer] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async allTicketsTicketGet(owner?: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Stream>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.allTicketsTicketGet(owner, offset, limit, options);
+        async allTicketsTicketGet(owner?: Owner, buyer?: Buyer, offset?: any, limit?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Stream>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.allTicketsTicketGet(owner, buyer, offset, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.allTicketsTicketGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -601,11 +710,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Get Stream
          * @param {string} ticketAddr 
+         * @param {Buyer} [buyer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStreamTicketTicketAddrGet(ticketAddr: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResponseGetStreamTicketTicketAddrGet>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getStreamTicketTicketAddrGet(ticketAddr, options);
+        async getStreamTicketTicketAddrGet(ticketAddr: string, buyer?: Buyer, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResponseGetStreamTicketTicketAddrGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStreamTicketTicketAddrGet(ticketAddr, buyer, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStreamTicketTicketAddrGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -613,12 +723,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Index Promo
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async indexPromoIndexPromoPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async indexPromoIndexPromoPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.indexPromoIndexPromoPost(fromBlock, toBlock, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.indexPromoIndexPromoPost']?.[localVarOperationServerIndex]?.url;
@@ -627,12 +737,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Index Ticket
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async indexTicketIndexTicketPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async indexTicketIndexTicketPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.indexTicketIndexTicketPost(fromBlock, toBlock, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.indexTicketIndexTicketPost']?.[localVarOperationServerIndex]?.url;
@@ -640,13 +750,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Start Index
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @summary My Promos
+         * @param {any} buyer 
+         * @param {any} [offset] 
+         * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async startIndexIndexStartPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async myPromosPromoMyGet(buyer: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.myPromosPromoMyGet(buyer, offset, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.myPromosPromoMyGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Start Index
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async startIndexIndexStartPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.startIndexIndexStartPost(fromBlock, toBlock, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.startIndexIndexStartPost']?.[localVarOperationServerIndex]?.url;
@@ -665,69 +790,83 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary All Promos
-         * @param {any} [stream] 
-         * @param {any} [owner] 
+         * @param {Stream1} [stream] 
+         * @param {Owner} [owner] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        allPromosPromoGet(stream?: any, owner?: any, offset?: any, limit?: any, options?: any): AxiosPromise<any> {
+        allPromosPromoGet(stream?: Stream1, owner?: Owner, offset?: any, limit?: any, options?: any): AxiosPromise<any> {
             return localVarFp.allPromosPromoGet(stream, owner, offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary All Tickets
-         * @param {any} [owner] 
+         * @param {Owner} [owner] 
+         * @param {Buyer} [buyer] 
          * @param {any} [offset] 
          * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        allTicketsTicketGet(owner?: any, offset?: any, limit?: any, options?: any): AxiosPromise<Array<Stream>> {
-            return localVarFp.allTicketsTicketGet(owner, offset, limit, options).then((request) => request(axios, basePath));
+        allTicketsTicketGet(owner?: Owner, buyer?: Buyer, offset?: any, limit?: any, options?: any): AxiosPromise<Array<Stream>> {
+            return localVarFp.allTicketsTicketGet(owner, buyer, offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get Stream
          * @param {string} ticketAddr 
+         * @param {Buyer} [buyer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStreamTicketTicketAddrGet(ticketAddr: string, options?: any): AxiosPromise<ResponseGetStreamTicketTicketAddrGet> {
-            return localVarFp.getStreamTicketTicketAddrGet(ticketAddr, options).then((request) => request(axios, basePath));
+        getStreamTicketTicketAddrGet(ticketAddr: string, buyer?: Buyer, options?: any): AxiosPromise<ResponseGetStreamTicketTicketAddrGet> {
+            return localVarFp.getStreamTicketTicketAddrGet(ticketAddr, buyer, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Index Promo
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        indexPromoIndexPromoPost(fromBlock?: any, toBlock?: any, options?: any): AxiosPromise<any> {
+        indexPromoIndexPromoPost(fromBlock?: number, toBlock?: ToBlock, options?: any): AxiosPromise<any> {
             return localVarFp.indexPromoIndexPromoPost(fromBlock, toBlock, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Index Ticket
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        indexTicketIndexTicketPost(fromBlock?: any, toBlock?: any, options?: any): AxiosPromise<any> {
+        indexTicketIndexTicketPost(fromBlock?: number, toBlock?: ToBlock, options?: any): AxiosPromise<any> {
             return localVarFp.indexTicketIndexTicketPost(fromBlock, toBlock, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @summary Start Index
-         * @param {any} [fromBlock] 
-         * @param {any} [toBlock] 
+         * @summary My Promos
+         * @param {any} buyer 
+         * @param {any} [offset] 
+         * @param {any} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startIndexIndexStartPost(fromBlock?: any, toBlock?: any, options?: any): AxiosPromise<any> {
+        myPromosPromoMyGet(buyer: any, offset?: any, limit?: any, options?: any): AxiosPromise<any> {
+            return localVarFp.myPromosPromoMyGet(buyer, offset, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Start Index
+         * @param {number} [fromBlock] 
+         * @param {ToBlock} [toBlock] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startIndexIndexStartPost(fromBlock?: number, toBlock?: ToBlock, options?: any): AxiosPromise<any> {
             return localVarFp.startIndexIndexStartPost(fromBlock, toBlock, options).then((request) => request(axios, basePath));
         },
     };
@@ -743,80 +882,96 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary All Promos
-     * @param {any} [stream] 
-     * @param {any} [owner] 
+     * @param {Stream1} [stream] 
+     * @param {Owner} [owner] 
      * @param {any} [offset] 
      * @param {any} [limit] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public allPromosPromoGet(stream?: any, owner?: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig) {
+    public allPromosPromoGet(stream?: Stream1, owner?: Owner, offset?: any, limit?: any, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).allPromosPromoGet(stream, owner, offset, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary All Tickets
-     * @param {any} [owner] 
+     * @param {Owner} [owner] 
+     * @param {Buyer} [buyer] 
      * @param {any} [offset] 
      * @param {any} [limit] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public allTicketsTicketGet(owner?: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).allTicketsTicketGet(owner, offset, limit, options).then((request) => request(this.axios, this.basePath));
+    public allTicketsTicketGet(owner?: Owner, buyer?: Buyer, offset?: any, limit?: any, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).allTicketsTicketGet(owner, buyer, offset, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Get Stream
      * @param {string} ticketAddr 
+     * @param {Buyer} [buyer] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getStreamTicketTicketAddrGet(ticketAddr: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getStreamTicketTicketAddrGet(ticketAddr, options).then((request) => request(this.axios, this.basePath));
+    public getStreamTicketTicketAddrGet(ticketAddr: string, buyer?: Buyer, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStreamTicketTicketAddrGet(ticketAddr, buyer, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Index Promo
-     * @param {any} [fromBlock] 
-     * @param {any} [toBlock] 
+     * @param {number} [fromBlock] 
+     * @param {ToBlock} [toBlock] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public indexPromoIndexPromoPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig) {
+    public indexPromoIndexPromoPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).indexPromoIndexPromoPost(fromBlock, toBlock, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Index Ticket
-     * @param {any} [fromBlock] 
-     * @param {any} [toBlock] 
+     * @param {number} [fromBlock] 
+     * @param {ToBlock} [toBlock] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public indexTicketIndexTicketPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig) {
+    public indexTicketIndexTicketPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).indexTicketIndexTicketPost(fromBlock, toBlock, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @summary Start Index
-     * @param {any} [fromBlock] 
-     * @param {any} [toBlock] 
+     * @summary My Promos
+     * @param {any} buyer 
+     * @param {any} [offset] 
+     * @param {any} [limit] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public startIndexIndexStartPost(fromBlock?: any, toBlock?: any, options?: RawAxiosRequestConfig) {
+    public myPromosPromoMyGet(buyer: any, offset?: any, limit?: any, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).myPromosPromoMyGet(buyer, offset, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Start Index
+     * @param {number} [fromBlock] 
+     * @param {ToBlock} [toBlock] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public startIndexIndexStartPost(fromBlock?: number, toBlock?: ToBlock, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).startIndexIndexStartPost(fromBlock, toBlock, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -13,13 +13,16 @@ paths:
         in: query
         required: false
         schema:
+          type: integer
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          default: latest
+          anyOf:
+          - type: integer
+          - type: 'null'
           title: To Block
       responses:
         '200':
@@ -42,13 +45,16 @@ paths:
         in: query
         required: false
         schema:
+          type: integer
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          default: latest
+          anyOf:
+          - type: integer
+          - type: 'null'
           title: To Block
       responses:
         '200':
@@ -71,13 +77,16 @@ paths:
         in: query
         required: false
         schema:
+          type: integer
           default: 37553211
           title: From Block
       - name: to_block
         in: query
         required: false
         schema:
-          default: latest
+          anyOf:
+          - type: integer
+          - type: 'null'
           title: To Block
       responses:
         '200':
@@ -100,7 +109,18 @@ paths:
         in: query
         required: false
         schema:
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Owner
+      - name: buyer
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Buyer
       - name: offset
         in: query
         required: false
@@ -140,6 +160,14 @@ paths:
         schema:
           type: string
           title: Ticket Addr
+      - name: buyer
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Buyer
       responses:
         '200':
           description: Successful Response
@@ -165,12 +193,52 @@ paths:
         in: query
         required: false
         schema:
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Stream
       - name: owner
         in: query
         required: false
         schema:
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Owner
+      - name: offset
+        in: query
+        required: false
+        schema:
+          default: 0
+          title: Offset
+      - name: limit
+        in: query
+        required: false
+        schema:
+          default: 25
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/promo/my":
+    get:
+      summary: My Promos
+      operationId: my_promos_promo_my_get
+      parameters:
+      - name: buyer
+        in: query
+        required: true
+        schema:
+          title: Buyer
       - name: offset
         in: query
         required: false
@@ -220,6 +288,9 @@ components:
           type: string
           format: binary
           title: Ticket Address
+        created:
+          type: integer
+          title: Created
         payment_token_address:
           type: string
           format: binary
@@ -258,13 +329,16 @@ components:
           type: integer
           title: Reserved Amount
         purchased:
-          type: boolean
+          anyOf:
+          - type: boolean
+          - type: 'null'
           title: Purchased
       type: object
       required:
       - owner_address
       - sale_address
       - ticket_address
+      - created
       - payment_token_address
       - name
       - description

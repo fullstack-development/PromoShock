@@ -49,14 +49,14 @@
 
     &_field {
       display: grid !important;
-      grid-template-columns: subgrid;
+      grid-template-columns: subgrid !important;
       grid-column: span 2;
       margin-bottom: 24px;
     }
   }
 
   &_2 {
-    grid-template-columns: subgrid;
+    grid-template-columns: subgrid !important;
     grid-column: 3;
     height: max-content;
   }

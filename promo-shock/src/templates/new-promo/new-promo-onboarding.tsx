@@ -57,9 +57,8 @@ const NewPromoOnboarding: FC<Props> = ({
           title: "Step 2",
           description: (
             <>
-              You can add up to 10 audiences. To do this, you can upload a .csv
-              file with a list of streams you&apos;re interested in, or by
-              clicking the Add more button. 1 audience costs{" "}
+              You can add up to 10 audiences. To do this click the &quot;Add
+              more button&quot;. 1 audience costs{" "}
               {creationPriceString || "(loading...)"}.
             </>
           ),
