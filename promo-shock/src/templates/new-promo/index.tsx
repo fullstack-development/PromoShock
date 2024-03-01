@@ -324,6 +324,8 @@ const NewPromo: FC = () => {
                 />
               )}
             />
+
+            <span className={classes.utcLabel}>UTC time zone</span>
           </div>
 
           <div

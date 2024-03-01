@@ -34,6 +34,7 @@
 }
 
 .column {
+  position: relative;
   display: grid;
   > *:first-child > * {
     margin-bottom: 56px;
@@ -118,4 +119,15 @@
   letter-spacing: 0em;
   text-align: center;
   color: #FF4D4F;
+}
+
+.utcLabel {
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  margin-left: 395px;
+  font-family: var(--font-georama);
+  position: absolute;
+  left: 0;
+  bottom: 33px;
 }
