@@ -269,11 +269,13 @@ async def all_promos(
                 shopping_link=promo.uri.get("shopping_link", ""),
                 start_date=promo.start_time,
                 end_date=promo.end_time,
-                ticket_sales=ticket_sales,
+                ticket_sales=sorted(
+                    ticket_sales, key=lambda t: t.start_time, reverse=True
+                ),
                 tickets=tickets,
             )
         )
-    return promo_info_result
+    return sorted(promo_info_result, key=lambda p: p.start_date, reverse=True)
 
 
 @app.get("/promo/my")
@@ -311,8 +313,10 @@ async def my_promos(buyer, offset=0, limit=25):
                 shopping_link=promo.uri.get("shopping_link", ""),
                 start_date=promo.start_time,
                 end_date=promo.end_time,
-                ticket_sales=ticket_sales,
+                ticket_sales=sorted(
+                    ticket_sales, key=lambda t: t.start_time, reverse=True
+                ),
                 tickets=tickets,
             )
         )
-    return promo_info_result
+    return sorted(promo_info_result, key=lambda p: p.start_date, reverse=True)
