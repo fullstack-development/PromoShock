@@ -1,0 +1,208 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/typescript",
+    "next"
+  ],
+  "rules": {
+    "@typescript-eslint/consistent-type-exports": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/member-ordering": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "args": "after-used", "argsIgnorePattern": "^_" }
+    ],
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+    "import/exports-last": "error",
+    "import/first": "error",
+    "import/group-exports": "error",
+    "import/newline-after-import": "error",
+    "import/no-commonjs": "error",
+    "import/no-cycle": "error",
+    "import/no-deprecated": "warn",
+    "import/no-default-export": "error",
+    "import/no-duplicates": "error",
+    "import/no-empty-named-blocks": "error",
+    "import/no-mutable-exports": "error",
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "basePath": "./src",
+        "zones": [
+          // configs
+          {
+            "target": "configs",
+            "from": "app/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "templates/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "layouts/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "components/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "services/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "ui-kit/**/*"
+          },
+          {
+            "target": "configs",
+            "from": "shared/**/*"
+          },
+          // shared
+          {
+            "target": "shared",
+            "from": "app/**/*"
+          },
+          {
+            "target": "shared",
+            "from": "templates/**/*"
+          },
+          {
+            "target": "shared",
+            "from": "layouts/**/*"
+          },
+          {
+            "target": "shared",
+            "from": "components/**/*"
+          },
+          {
+            "target": "shared",
+            "from": "services/**/*"
+          },
+          {
+            "target": "shared",
+            "from": "ui-kit/**/*"
+          },
+          // ui-kit
+          {
+            "target": "ui-kit",
+            "from": "app/**/*"
+          },
+          {
+            "target": "ui-kit",
+            "from": "templates/**/*"
+          },
+          {
+            "target": "ui-kit",
+            "from": "layouts/**/*"
+          },
+          {
+            "target": "ui-kit",
+            "from": "components/**/*"
+          },
+          {
+            "target": "ui-kit",
+            "from": "services/**/*"
+          },
+          // services
+          {
+            "target": "services",
+            "from": "app/**/*"
+          },
+          {
+            "target": "services",
+            "from": "templates/**/*"
+          },
+          {
+            "target": "services",
+            "from": "layouts/**/*"
+          },
+          {
+            "target": "services",
+            "from": "components/**/*"
+          },
+          // components
+          {
+            "target": "components",
+            "from": "app/**/*"
+          },
+          {
+            "target": "components",
+            "from": "templates/**/*"
+          },
+          {
+            "target": "components",
+            "from": "layouts/**/*"
+          },
+          // layouts
+          {
+            "target": "layouts",
+            "from": "app/**/*"
+          },
+          {
+            "target": "layouts",
+            "from": "templates/**/*"
+          },
+          // templates
+          {
+            "target": "templates",
+            "from": "app/**/*"
+          }
+        ]
+      }
+    ],
+    "import/no-self-import": "error",
+    "import/no-unused-modules": ["error", { "missingExports": true }],
+    "import/no-unassigned-import": [
+      "error",
+      { "allow": ["src/app/index.css"] }
+    ],
+    "import/no-useless-path-segments": "error",
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "caseInsensitive": true,
+          "order": "asc"
+        },
+        "groups": ["external", "internal", ["parent", "sibling", "index"]],
+        "newlines-between": "always",
+        "pathGroups": [
+          {
+            "group": "parent",
+            "pattern": "@generated/**",
+            "position": "before"
+          },
+          {
+            "group": "parent",
+            "pattern": "@promo-shock/**",
+            "position": "before"
+          }
+        ]
+      }
+    ],
+    "react/display-name": "off"
+  },
+  "ignorePatterns": ["node_modules", ".next", "generated", "*.config.*"],
+  "overrides": [
+    {
+      "files": ["src/app/**/*"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": ["src/**/index.ts"],
+      "rules": {
+        "import/no-unused-modules": "off"
+      }
+    }
+  ]
+}

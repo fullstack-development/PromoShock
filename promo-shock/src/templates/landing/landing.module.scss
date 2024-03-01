@@ -1,0 +1,172 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: grid;
+  gap: 80px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.backgroundIcons {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 132px;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  max-width: 900px;
+  text-align: center;
+  justify-self: center;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.description {
+  min-height: 100px;
+  max-width: 960px;
+  text-align: center;
+  font-family: var(--font-georama);
+  font-size: 20px;
+  line-height: 32px;
+  margin-top: 40px;
+  margin-bottom: 32px;
+}
+
+.panels {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: nowrap;
+  font-weight: 700;
+  font-size: 20px;
+  font-family: var(--font-georama);
+  margin-bottom: 56px;
+}
+
+.leftPanel {
+  min-width: 350px;
+  text-align: right;
+}
+
+.middlePanel {
+  min-width: 300px;
+  text-align: center;
+}
+
+.panel {
+  min-width: 350px;
+}
+
+.upcoming {
+  justify-self: center;
+  background: $mainCyan;
+  min-height: 865px;
+  width: 120%;
+  padding: 56px 0 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-top: 180px;
+  transform: rotate(-2deg);
+}
+
+.seeAllShowsLink {
+  font-size: 24px;
+  margin-bottom: 40px;
+  margin-left: auto;
+  transform: rotate(2deg);
+}
+
+.card_title {
+  display: grid;
+  justify-items: end;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  transform: rotate(2deg);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  justify-content: center;
+  gap: 56px 36px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  transform: rotate(2deg);
+}
+
+.ticker {
+  position: absolute;
+  color: $textSunriseYellow;
+  background: linear-gradient(180deg, $fadedPink 0%, $goldenPurple 100%);
+  width: 100%;
+  top: -80px;
+  left: -10px;
+  font-size: 64px;
+  white-space: nowrap;
+  width: 200%;
+  font-family: var(--font-bowlby-one-sc);
+}
+
+.tickerLine {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  transform: translate3d(-400px, 0, 0);
+}
+
+.plans {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  gap: 30px;
+  min-height: 450px;
+}
+
+.quoteBackground {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.h3 {
+  @include h3;
+  z-index: 2;
+  margin-top: 50px;
+  text-transform: uppercase;
+}
+
+.points {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  z-index: 2;
+  max-width: 1126px;
+  padding: 0 80px;
+  font-size: 20px;
+  line-height: 32px;
+  font-family: var(--font-georama);
+}
+
+.readMore {
+  font-size: 20px !important;
+  padding: 6px 24px !important;
+}

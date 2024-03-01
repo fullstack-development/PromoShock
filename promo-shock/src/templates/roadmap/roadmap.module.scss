@@ -1,0 +1,62 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 96px;
+  position: relative;
+  overflow-x: hidden;
+  z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-family: var(--font-georama);
+  line-height: 32px;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  text-align: center;
+}
+
+.phasesList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.phaseCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #FFF;
+  border: 2px dashed $gray5;
+  font-size: 16px;
+  line-height: 24px;
+  width: 100%;
+}
+
+.phaseTitle {
+  @include h3;
+
+  color: $mainPink;
+  font-size: 40px;
+}
+
+.phaseStatus {
+  color: $gray6;
+}
+
+.phaseList {
+  list-style: disc inside;
+}
+
+.phaseItem {
+
+}

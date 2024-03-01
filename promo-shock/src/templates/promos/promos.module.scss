@@ -1,0 +1,25 @@
+@import 'src/shared/styles/mixins.scss';
+
+.root {
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 1440px;
+  padding: 0px 120px 0 120px;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+.header {
+  display: grid;
+  justify-items: center;
+  row-gap: 32px;
+  padding-bottom: 96px;
+}
+
+.title {
+  @include h1;
+
+  padding-top: 132px;
+  text-align: center;
+}

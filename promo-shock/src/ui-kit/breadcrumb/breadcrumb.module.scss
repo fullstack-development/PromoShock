@@ -1,0 +1,33 @@
+@import 'src/shared/styles/vars.scss';
+
+.root {
+  font-family: inherit !important;
+
+  & *:hover {
+    background: none !important;
+  }
+}
+
+.item {
+  display: inline-block !important;
+  font-family: inherit !important;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0em;
+  text-align: left;
+
+  &::first-letter,
+  > *::first-letter {
+    text-transform: capitalize;
+  }
+}
+
+.current {
+  color: $gray7 !important;
+}
+
+.link {
+  color: $goldenPurple !important;
+  cursor: pointer;
+}

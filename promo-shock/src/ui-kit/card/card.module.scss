@@ -1,0 +1,139 @@
+@import 'src/shared/styles/vars.scss';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #FFF;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  height: max-content;
+  padding-bottom: 24px;
+  border: 2px dashed $gray5;
+  overflow: hidden;
+
+  &_disabled {
+    pointer-events: none;
+  }
+}
+
+.root_highlight {
+  z-index: 1;
+  border: none;
+  border-radius: 12px;
+}
+
+.wrap {
+  position: relative;
+  z-index: 0;
+
+  &:has(.highlight) {
+    padding: 6px;
+  }
+}
+
+.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  background-image: linear-gradient(180deg, #FFADD2 0%, #9254DE 100%);
+  z-index: -1;
+}
+
+.image_wrap {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 360 / 255;
+}
+
+.copy {
+  position: absolute;
+  z-index: 1;
+  bottom: 20px;
+  left: 24px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy_hovered {
+  opacity: 1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.image {
+  object-fit: cover;
+
+  &_disabled {
+    opacity: 0.4;
+  }
+}
+
+.subtitle {
+  color: $textSubtitle;
+  font-size: 14px;
+  font-family: var(--font-georama);
+}
+
+.error {
+  color: $mainError;
+}
+
+.fire {
+  color: #FFF;
+}
+
+.description {
+  font-family: var(--font-georama);
+  line-height: 24px;
+  font-size: 16px;
+  height: 120px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+.title {
+  color: $goldenPurple;
+  font-weight: 500;
+}
+
+.cost {
+  font-size: 24px;
+
+  &_lineThrough {
+    text-decoration: line-through;
+    color: $gray7;
+  }
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.bottomDivider {
+  padding-top: 20px;
+  border-top: 1px solid $backgroundDisabled;
+}
+
+.sale_period {
+  font-family: var(--font-georama);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #00000073;
+}

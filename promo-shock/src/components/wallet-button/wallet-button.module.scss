@@ -1,0 +1,23 @@
+.popover {
+  width:  185px;
+  height: max-content;
+}
+
+.popover_content {
+  display: grid;
+  justify-items: center;
+  row-gap: 8px;
+  padding: 16px 16px 24px;
+}
+
+.popover_separator {
+  width: 100%;
+  margin: 16px 0;
+  border: 2px dashed #595959;
+}
+
+.invert {
+  &:not(:hover) {
+    color: #FFF !important;
+  }
+}

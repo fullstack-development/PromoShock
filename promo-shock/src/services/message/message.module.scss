@@ -1,0 +1,20 @@
+.root {
+  & :global(.ant-message-notice-content) {
+    width: 100%;
+    max-width: 560px;
+    padding: 16px !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    background-color: #000 !important;
+
+    span:last-child {
+      font-family: var(--font-georama) !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      line-height: 22px !important;
+      letter-spacing: 0em !important;
+      text-align: left !important;
+      color: #FFF !important;
+    }
+  }
+}

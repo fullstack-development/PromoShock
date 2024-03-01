@@ -1,0 +1,189 @@
+@import 'src/shared/styles/vars.scss';
+
+.button {
+  color: $textSecondary !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: min-content !important;
+  min-height: auto !important;
+  line-height: 1 !important;
+  font-family: inherit !important;
+  transition: 300ms background-color, 300ms border-color, 300ms color !important;
+
+  border: 2px solid transparent !important;
+  &:hover {
+    border: 2px solid transparent !important;
+  }
+}
+
+.theme {
+  &_primary {
+    background-color: $mainPink !important;
+    &:hover {
+      background-color: $boldPink !important;
+    }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+    }
+  }
+  
+  &_secondary {
+    background-color: $mainCyan !important;
+    &:hover {
+      background-color: $boldCyan !important;
+    }
+
+    &.disabled {
+      color: #FFF !important;
+      background-color: $textDisabled !important;
+    }
+  }
+
+  &_tertiary {
+    color: $goldenPurple !important;
+    border: 2px solid $goldenPurple !important;
+    background-color: $fadedPurple !important;
+    &:hover {
+      background-color: $fadedBoldPurple !important;
+      border: 2px solid $goldenPurple !important;
+    }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+      border: 2px solid $textDisabled !important;
+    }
+  }
+
+  &_quaternary {
+    color: $mainPink !important;
+    border: 2px solid $mainPink !important;
+    background-color: $fadedPurple !important;
+
+    &:hover {
+      border: 2px solid $mainPink !important;
+      background-color: $fadedBoldPink !important;
+    }
+
+    &.disabled {
+      color: $textDisabled !important;
+      background-color: $backgroundDisabled !important;
+      border: 2px solid $textDisabled !important;
+    }
+  }
+
+  &_quinary {
+    background-color: transparent !important;
+    border-color: $goldenPurple !important;
+    border-radius: 16px !important;
+    color: $goldenPurple !important;
+
+    &:hover {
+      border-color: $mainPink !important;
+      color: $mainPink !important;
+    }
+
+    &.disabled {
+      color: $textDisabled !important;
+      border-color: $textDisabled !important;
+    }
+  }
+}
+
+.fullwidth {
+  width: 100%;
+}
+
+.size {
+  &_medium {
+    font-size: 20px !important;
+    padding: 6px 24px !important;
+
+    &.loading > *::after {
+      --size: 1.5;
+    }
+  }
+
+  &_large {
+    font-size: 32px !important;
+    padding: 22px 24px !important;
+
+    &.loading > *::after {
+      --size: 2.5;
+    }
+  }
+
+  &_largeWide {
+    font-size: 32px !important;
+    padding: 22px 24px !important;
+    min-width: 480px;
+
+    &.loading > *::after {
+      --size: 2.5;
+    }
+  }
+
+  &_big {
+    padding: 13px 32px !important;
+    font-size: 28px !important;
+
+    &.loading > *::after {
+      --size: 2;
+    }
+  }
+
+  &_small {
+    width: max-content !important;
+    padding: 2px 12px !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+
+    &.loading > *::after {
+      --size: 1;
+    }
+  }
+}
+
+.loading {
+  cursor: wait !important;
+  > span:last-child {
+    position: relative;
+    display: inline-flex !important;
+    align-items: baseline;
+
+    &::after {
+      content: '';  
+        width: calc(2px * var(--size));
+        height: calc(2px * var(--size));
+      margin-left: 2px;
+      background: currentColor;
+      box-sizing: border-box;
+      animation: animloader 1s linear infinite;
+    }
+  }
+}
+
+@keyframes animloader {
+  0% {
+    box-shadow: calc(4px * var(--size)) 0 rgba(255, 255, 255, 0), calc(8px * var(--size)) 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow: calc(4px * var(--size)) 0 currentColor, calc(8px * var(--size)) 0 rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: calc(4px * var(--size)) 0 currentColor, calc(8px * var(--size)) 0 currentColor;
+  }
+}
+
+.error {
+  border: 2px solid #FF4D4F !important;
+
+  &:hover {
+    border: 2px solid #FF4D4F !important;
+  }
+}
