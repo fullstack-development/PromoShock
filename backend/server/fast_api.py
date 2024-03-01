@@ -296,7 +296,9 @@ async def my_promos(buyer, offset=0, limit=25):
         PromoToTicket, PromoToTicket.ticket_addr, ticket_addrs
     )
     promo_addrs = [p.promo_addr for p in promo_to_tickets]
-    promos = repo.filter_in(Promo, Promo.promo_addr, promo_addrs, offset, limit)
+    promos = repo.filter_in(
+        Promo, Promo.promo_addr, promo_addrs, offset=offset, limit=limit
+    )
     promo_info_result = []
     for promo in promos:
         promo_to_tickets = repo.filter(PromoToTicket, {"promo_addr": promo.promo_addr})
