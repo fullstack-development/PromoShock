@@ -1,6 +1,6 @@
 import type { QueryFunction } from "@tanstack/react-query";
 
-import { api } from "@promo-shock/configs/axios";
+import { apiClient } from "@promo-shock/configs/api";
 import type { Promo } from "@promo-shock/shared/entities";
 
 type Filters = {
@@ -13,7 +13,9 @@ type Filters = {
 const promoToPromoCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promo: any,
+  ticketAddress: string,
 ): Promo => ({
+  ticketAddress,
   promoAddress: promo.promo_addr,
   tokenId: promo.token_id,
   name: promo.name,
@@ -33,30 +35,43 @@ const fetchPromoCards: QueryFunction<Promo[], [string, Filters]> = async ({
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
   const buyer = filters?.buyer?.toLowerCase();
-  // TODO :: uncomment when FastAPI will be correctly generated
-  // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
-  //   signal,
-  // });
   if (buyer) {
-    const { data } = await api.myPromosPromoMyGet("", undefined, undefined, {
-      params: { buyer, offset, limit },
+    const res = await apiClient.my_promos_promo_my_get({
+      queries: {
+        offset,
+        buyer,
+        limit,
+      },
       signal,
     });
-    // FIXME :: codegen return type
-    return (data as []).map(promoToPromoCard);
-  } else {
-    const { data } = await api.allPromosPromoGet(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        params: { stream, owner, offset, limit },
-        signal,
-      },
+    return res.reduce(
+      (promos, inputPromo) => [
+        ...promos,
+        ...inputPromo.tickets.map((ticket) =>
+          promoToPromoCard(inputPromo, ticket.ticket_addr),
+        ),
+      ],
+      [] as Promo[],
     );
-    // FIXME :: codegen return type
-    return (data as []).map(promoToPromoCard);
+  } else {
+    const res = await apiClient.all_promos_promo_get({
+      queries: {
+        stream,
+        owner,
+        offset,
+        limit,
+      },
+      signal,
+    });
+    return res.reduce(
+      (promos, inputPromo) => [
+        ...promos,
+        ...inputPromo.tickets.map((ticket) =>
+          promoToPromoCard(inputPromo, ticket.ticket_addr),
+        ),
+      ],
+      [] as Promo[],
+    );
   }
 };
 
@@ -70,36 +85,48 @@ const fetchInfinitePromoCards: QueryFunction<
   const owner = filters?.owner?.toLowerCase();
   const stream = filters?.stream?.toLowerCase();
   const buyer = filters?.buyer?.toLowerCase();
-  // TODO :: uncomment when FastAPI will be correctly generated
-  // const { data } = await api.allPromosPromoGet(stream, owner, offset, limit, {
-  //   signal,
-  // });
   if (buyer) {
-    const { data } = await api.myPromosPromoMyGet("", undefined, undefined, {
-      params: { buyer, offset, limit },
+    const res = await apiClient.my_promos_promo_my_get({
+      queries: {
+        offset,
+        buyer,
+        limit,
+      },
       signal,
     });
-
     return {
-      // FIXME :: codegen return type
-      items: (data as []).map(promoToPromoCard),
-      cursor: data.length ? pageParam + 1 : null,
+      items: res.reduce(
+        (promos, inputPromo) => [
+          ...promos,
+          ...inputPromo.tickets.map((ticket) =>
+            promoToPromoCard(inputPromo, ticket.ticket_addr),
+          ),
+        ],
+        [] as Promo[],
+      ),
+      cursor: res.length ? pageParam + 1 : null,
     };
   } else {
-    const { data } = await api.allPromosPromoGet(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        params: { stream, owner, offset, limit },
-        signal,
+    const res = await apiClient.all_promos_promo_get({
+      queries: {
+        stream,
+        owner,
+        offset,
+        limit,
       },
-    );
+      signal,
+    });
     return {
-      // FIXME :: codegen return type
-      items: (data as []).map(promoToPromoCard),
-      cursor: data.length ? pageParam + 1 : null,
+      items: res.reduce(
+        (promos, inputPromo) => [
+          ...promos,
+          ...inputPromo.tickets.map((ticket) =>
+            promoToPromoCard(inputPromo, ticket.ticket_addr),
+          ),
+        ],
+        [] as Promo[],
+      ),
+      cursor: res.length ? pageParam + 1 : null,
     };
   }
 };

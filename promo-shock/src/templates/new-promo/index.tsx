@@ -25,7 +25,7 @@ import { withConnect, withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
-import { api } from "@promo-shock/configs/axios";
+import { apiClient } from "@promo-shock/configs/api";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -34,6 +34,7 @@ import {
   DynamicFieldset,
   ImageUploader,
   Button,
+  TextLink,
 } from "@promo-shock/ui-kit";
 
 import { writeMetadata } from "./mutations";
@@ -125,10 +126,10 @@ const NewPromo: FC = () => {
             );
 
             try {
-              return api.indexPromoIndexPromoPost(undefined, undefined, {
-                params: {
-                  fromBlock: Number(log.blockNumber - BigInt(5)),
-                  toBlock: Number(log.blockNumber),
+              return apiClient.index_promo_index_promo_post(undefined, {
+                queries: {
+                  from_block: Number(log.blockNumber) - 5,
+                  to_block: Number(log.blockNumber),
                 },
               });
             } catch {}
@@ -346,14 +347,29 @@ const NewPromo: FC = () => {
               label="Smart contract address:"
               placeholder="x43djvnprjvfbo2ei2e2e"
               name="promo_stream_addresses"
+              addMoreText="Add address"
+              addMoreTooltipContent={
+                <span>
+                  For targeted promos, just enter the stream ticket address your
+                  audience hit up. Hover over the stream, click &quot;Copy
+                  ticket address&quot;, and paste it here. All streams are
+                  listed on{" "}
+                  <TextLink
+                    className={classes.thisLink}
+                    title="this"
+                    external
+                    href="/streams?filters=all"
+                  />{" "}
+                  page.
+                </span>
+              }
+              addMoreCaption={creationPriceString && `+${creationPriceString}`}
+              uploadCSVTooltipContent="Next version: easy-peasy address upload from a CSV file!"
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
-              refs={{
-                addButtonRef: addMoreElRef,
-              }}
+              addMoreRef={addMoreElRef}
               disabled={pending}
-              caption={creationPriceString && `+${creationPriceString}`}
             />
           </div>
         </div>

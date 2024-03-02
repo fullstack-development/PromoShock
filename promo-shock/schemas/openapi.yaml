@@ -1,4 +1,3 @@
----
 openapi: 3.1.0
 info:
   title: FastAPI
@@ -9,21 +8,21 @@ paths:
       summary: Start Index
       operationId: start_index_index_start_post
       parameters:
-      - name: from_block
-        in: query
-        required: false
-        schema:
-          type: integer
-          default: 37553211
-          title: From Block
-      - name: to_block
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: To Block
+        - name: from_block
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 37553211
+            title: From Block
+        - name: to_block
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: 'null'
+            title: To Block
       responses:
         '200':
           description: Successful Response
@@ -41,21 +40,21 @@ paths:
       summary: Index Ticket
       operationId: index_ticket_index_ticket_post
       parameters:
-      - name: from_block
-        in: query
-        required: false
-        schema:
-          type: integer
-          default: 37553211
-          title: From Block
-      - name: to_block
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: To Block
+        - name: from_block
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 37553211
+            title: From Block
+        - name: to_block
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: 'null'
+            title: To Block
       responses:
         '200':
           description: Successful Response
@@ -73,21 +72,21 @@ paths:
       summary: Index Promo
       operationId: index_promo_index_promo_post
       parameters:
-      - name: from_block
-        in: query
-        required: false
-        schema:
-          type: integer
-          default: 37553211
-          title: From Block
-      - name: to_block
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: To Block
+        - name: from_block
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 37553211
+            title: From Block
+        - name: to_block
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: 'null'
+            title: To Block
       responses:
         '200':
           description: Successful Response
@@ -105,34 +104,34 @@ paths:
       summary: All Tickets
       operationId: all_tickets_ticket_get
       parameters:
-      - name: owner
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Owner
-      - name: buyer
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Buyer
-      - name: offset
-        in: query
-        required: false
-        schema:
-          default: 0
-          title: Offset
-      - name: limit
-        in: query
-        required: false
-        schema:
-          default: 25
-          title: Limit
+        - name: owner
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Owner
+        - name: buyer
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Buyer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            default: 25
+            title: Limit
       responses:
         '200':
           description: Successful Response
@@ -154,20 +153,20 @@ paths:
       summary: Get Stream
       operationId: get_stream_ticket__ticket_addr__get
       parameters:
-      - name: ticket_addr
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Ticket Addr
-      - name: buyer
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Buyer
+        - name: ticket_addr
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Ticket Addr
+        - name: buyer
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Buyer
       responses:
         '200':
           description: Successful Response
@@ -175,8 +174,8 @@ paths:
             application/json:
               schema:
                 anyOf:
-                - "$ref": "#/components/schemas/Stream"
-                - type: 'null'
+                  - "$ref": "#/components/schemas/Stream"
+                  - type: 'null'
                 title: Response Get Stream Ticket  Ticket Addr  Get
         '422':
           description: Validation Error
@@ -189,40 +188,44 @@ paths:
       summary: All Promos
       operationId: all_promos_promo_get
       parameters:
-      - name: stream
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Stream
-      - name: owner
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Owner
-      - name: offset
-        in: query
-        required: false
-        schema:
-          default: 0
-          title: Offset
-      - name: limit
-        in: query
-        required: false
-        schema:
-          default: 25
-          title: Limit
+        - name: stream
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Stream
+        - name: owner
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Owner
+        - name: offset
+          in: query
+          required: false
+          schema:
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            default: 25
+            title: Limit
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Promo"
+                title: Response All Promos Promo Get
         '422':
           description: Validation Error
           content:
@@ -234,29 +237,34 @@ paths:
       summary: My Promos
       operationId: my_promos_promo_my_get
       parameters:
-      - name: buyer
-        in: query
-        required: true
-        schema:
-          title: Buyer
-      - name: offset
-        in: query
-        required: false
-        schema:
-          default: 0
-          title: Offset
-      - name: limit
-        in: query
-        required: false
-        schema:
-          default: 25
-          title: Limit
+        - name: buyer
+          in: query
+          required: true
+          schema:
+            type: string
+            title: Buyer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            default: 25
+            title: Limit
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Promo"
+                title: Response My Promos Promo My Get
         '422':
           description: Validation Error
           content:
@@ -278,22 +286,18 @@ components:
       properties:
         owner_address:
           type: string
-          format: binary
           title: Owner Address
         sale_address:
           type: string
-          format: binary
           title: Sale Address
         ticket_address:
           type: string
-          format: binary
           title: Ticket Address
         created:
           type: integer
           title: Created
         payment_token_address:
           type: string
-          format: binary
           title: Payment Token Address
         name:
           type: string
@@ -330,36 +334,167 @@ components:
           title: Reserved Amount
         purchased:
           anyOf:
-          - type: boolean
-          - type: 'null'
+            - type: boolean
+            - type: 'null'
           title: Purchased
       type: object
       required:
-      - owner_address
-      - sale_address
-      - ticket_address
-      - created
-      - payment_token_address
-      - name
-      - description
-      - banner
-      - start_date
-      - sale_start_date
-      - sale_end_date
-      - stream_link
-      - streamer_link
-      - price
-      - total_amount
-      - reserved_amount
-      - purchased
+        - owner_address
+        - sale_address
+        - ticket_address
+        - created
+        - payment_token_address
+        - name
+        - description
+        - banner
+        - start_date
+        - sale_start_date
+        - sale_end_date
+        - stream_link
+        - streamer_link
+        - price
+        - total_amount
+        - reserved_amount
+        - purchased
       title: Stream
+    Promo:
+      properties:
+        owner_address:
+          type: string
+          title: Owner Address
+        promo_addr:
+          type: string
+          title: Promo Address
+        token_id:
+          type: integer
+          title: Token ID
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+        cover:
+          type: string
+          title: Cover
+        link:
+          type: string
+          title: Link
+        shopping_link:
+          type: string
+          title: Shopping Link
+        start_date:
+          type: integer
+          title: Start Date
+        end_date:
+          type: integer
+          title: End Date
+        ticket_sales:
+          type: array
+          items:
+            "$ref": "#/components/schemas/TicketSale"
+          title: Ticket Sales
+        tickets:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Ticket"
+          title: Tickets
+        created:
+          type: integer
+          title: Created
+      type: object
+      required:
+        - owner_address
+        - promo_addr
+        - token_id
+        - name
+        - description
+        - cover
+        - start_date
+        - end_date
+        - ticket_sales
+        - tickets
+        - created
+      title: Promo
+    TicketSale:
+      properties:
+        ticket_sale_addr:
+          type: string
+          title: Ticket Sale Address
+        token_payment_addr:
+          type: string
+          title: Token Payment Address
+        start_time:
+          type: integer
+          title: Start Time
+        end_time:
+          type: integer
+          title: End Time
+        price:
+          type: string
+          title: Price
+        owner:
+          type: string
+          title: Owner
+      type: object
+      required:
+        - ticket_sale_addr
+        - token_payment_addr
+        - start_time
+        - end_time
+        - price
+        - owner
+      title: TicketSale
+    Ticket:
+      properties:
+        cap:
+          type: integer
+          title: Cap
+        total_supply:
+          type: integer
+          title: Total Supply
+        ticket_addr:
+          type: string
+          title: Ticket Address
+        name:
+          type: string
+          title: Name
+        symbol:
+          type: string
+          title: Symbol
+        token_uri:
+          type: object
+          properties:
+            name:
+              type: string
+              title: Token URI Name
+            description:
+              type: string
+              title: Token URI Description
+            image:
+              type: string
+              title: Token URI Image
+            attributes:
+              type: array
+              items:
+                type: string
+          title: Token URI
+      type: object
+      required:
+        - cap
+        - total_supply
+        - ticket_addr
+        - name
+        - symbol
+        - token_uri
+      title: Ticket
     ValidationError:
       properties:
         loc:
           items:
             anyOf:
-            - type: string
-            - type: integer
+              - type: string
+              - type: integer
           type: array
           title: Location
         msg:
@@ -370,7 +505,7 @@ components:
           title: Error Type
       type: object
       required:
-      - loc
-      - msg
-      - type
+        - loc
+        - msg
+        - type
       title: ValidationError

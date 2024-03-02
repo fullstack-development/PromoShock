@@ -1,5 +1,5 @@
 "use client";
-import type { ReactElement, Ref } from "react";
+import type { ReactElement, ReactNode, Ref } from "react";
 import type {
   FieldArrayPath,
   FieldValues,
@@ -15,7 +15,6 @@ import { IconDelete } from "./icons/icon-delete";
 import { LabelWrapper } from "./label-wrapper";
 import { TextField } from "./text-field";
 import { Button } from "../button";
-import { TextLink } from "../link";
 import { IconTooltip } from "../tooltips";
 
 type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
@@ -27,28 +26,16 @@ type Props<T extends FieldValues, K extends FieldArrayPath<T>> = {
     : never;
   label?: string;
   labelPosition?: "top" | "left";
+  addMoreText?: string;
+  addMoreTooltipContent?: ReactNode;
+  addMoreCaption?: string;
+  uploadCSVTooltipContent?: ReactNode;
   errors?: Array<string | undefined>;
   disabled?: boolean;
   placeholder?: string;
-  caption?: string;
-  refs?: {
-    addButtonRef?: Ref<HTMLButtonElement>;
-  };
+  addMoreRef?: Ref<HTMLButtonElement>;
 };
 
-const TOOLTIP_TEXT = (
-  <span>
-    For targeted promos, just enter the stream ticket address your audience hit
-    up. Hover over the stream, click &quot;Copy ticket address&quot;, and paste
-    it here. All streams are listed on{" "}
-    <TextLink
-      className={classes.thisLink}
-      title="this"
-      href="/streams?filters=all"
-    />{" "}
-    page.
-  </span>
-);
 const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   control,
   name,
@@ -58,8 +45,11 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
   labelPosition = "left",
   disabled,
   className,
-  caption,
-  refs,
+  addMoreRef,
+  addMoreText = "Add more",
+  addMoreCaption,
+  addMoreTooltipContent,
+  uploadCSVTooltipContent,
 }: PropsWithClassName<Props<T, K>>): ReactElement => {
   const fieldset = useFieldArray({ control, name });
 
@@ -112,28 +102,32 @@ const DynamicFieldset = <T extends FieldValues, K extends FieldArrayPath<T>>({
             <div className={classes.append}>
               <Button text="Upload.csv" theme="tertiary" disabled />
             </div>
-            <IconTooltip
-              icon="info"
-              placement="bottomRight"
-              title="Next version: easy-peasy address upload from a CSV file!"
-            />
+            {uploadCSVTooltipContent && (
+              <IconTooltip
+                icon="info"
+                placement="bottomRight"
+                title={uploadCSVTooltipContent}
+              />
+            )}
           </div>
           <div className={classes.buttonWithTooltip}>
             <div className={classes.append}>
               <Button
-                ref={refs?.addButtonRef}
-                text="Add address"
+                ref={addMoreRef}
+                text={addMoreText}
                 theme="tertiary"
                 onClick={handleAppend}
                 disabled={disabled}
               />
-              <span className={classes.caption}>{caption}</span>
+              <span className={classes.caption}>{addMoreCaption}</span>
             </div>
-            <IconTooltip
-              icon="info"
-              placement="bottomRight"
-              title={TOOLTIP_TEXT}
-            />
+            {addMoreTooltipContent && (
+              <IconTooltip
+                icon="info"
+                placement="bottomRight"
+                title={addMoreTooltipContent}
+              />
+            )}
           </div>
         </div>
       </ul>
