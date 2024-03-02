@@ -34,6 +34,7 @@ import {
   DynamicFieldset,
   ImageUploader,
   Button,
+  TextLink,
 } from "@promo-shock/ui-kit";
 
 import { writeMetadata } from "./mutations";
@@ -346,14 +347,29 @@ const NewPromo: FC = () => {
               label="Smart contract address:"
               placeholder="x43djvnprjvfbo2ei2e2e"
               name="promo_stream_addresses"
+              addMoreText="Add address"
+              addMoreTooltipContent={
+                <span>
+                  For targeted promos, just enter the stream ticket address your
+                  audience hit up. Hover over the stream, click &quot;Copy
+                  ticket address&quot;, and paste it here. All streams are
+                  listed on{" "}
+                  <TextLink
+                    className={classes.thisLink}
+                    title="this"
+                    external
+                    href="/streams?filters=all"
+                  />{" "}
+                  page.
+                </span>
+              }
+              addMoreCaption={creationPriceString && `+${creationPriceString}`}
+              uploadCSVTooltipContent="Next version: easy-peasy address upload from a CSV file!"
               errors={errors.promo_stream_addresses?.map?.(
                 (error) => error?.value?.message,
               )}
-              refs={{
-                addButtonRef: addMoreElRef,
-              }}
+              addMoreRef={addMoreElRef}
               disabled={pending}
-              caption={creationPriceString && `+${creationPriceString}`}
             />
           </div>
         </div>

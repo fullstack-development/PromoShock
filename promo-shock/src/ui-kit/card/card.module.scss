@@ -105,6 +105,11 @@
 .title {
   color: $goldenPurple;
   font-weight: 500;
+  transition: color 0.3s;
+
+  &:hover {
+    color: $mainPink;
+  }
 }
 
 .cost {

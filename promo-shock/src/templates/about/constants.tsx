@@ -18,8 +18,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
     description: `Backend maestro who always answers: "Why not? We can do this!"`,
     image: kirill_image,
     link: {
-      title: "Twitch",
-      href: "",
+      title: "GitHub",
+      href: "https://github.com/kelizarov",
     },
   },
   {
@@ -38,7 +38,7 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
     image: oleg_image,
     link: {
       title: "GitHub",
-      href: "",
+      href: "https://github.com/Everrest1",
     },
   },
   {
@@ -55,8 +55,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
     description: "UX/UI designer who nails the smooth flow and rocks the style",
     image: masha_image,
     link: {
-      title: "Link",
-      href: "",
+      title: "Telegram",
+      href: "https://t.me/mari_i_ya",
     },
   },
   {
@@ -64,8 +64,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
     description: "UX/UI designer with a keen eye for texts and prioritization",
     image: lulllia_image,
     link: {
-      title: "Link",
-      href: "",
+      title: "Telegram",
+      href: "https://t.me/julya_key09",
     },
   },
   {
@@ -74,8 +74,8 @@ const TEAM_LIST: Array<ComponentProps<typeof TeamMember>> = [
       "Boss and crypto enthusiast. Faces firing if we don't win the hackathon.",
     image: nico_image,
     link: {
-      title: "Link",
-      href: "",
+      title: "Telegram",
+      href: "https://t.me/indigonico",
     },
   },
 ];
