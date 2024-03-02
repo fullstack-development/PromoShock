@@ -24,7 +24,7 @@ import {
   withSwitchNetwork,
 } from "@promo-shock/components";
 // import { api } from "@promo-shock/configs/axios";
-import { api } from "@promo-shock/configs/axios";
+import { apiClient } from "@promo-shock/configs/api";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   Button,
@@ -95,10 +95,10 @@ const NewStreamPass: FC = () => {
               "Congratulations! Your stream pass has been created and will be available for everyone to enjoy soon.",
             );
             try {
-              return api.indexTicketIndexTicketPost(undefined, undefined, {
-                params: {
-                  fromBlock: Number(log.blockNumber - BigInt(5)),
-                  toBlock: Number(log.blockNumber),
+              return apiClient.index_ticket_index_ticket_post(undefined, {
+                queries: {
+                  from_block: Number(log.blockNumber) - 5,
+                  to_block: Number(log.blockNumber),
                 },
               });
             } catch {}

@@ -21,6 +21,7 @@ type Stream = {
 
 type Promo = {
   tokenId: string;
+  ticketAddress: string;
   promoAddress: string;
   name: string;
   description: string;

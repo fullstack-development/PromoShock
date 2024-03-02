@@ -25,7 +25,7 @@ import { withConnect, withSwitchNetwork } from "@promo-shock/components";
 import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
-import { api } from "@promo-shock/configs/axios";
+import { apiClient } from "@promo-shock/configs/api";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
 import {
   RangeDateField,
@@ -126,10 +126,10 @@ const NewPromo: FC = () => {
             );
 
             try {
-              return api.indexPromoIndexPromoPost(undefined, undefined, {
-                params: {
-                  fromBlock: Number(log.blockNumber - BigInt(5)),
-                  toBlock: Number(log.blockNumber),
+              return apiClient.index_promo_index_promo_post(undefined, {
+                queries: {
+                  from_block: Number(log.blockNumber) - 5,
+                  to_block: Number(log.blockNumber),
                 },
               });
             } catch {}

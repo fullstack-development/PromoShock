@@ -1,7 +1,7 @@
 import type { QueryFunction } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
-import { api } from "@promo-shock/configs/axios";
+import { apiClient } from "@promo-shock/configs/api";
 import type { Stream } from "@promo-shock/shared/entities";
 
 const ticketToStreamCard = (
@@ -40,14 +40,14 @@ const fetchStreamCard: QueryFunction<Stream | null, [string, string]> = async ({
 }) => {
   // FIXME :: codegen parameters
   try {
-    const { data } = await api.getStreamTicketTicketAddrGet(address, {
+    const res = await apiClient.get_stream_ticket__ticket_addr__get({
       params: {
-        address,
+        ticket_addr: address,
       },
       signal,
     });
 
-    return ticketToStreamCard(data);
+    return ticketToStreamCard(res);
   } catch (error) {
     if (error instanceof AxiosError && error.response?.status === 404) {
       return null;
@@ -65,22 +65,17 @@ const fetchStreamCards: QueryFunction<Stream[], [string, Filters]> = async ({
   const limit = filters?.limit;
   const owner = filters?.owner?.toLowerCase();
   const buyer = filters?.buyer?.toLowerCase();
-  // TODO :: uncomment when FastAPI will be correctly generated
-  // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
-  //   signal,
-  // });
-  const { data } = await api.allTicketsTicketGet(
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      params: { owner, offset, limit, buyer },
-      signal,
+  const res = await apiClient.all_tickets_ticket_get({
+    queries: {
+      owner,
+      buyer,
+      offset,
+      limit,
     },
-  );
+    signal,
+  });
 
-  return data.map(ticketToStreamCard);
+  return res.map(ticketToStreamCard);
 };
 
 const fetchInfiniteStreamCards: QueryFunction<
@@ -92,24 +87,19 @@ const fetchInfiniteStreamCards: QueryFunction<
   const offset = limit && limit * pageParam;
   const owner = filters?.owner?.toLowerCase();
   const buyer = filters?.buyer?.toLowerCase();
-  // TODO :: uncomment when FastAPI will be correctly generated
-  // const { data } = await api.allTicketsTicketGet(owner, offset, limit, {
-  //   signal,
-  // });
-  const { data } = await api.allTicketsTicketGet(
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      params: { owner, buyer, offset, limit },
-      signal,
+  const res = await apiClient.all_tickets_ticket_get({
+    queries: {
+      owner,
+      buyer,
+      offset,
+      limit,
     },
-  );
+    signal,
+  });
 
   return {
-    items: data.map(ticketToStreamCard),
-    cursor: data.length ? pageParam + 1 : null,
+    items: res.map(ticketToStreamCard),
+    cursor: res.length ? pageParam + 1 : null,
   };
 };
 
