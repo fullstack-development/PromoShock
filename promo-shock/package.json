@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "gen:wagmi": "wagmi generate --config ./wagmi.config.ts",
-    "gen:api": "openapi-generator-cli generate -i ./schemas/openapi.yaml -g typescript-axios -o ./generated/api",
-    "gen:zodios": "openapi-zod-client ./schemas/openapi.yaml --output ./generated/zodios.ts"
+    "gen:api": "openapi-zod-client ./schemas/openapi.yaml --output ./generated/zodios.ts"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
