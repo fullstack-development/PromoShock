@@ -4,8 +4,8 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import type { FC } from "react";
 import { useHover } from "react-use";
-import { erc721Abi } from "viem";
-import { useReadContract } from "wagmi";
+import { erc20Abi, formatUnits } from "viem";
+import { useReadContracts } from "wagmi";
 
 import type { Stream } from "@promo-shock/shared/entities";
 
@@ -37,11 +37,26 @@ export const StreamCard: FC<Props> = ({
   highlight,
   watchOnly,
 }) => {
-  const paymentTokenSymbol = useReadContract({
-    abi: erc721Abi,
-    address: paymentTokenAddress,
-    functionName: "symbol",
+  const tokenInfo = useReadContracts({
+    query: {
+      staleTime: Infinity,
+    },
+    contracts: [
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: paymentTokenAddress,
+        functionName: "decimals",
+      },
+      {
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        abi: erc20Abi,
+        address: paymentTokenAddress,
+        functionName: "symbol",
+      },
+    ],
   });
+  const [tokenDecimals, tokenSymbol] = tokenInfo.data || [];
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
       <div
@@ -122,12 +137,14 @@ export const StreamCard: FC<Props> = ({
                 className={cn(styles.cost, {
                   [styles.cost_lineThrough]:
                     (ticketsAreOut || streamHasFinished) &&
-                    !paymentTokenSymbol.isLoading,
+                    !tokenInfo.isLoading,
                 })}
               >
-                {!paymentTokenSymbol.isLoading
-                  ? paymentTokenSymbol.data
-                    ? `${price} ${paymentTokenSymbol.data}`
+                {!tokenInfo.isLoading
+                  ? tokenDecimals?.result && tokenSymbol?.result
+                    ? `${formatUnits(BigInt(price), tokenDecimals.result)} ${
+                        tokenSymbol.result
+                      }`
                     : price
                   : "loading..."}
               </span>

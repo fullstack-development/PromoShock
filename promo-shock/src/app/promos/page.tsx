@@ -3,9 +3,10 @@ import type { FC } from "react";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
+import { fetchInfinitePromoCards } from "@promo-shock/shared/queries";
 import type { InferQueryKey } from "@promo-shock/shared/types";
 import { getServerAccount } from "@promo-shock/shared/utils/wagmi";
-import { Promos, fetchInfinitePromoCards } from "@promo-shock/templates";
+import { Promos } from "@promo-shock/templates";
 
 const PromosPage: FC<{
   searchParams: { [key: string]: string | string[] | undefined };

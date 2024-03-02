@@ -53,7 +53,7 @@ const Header: FC<Props> = ({ isMirror, gutterBottom }) => {
             <TabLink
               active={pathname.includes("/promos")}
               href="/promos?filters=all"
-              text="Promo"
+              text="Promos"
             />
             <TabLink
               active={pathname.includes("/about")}

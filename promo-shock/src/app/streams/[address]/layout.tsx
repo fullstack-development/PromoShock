@@ -5,7 +5,7 @@ import { isAddress } from "viem";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { WithBreadcrumb } from "@promo-shock/layouts";
-import { fetchStreamCard } from "@promo-shock/templates";
+import { fetchStreamCard } from "@promo-shock/shared/queries";
 
 const StreamLayout: FC<
   PropsWithChildren<{ params: { address: Address } }>

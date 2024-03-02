@@ -3,9 +3,10 @@ import type { FC } from "react";
 
 import { queryClient } from "@promo-shock/configs/query";
 import { web3Config } from "@promo-shock/configs/web3";
+import { fetchInfiniteStreamCards } from "@promo-shock/shared/queries";
 import type { InferQueryKey } from "@promo-shock/shared/types";
 import { getServerAccount } from "@promo-shock/shared/utils/wagmi";
-import { Streams, fetchInfiniteStreamCards } from "@promo-shock/templates";
+import { Streams } from "@promo-shock/templates";
 
 const StreamsPage: FC<{
   searchParams: { [key: string]: string | string[] | undefined };

@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { ReactElement } from "react";
 
-import { Button, Multiselect } from "@promo-shock/ui-kit";
+import { Button, Tag } from "@promo-shock/ui-kit";
 
 import styles from "./card-list.module.scss";
 
@@ -83,6 +83,7 @@ export const CardList = <
   };
 
   const handleFilter = (value: (TFilterKeys | "all")[]) => {
+    console.log(value);
     const params = new URLSearchParams(searchParams.toString());
     let filterKeys: (TFilterKeys | "all")[];
     if (value.length === 0 || value[value.length - 1] === "all") {
@@ -95,15 +96,30 @@ export const CardList = <
     router.replace(pathname + "?" + params.toString(), { scroll: false });
   };
 
+  const createHandleFilterChange =
+    (value: TFilterKeys | "all") => (checked: boolean) => {
+      if (checked) {
+        handleFilter([value]);
+      }
+    };
+
   return (
     <div className={styles.root}>
       {filterOptions && (
         <div className={styles.filter}>
-          <Multiselect
+          {filterOptions.map((option, index) => (
+            <Tag
+              key={index}
+              title={option.label}
+              checked={filterKeys.includes(option.value)}
+              onChange={createHandleFilterChange(option.value)}
+            />
+          ))}
+          {/* <Multiselect
             value={filterKeys}
             options={filterOptions}
             onChange={handleFilter}
-          />
+          /> */}
         </div>
       )}
       <div className={styles.list}>{cards.data?.map(children)}</div>

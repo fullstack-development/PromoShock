@@ -47,6 +47,8 @@ const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
             suffixIcon={false}
             separator="—"
             minDate={min}
+            allowClear={false}
+            format="DD.MM.YYYY"
             {...rest}
           />
         </ErrorWrapper>
