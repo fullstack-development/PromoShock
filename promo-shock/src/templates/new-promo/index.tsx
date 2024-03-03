@@ -244,7 +244,7 @@ const NewPromo: FC = () => {
         <span className={classes.description}>
           Target multiple stream viewers with a single ad without needing
           users&apos; wallet addresses. Just drop the promo. Users will visit
-          your shop, connect their wallets, and make purchases — voilà!
+          your shop, connect their wallets, and make purchases — voilà!{" "}
           <button type="button" onClick={handleStartOnboarding}>
             Show me how
           </button>
