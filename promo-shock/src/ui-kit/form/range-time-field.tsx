@@ -1,12 +1,15 @@
 "use client";
+import { useMask } from "@react-input/mask";
+import { TimePicker } from "antd";
 import cn from "classnames";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { forwardRef } from "react";
-import type { Ref, FC, ChangeEvent } from "react";
+import type { Ref, FC, ReactNode } from "react";
 
 import type { PropsWithClassName } from "@promo-shock/shared/types";
 
+import { TIME_FORMAT } from "./constants";
 import { ErrorWrapper } from "./error-wrapper";
 import classes from "./field.module.scss";
 import { LabelWrapper } from "./label-wrapper";
@@ -16,81 +19,86 @@ type Props = {
   label?: string;
   labelPosition?: "top" | "left";
   defaultValue?: [Dayjs, Dayjs];
+  suffixIcon?: ReactNode;
   min?: Dayjs;
   error?: string;
   disabled?: boolean;
   onChange?(values: [start: Dayjs | null, end: Dayjs | null]): void;
 };
 
-const INPUT_TIME_FORMAT = "HH:mm";
+const RangePicker = TimePicker.RangePicker;
 
-const RangeTimeField: FC<PropsWithClassName<Props>> = forwardRef(
-  (
-    {
-      label,
-      labelPosition = "left",
-      min = dayjs(),
-      className,
-      error,
-      defaultValue,
-      value,
-      onChange,
-      ...rest
+const RangeTimeField: FC<PropsWithClassName<Omit<Props, "placeholder">>> =
+  forwardRef(
+    (
+      {
+        label,
+        labelPosition = "left",
+        min = dayjs(),
+        className,
+        error,
+        ...rest
+      },
+      ref?: Ref<HTMLInputElement>,
+    ) => {
+      const mask_1 = useMask({
+        mask: TIME_FORMAT,
+        replacement: {
+          H: /\d/,
+          m: /\d/,
+        },
+      });
+      const mask_2 = useMask({
+        mask: TIME_FORMAT,
+        replacement: {
+          H: /\d/,
+          m: /\d/,
+        },
+      });
+
+      return (
+        <LabelWrapper
+          label={label}
+          labelPosition={labelPosition}
+          className={className}
+        >
+          <ErrorWrapper message={error}>
+            <RangePicker
+              ref={(target) => {
+                if (ref && typeof ref === "function") {
+                  ref(target);
+                } else if (ref) {
+                  // @ts-expect-error RefObject
+                  ref.current = target;
+                }
+                const [input_1 = null, input_2 = null] =
+                  target?.nativeElement.querySelectorAll("input") || [];
+                mask_1.current = input_1;
+                mask_2.current = input_2;
+              }}
+              className={cn(
+                classes.input,
+
+                error && classes.error,
+              )}
+              placeholder={[
+                dayjs().utc(false).format(TIME_FORMAT),
+                dayjs().utc(false).add(2, "hour").format(TIME_FORMAT),
+              ]}
+              popupClassName={classes.picker}
+              format={TIME_FORMAT}
+              separator="—"
+              minDate={min}
+              changeOnScroll
+              allowClear={{
+                clearIcon: null,
+              }}
+              {...rest}
+            />
+          </ErrorWrapper>
+        </LabelWrapper>
+      );
     },
-    ref?: Ref<HTMLInputElement>,
-  ) => {
-    const minValue = min?.format(INPUT_TIME_FORMAT);
-    const inputStartValue = value?.[0]?.format(INPUT_TIME_FORMAT) || "";
-    const defaultStartInputValue = defaultValue?.[0]?.format(INPUT_TIME_FORMAT);
-    const handleStartChange = (event: ChangeEvent<HTMLInputElement>) => {
-      const time = event.target.value;
-      onChange?.([
-        dayjs(time, INPUT_TIME_FORMAT),
-        value?.[1] || defaultValue?.[1] || null,
-      ]);
-    };
-    const inputEndValue = value?.[1]?.format(INPUT_TIME_FORMAT) || "";
-    const defaultEndInputValue = defaultValue?.[1]?.format(INPUT_TIME_FORMAT);
-    const handleEndChange = (event: ChangeEvent<HTMLInputElement>) => {
-      const time = event.target.value;
-      onChange?.([
-        value?.[0] || defaultValue?.[0] || null,
-        dayjs(time, INPUT_TIME_FORMAT),
-      ]);
-    };
-
-    return (
-      <LabelWrapper
-        label={label}
-        labelPosition={labelPosition}
-        className={className}
-      >
-        <ErrorWrapper message={error}>
-          <input
-            value={inputStartValue}
-            onChange={handleStartChange}
-            type="time"
-            ref={ref}
-            className={cn(classes.input, classes.timepicker)}
-            defaultValue={defaultStartInputValue}
-            min={minValue}
-            {...rest}
-          />
-          {" — "}
-          <input
-            value={inputEndValue}
-            onChange={handleEndChange}
-            type="time"
-            ref={ref}
-            className={cn(classes.input, classes.timepicker)}
-            defaultValue={defaultEndInputValue}
-            min={minValue}
-            {...rest}
-          />
-        </ErrorWrapper>
-      </LabelWrapper>
-    );
-  },
-);
+  );
 
 export { RangeTimeField };

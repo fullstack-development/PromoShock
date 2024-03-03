@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import type { Address } from "viem";
 import { z } from "zod";
 
@@ -48,6 +49,9 @@ const formSchema = z.object({
     })
     .refine(([start, end]) => end.diff(start, "day") !== 0, {
       message: "Sale time must be at least 1 day",
+    })
+    .refine(([start]) => start.isAfter(dayjs().subtract(1, "day")), {
+      message: "Sale cannot be in the past",
     }),
   promo_shopping_link: z.string({
     errorMap: (issue) =>
@@ -60,7 +64,7 @@ const formSchema = z.object({
       value: zAddress({
         errorMap: (issue) =>
           issue.code === z.ZodIssueCode.invalid_type
-            ? { message: "Address is required" }
+            ? { message: "Invalid address or empty field" }
             : { message: issue.message || "Invalid value" },
       }).refine(supportsInterface, {
         message: "Given address is not a ticket",

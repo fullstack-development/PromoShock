@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { ComponentProps, FC } from "react";
 import { useHover } from "react-use";
-import { parseUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 import { useAccount } from "wagmi";
 
 import {
@@ -172,7 +172,10 @@ export const Stream: FC<Props> = ({
             text={
               purchased
                 ? "You already have access"
-                : `Pay ${price} ${paymentTokenSymbol} and buy access`
+                : `Pay ${formatUnits(
+                    BigInt(price),
+                    paymentTokenDecimals,
+                  )} ${paymentTokenSymbol} and buy access`
             }
             loading={loading || pending}
             tokenAddress={paymentTokenAddress}

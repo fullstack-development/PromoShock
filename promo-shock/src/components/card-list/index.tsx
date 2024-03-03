@@ -83,7 +83,6 @@ export const CardList = <
   };
 
   const handleFilter = (value: (TFilterKeys | "all")[]) => {
-    console.log(value);
     const params = new URLSearchParams(searchParams.toString());
     let filterKeys: (TFilterKeys | "all")[];
     if (value.length === 0 || value[value.length - 1] === "all") {
