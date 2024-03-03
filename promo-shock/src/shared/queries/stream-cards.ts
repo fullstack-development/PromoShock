@@ -19,8 +19,7 @@ const apiTicketToStreamCard = (
   price: stream.price,
   startDate: Number(stream.start_date) * 1000,
   endDate:
-    (Number(stream.end_date) || Number(stream.start_date) + 60 * 60 * 24) *
-    1000,
+    (Number(stream.end_date) || Number(stream.start_date) + 60 * 60) * 1000,
   streamLink: stream.stream_link,
   streamerLink: stream.streamer_link,
   saleStartDate: Number(stream.sale_start_date) * 1000,
@@ -42,7 +41,7 @@ const subgraphStreamToStreamCard = (stream: any): Stream => ({
   startDate: Number(stream.metadata.start_time) * 1000,
   endDate:
     (Number(stream.metadata.end_time) ||
-      Number(stream.metadata.start_time) + 60 * 60 * 24) * 1000,
+      Number(stream.metadata.start_time) + 60 * 60) * 1000,
   streamLink: stream.metadata.stream_link,
   streamerLink: stream.metadata.streamer_link,
   saleStartDate: Number(stream.saleStartDate) * 1000,
