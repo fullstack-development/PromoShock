@@ -38,9 +38,10 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 
 
 @app.post("/index/start")
-async def start_index(from_block: int = 37553211, to_block: Optional[int] = None):
+async def start_index():
     repo = SqlAlchemyRepository(get_session())
-    toBlock = "latest" if to_block is None else to_block
+    current_block = await web3.eth.block_number
+    from_block = current_block - (15 * 60)  # last 15 mins
     ticket_indexer = NftIndexer(
         web3,
         repo,
@@ -54,14 +55,14 @@ async def start_index(from_block: int = 37553211, to_block: Optional[int] = None
         get_promo_factory_abi(),
     )
     # TODO: run async
-    await ticket_indexer.start_index(from_block=from_block, to_block=toBlock)
-    await ticket_indexer.index_ticket_bought_event(from_block, to_block=toBlock)
-    await promo_indexer.start_index(from_block=from_block, to_block=toBlock)
-    await promo_indexer.index_promo(from_block=from_block, to_block=toBlock)
+    await ticket_indexer.start_index(from_block=from_block)
+    await ticket_indexer.index_ticket_bought_event(from_block=from_block)
+    await promo_indexer.start_index(from_block=from_block)
+    await promo_indexer.index_promo(from_block=from_block)
 
 
 @app.post("/index/ticket")
-async def index_ticket(from_block: int = 37553211, to_block: Optional[int] = None):
+async def index_ticket(from_block: int, to_block: Optional[int] = None):
     repo = SqlAlchemyRepository(get_session())
     toBlock = "latest" if to_block is None else to_block
     ticket_indexer = NftIndexer(
@@ -75,7 +76,7 @@ async def index_ticket(from_block: int = 37553211, to_block: Optional[int] = Non
 
 
 @app.post("/index/promo")
-async def index_promo(from_block: int = 37553211, to_block: Optional[int] = None):
+async def index_promo(from_block: int, to_block: Optional[int] = None):
     repo = SqlAlchemyRepository(get_session())
     toBlock = "latest" if to_block is None else to_block
     promo_indexer = NftIndexer(
@@ -238,6 +239,7 @@ async def all_promos(
     if stream:
         promo_to_tickets = repo.filter(PromoToTicket, {"ticket_addr": stream})
         promo_addresses = [a.promo_addr for a in promo_to_tickets]
+        logger.info(promo_addresses)
         promos = repo.filter_in(
             Promo,
             Promo.promo_addr,

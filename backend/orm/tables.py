@@ -110,7 +110,6 @@ promo_to_ticket_table = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("promo_addr", String(256)),
     Column("ticket_addr", String(256)),
-    Column("token_id", Integer),
 )
 
 
