@@ -155,7 +155,9 @@ const NewPromo: FC = () => {
         shopping_link: data.promo_shopping_link,
       })
       .catch(() => {
-        showErrorMessage("Failed to upload metadata");
+        showErrorMessage(
+          "Oops! Something went wrong while uploading the metadata. Please try again later.",
+        );
         setPending(false);
       });
     const now = dayjs();
@@ -192,7 +194,9 @@ const NewPromo: FC = () => {
         setEstimatedGasForCreatePromo(estimatedGas);
       })(),
     ]).catch(() => {
-      showErrorMessage("Failed to create promo");
+      showErrorMessage(
+        "Oops! Something went wrong while creating the promo. Please try again later.",
+      );
       setPending(false);
     });
   };

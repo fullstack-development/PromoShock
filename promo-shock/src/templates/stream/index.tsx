@@ -24,6 +24,7 @@ import {
   withConnect,
   withSwitchNetwork,
 } from "@promo-shock/components";
+import { useErrorMessage, useSuccessMessage } from "@promo-shock/services";
 import type { Stream as StreamType } from "@promo-shock/shared/entities";
 import { fetchStreamCard, fetchPromoCards } from "@promo-shock/shared/queries";
 import type { InferQueryKey } from "@promo-shock/shared/types";
@@ -75,6 +76,8 @@ export const Stream: FC<Props> = ({
     totalAmount,
     reservedAmount,
   } = stream.data as StreamType;
+  const showErrorMessage = useErrorMessage();
+  const showSuccessMessage = useSuccessMessage();
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
       <div
@@ -129,8 +132,13 @@ export const Stream: FC<Props> = ({
         purchased: true,
       }));
       setBought(true);
-    } catch (e) {
-      console.error(e);
+      showSuccessMessage(
+        "Congratulations! You've successfully secured your ticket!",
+      );
+    } catch {
+      showErrorMessage(
+        "Oops! Something went wrong while trying to buy a ticket. Please try again later.",
+      );
     } finally {
       setPending(false);
     }

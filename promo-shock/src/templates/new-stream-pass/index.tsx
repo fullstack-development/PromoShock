@@ -134,7 +134,9 @@ const NewStreamPass: FC = () => {
         banner: data.stream_banner.originFileObj!,
       })
       .catch(() => {
-        showErrorMessage("Failed to upload metadata");
+        showErrorMessage(
+          "Oops! Something went wrong while uploading metadata. Please try again later.",
+        );
         setPending(false);
       });
     const now = dayjs();
@@ -173,7 +175,9 @@ const NewStreamPass: FC = () => {
         setEstimatedGasForCreateStream(estimatedGas);
       })(),
     ]).catch(() => {
-      showErrorMessage("Failed to create stream");
+      showErrorMessage(
+        "Oops! Something went wrong while creating the stream. Please try again later.",
+      );
       setPending(false);
     });
   };
