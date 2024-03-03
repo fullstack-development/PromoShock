@@ -60,7 +60,7 @@ const formSchema = z.object({
       value: zAddress({
         errorMap: (issue) =>
           issue.code === z.ZodIssueCode.invalid_type
-            ? { message: "Address is required" }
+            ? { message: "Invalid address or empty field" }
             : { message: issue.message || "Invalid value" },
       }).refine(supportsInterface, {
         message: "Given address is not a ticket",
