@@ -305,7 +305,7 @@ const NewPromo: FC = () => {
               render={({ field }) => (
                 <TextField
                   label="Link to shopping:"
-                  placeholder="heretowatch.com"
+                  placeholder="https://promoshock.metalamp.io/"
                   className={classes.column_1_field}
                   error={errors.promo_shopping_link?.message}
                   disabled={pending}
