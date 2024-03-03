@@ -1,10 +1,12 @@
 import type { QueryFunction } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { gql } from "graphql-request";
 
 import { apiClient } from "@promo-shock/configs/api";
+import { graphql } from "@promo-shock/configs/graphql";
 import type { Stream } from "@promo-shock/shared/entities";
 
-const ticketToStreamCard = (
+const apiTicketToStreamCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stream: any,
 ): Stream => ({
@@ -17,14 +19,36 @@ const ticketToStreamCard = (
   price: stream.price,
   startDate: Number(stream.start_date) * 1000,
   endDate:
-    Number(stream.end_date) ||
-    (Number(stream.start_date) + 60 * 60 * 24) * 1000,
+    (Number(stream.end_date) || Number(stream.start_date) + 60 * 60 * 24) *
+    1000,
   streamLink: stream.stream_link,
   streamerLink: stream.streamer_link,
   saleStartDate: Number(stream.sale_start_date) * 1000,
   saleEndDate: Number(stream.sale_end_date) * 1000,
   totalAmount: stream.total_amount,
   reservedAmount: stream.reserved_amount,
+  purchased: stream.purchased,
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const subgraphStreamToStreamCard = (stream: any): Stream => ({
+  saleAddress: stream.saleAddress,
+  ticketAddress: stream.ticketAddress,
+  paymentTokenAddress: stream.paymentTokenAddress,
+  name: stream.metadata.name,
+  description: stream.metadata.description,
+  banner: stream.metadata.banner,
+  price: stream.price,
+  startDate: Number(stream.metadata.start_time) * 1000,
+  endDate:
+    (Number(stream.metadata.end_time) ||
+      Number(stream.metadata.start_time) + 60 * 60 * 24) * 1000,
+  streamLink: stream.metadata.stream_link,
+  streamerLink: stream.metadata.streamer_link,
+  saleStartDate: Number(stream.saleStartDate) * 1000,
+  saleEndDate: Number(stream.saleEndDate) * 1000,
+  totalAmount: Number(stream.totalAmount),
+  reservedAmount: Number(stream.reservedAmount),
   purchased: stream.purchased,
 });
 
@@ -40,14 +64,38 @@ const fetchStreamCard: QueryFunction<Stream | null, [string, string]> = async ({
 }) => {
   // FIXME :: codegen parameters
   try {
-    const res = await apiClient.get_stream_ticket__ticket_addr__get({
-      params: {
-        ticket_addr: address,
-      },
+    graphql.requestConfig.signal = signal;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res: any = await graphql.request({
+      document: gql`
+        query StreamQuery($id: Bytes!) {
+          stream(id: $id) {
+            metadata {
+              banner
+              description
+              name
+              start_time
+              stream_link
+              streamer_link
+            }
+            owner
+            paymentTokenAddress
+            purchased
+            price
+            reservedAmount
+            saleAddress
+            saleEndDate
+            saleStartDate
+            ticketAddress
+            totalAmount
+          }
+        }
+      `,
       signal,
+      variables: { id: address },
     });
 
-    return ticketToStreamCard(res);
+    return subgraphStreamToStreamCard(res.stream);
   } catch (error) {
     if (error instanceof AxiosError && error.response?.status === 404) {
       return null;
@@ -75,7 +123,7 @@ const fetchStreamCards: QueryFunction<Stream[], [string, Filters]> = async ({
     signal,
   });
 
-  return res.map(ticketToStreamCard);
+  return res.map(apiTicketToStreamCard);
 };
 
 const fetchInfiniteStreamCards: QueryFunction<
@@ -98,7 +146,7 @@ const fetchInfiniteStreamCards: QueryFunction<
   });
 
   return {
-    items: res.map(ticketToStreamCard),
+    items: res.map(apiTicketToStreamCard),
     cursor: res.length ? pageParam + 1 : null,
   };
 };

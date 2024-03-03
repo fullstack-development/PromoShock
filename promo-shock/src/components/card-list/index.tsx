@@ -19,7 +19,7 @@ type Props<
 > = {
   queryFn: QueryFn;
   queryKey: QueryKey;
-  children: (item: TValue) => ReactElement;
+  children: (item: TValue, idx: number) => ReactElement;
   initialData?: InfiniteData<QueryValue, number>;
   filterOptions?: { label: string; value: TFilterKeys | "all" }[];
   defaultFilterKeys?: TFilterKeys[];

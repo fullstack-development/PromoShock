@@ -1,12 +1,13 @@
 "use client";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
-import type { ComponentProps, FC } from "react";
+import type { FC } from "react";
 import { useHover } from "react-use";
 import { formatUnits } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useWatchBlocks } from "wagmi";
 
 import {
   useReadTicketBalanceOf,
@@ -20,14 +21,17 @@ import {
   withSwitchNetwork,
 } from "@promo-shock/components";
 import type { Stream as StreamType } from "@promo-shock/shared/entities";
+import { fetchStreamCard, fetchPromoCards } from "@promo-shock/shared/queries";
+import type { InferQueryKey } from "@promo-shock/shared/types";
 import { Button, PromoCard, CopyToClipboard } from "@promo-shock/ui-kit";
 
 import styles from "./stream.module.scss";
 
-type Props = Omit<StreamType, "purchased"> & {
+type Props = {
+  queryKey: InferQueryKey<typeof fetchStreamCard>;
+  promosQueryKey: InferQueryKey<typeof fetchPromoCards>;
   paymentTokenSymbol: string;
   paymentTokenDecimals: number;
-  promos: Array<ComponentProps<typeof PromoCard>>;
 };
 
 const TxButton = withApprove(
@@ -35,25 +39,38 @@ const TxButton = withApprove(
 );
 
 export const Stream: FC<Props> = ({
-  name,
-  startDate: startDateUnix,
-  endDate: endDateUnix,
-  description,
-  saleAddress,
-  ticketAddress,
-  paymentTokenAddress,
+  queryKey,
+  promosQueryKey,
   paymentTokenSymbol,
   paymentTokenDecimals,
-  saleEndDate: saleEndDateUnix,
-  saleStartDate: saleStartDateUnix,
-  streamerLink,
-  streamLink,
-  banner,
-  price,
-  totalAmount,
-  reservedAmount,
-  promos,
 }) => {
+  const stream = useQuery({
+    queryKey,
+    queryFn: fetchStreamCard,
+    placeholderData: keepPreviousData,
+  });
+  const promos = useQuery({
+    queryKey: promosQueryKey,
+    queryFn: fetchPromoCards,
+    placeholderData: keepPreviousData,
+  });
+  const {
+    name,
+    startDate: startDateUnix,
+    endDate: endDateUnix,
+    description,
+    saleAddress,
+    ticketAddress,
+    paymentTokenAddress,
+    saleEndDate: saleEndDateUnix,
+    saleStartDate: saleStartDateUnix,
+    streamerLink,
+    streamLink,
+    banner,
+    price,
+    totalAmount,
+    reservedAmount,
+  } = stream.data as StreamType;
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
       <div
@@ -80,6 +97,12 @@ export const Stream: FC<Props> = ({
   const accountTicketBalance = useReadTicketBalanceOf({
     address: ticketAddress,
     args: account.address && [account.address],
+  });
+  useWatchBlocks({
+    onBlock: () => {
+      stream.refetch();
+      promos.refetch();
+    },
   });
 
   const now = dayjs.utc();
@@ -203,11 +226,11 @@ export const Stream: FC<Props> = ({
         </div>
       </div>
 
-      {promos.length > 0 && <h3 className={styles.h3}>Promos</h3>}
+      {(promos.data?.length || 0) > 0 && <h3 className={styles.h3}>Promos</h3>}
 
       <div className={styles.promoList}>
-        {promos.map((promo) => (
-          <PromoCard key={promo.tokenId} {...promo} />
+        {promos.data?.map((promo) => (
+          <PromoCard key={promo.tokenId + promo.promoAddress} {...promo} />
         ))}
       </div>
     </main>
