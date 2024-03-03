@@ -35,3 +35,4 @@ class Promo:
 class PromoToTicket:
     promo_addr: Address
     ticket_addr: Address
+    token_id: int

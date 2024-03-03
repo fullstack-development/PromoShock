@@ -41,7 +41,7 @@ if os.environ.get("ENV") == "DEVELOPMENT":
 async def start_index():
     repo = SqlAlchemyRepository(get_session())
     current_block = await web3.eth.block_number
-    from_block = current_block - (15 * 60)  # last 15 mins
+    from_block = current_block - (60 * 60)  # last 60 mins
     ticket_indexer = NftIndexer(
         web3,
         repo,

@@ -301,6 +301,7 @@ class NftIndexer:
                         promo_to_ticket = PromoToTicket(
                             promo_addr=promo_addr.lower(),
                             ticket_addr=stream_addr.lower(),
+                            token_id=token_id,
                         )
                         if (
                             self._repository.get(
@@ -308,6 +309,7 @@ class NftIndexer:
                                 {
                                     "promo_addr": promo_addr.lower(),
                                     "ticket_addr": stream_addr.lower(),
+                                    "token_id": token_id,
                                 },
                             )
                             is None
