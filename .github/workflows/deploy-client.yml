@@ -8,8 +8,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.actor }}/promoshockclient:$GITHUB_SHA
   NEXT_PUBLIC_BSC_RPC_URL: https://go.getblock.io/08f6675f7e1642f5ac69505ff84235f3
-  NEXT_PUBLIC_BSC_CHAIN_ID: 97
-  NEXT_PUBLIC_IS_TESTNET: true
+  NEXT_PUBLIC_BSC_CHAIN_ID: "97"
+  NEXT_PUBLIC_IS_TESTNET: "true"
 
 jobs:
   publish:
