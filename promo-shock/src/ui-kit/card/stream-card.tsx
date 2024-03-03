@@ -68,7 +68,7 @@ export const StreamCard: FC<Props> = ({
         <CopyToClipboard text={ticketAddress} message="Copy ticket address" />
       </div>
 
-      <Link href={`/stream/${ticketAddress}`}>
+      <Link href={`/streams/${ticketAddress}`}>
         <Image
           className={styles.image}
           fill
