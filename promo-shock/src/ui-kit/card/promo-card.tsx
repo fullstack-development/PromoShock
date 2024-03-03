@@ -11,6 +11,7 @@ import { Link } from "../link";
 type Props = {
   tokenId: string;
   promoAddress: string;
+  ticketAddress: string;
   name: string;
   description: string;
   cover: string;
@@ -28,9 +29,17 @@ export const PromoCard: FC<Props> = ({
   shoppingLink,
   description,
   highlighted,
+  ticketAddress,
 }) => {
   const startDate = dayjs(startDateUnix);
   const endDate = dayjs(endDateUnix);
+  const handleGetCoupon = async () => {
+    try {
+      await navigator.clipboard.writeText(ticketAddress);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <div className={styles.wrap}>
       {highlighted && <div className={styles.highlight}></div>}
@@ -63,10 +72,12 @@ export const PromoCard: FC<Props> = ({
 
         <div className={cn(styles.center, styles.bottomDivider)}>
           <Button
-            text="Go shopping"
+            text="Get coupon and go shopping"
             theme="primary"
             size="medium"
             href={shoppingLink}
+            external
+            onClick={handleGetCoupon}
           />
         </div>
       </div>

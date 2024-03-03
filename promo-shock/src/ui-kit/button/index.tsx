@@ -11,6 +11,7 @@ type Props = {
   text: string;
   type?: "button" | "submit";
   href?: string;
+  external?: boolean;
   size?: "medium" | "big" | "large" | "largeWide" | "small";
   disabled?: boolean;
   loading?: boolean;
@@ -32,6 +33,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
       onClick,
       className,
       error,
+      external,
       theme = "primary",
       size = "medium",
       fullwidth,
@@ -67,7 +69,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
     );
 
     return href ? (
-      <Link href={href} passHref legacyBehavior>
+      <Link href={href} external={external} passHref legacyBehavior>
         {button}
       </Link>
     ) : (
