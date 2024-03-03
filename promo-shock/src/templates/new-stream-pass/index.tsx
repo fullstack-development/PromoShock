@@ -191,6 +191,7 @@ const NewStreamPass: FC = () => {
                   {...field}
                   disabled={pending}
                   aspectRatio="416/307"
+                  error={errors.stream_banner?.message}
                   placeholder="Upload banner"
                   accept="image/jpeg, image/png"
                 />
@@ -364,6 +365,7 @@ const NewStreamPass: FC = () => {
                 <ImageUploader
                   {...field}
                   disabled={pending}
+                  error={errors.stream_image?.message}
                   aspectRatio="416/307"
                   placeholder="Upload NFT image"
                   accept="image/jpeg, image/png"

@@ -13,6 +13,7 @@ declare global {
       NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS: Address;
       NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS: Address;
       NEXT_PUBLIC_METADATA_EXTERNAL_LINK: string;
+      NEXT_PUBLIC_SUBGRAPH_URL: string;
     }
   }
 }

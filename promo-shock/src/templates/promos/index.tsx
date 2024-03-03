@@ -55,9 +55,9 @@ const Promos: FC<Props> = ({ queryKey }) => {
           buyer: filterKeys.includes("buyer") ? account.address : undefined,
         })}
       >
-        {(promo: Promo) => (
+        {(promo: Promo, idx: number) => (
           <PromoCard
-            key={promo.tokenId}
+            key={promo.tokenId + promo.promoAddress + idx.toString()}
             highlighted={promo.promoAddress === highlightAddress}
             {...promo}
           />

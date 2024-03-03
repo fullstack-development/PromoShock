@@ -10,7 +10,7 @@ type Filters = {
   limit?: number;
 };
 
-const promoToPromoCard = (
+const apiPromoToPromoCard = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promo: any,
   ticketAddress: string,
@@ -48,7 +48,7 @@ const fetchPromoCards: QueryFunction<Promo[], [string, Filters]> = async ({
       (promos, inputPromo) => [
         ...promos,
         ...inputPromo.tickets.map((ticket) =>
-          promoToPromoCard(inputPromo, ticket.ticket_addr),
+          apiPromoToPromoCard(inputPromo, ticket.ticket_addr),
         ),
       ],
       [] as Promo[],
@@ -63,15 +63,17 @@ const fetchPromoCards: QueryFunction<Promo[], [string, Filters]> = async ({
       },
       signal,
     });
-    return res.reduce(
-      (promos, inputPromo) => [
-        ...promos,
-        ...inputPromo.tickets.map((ticket) =>
-          promoToPromoCard(inputPromo, ticket.ticket_addr),
-        ),
-      ],
-      [] as Promo[],
-    );
+    return stream
+      ? res.map((inputPromo) => apiPromoToPromoCard(inputPromo, stream))
+      : res.reduce(
+          (promos, inputPromo) => [
+            ...promos,
+            ...inputPromo.tickets.map((ticket) =>
+              apiPromoToPromoCard(inputPromo, ticket.ticket_addr),
+            ),
+          ],
+          [] as Promo[],
+        );
   }
 };
 
@@ -99,7 +101,7 @@ const fetchInfinitePromoCards: QueryFunction<
         (promos, inputPromo) => [
           ...promos,
           ...inputPromo.tickets.map((ticket) =>
-            promoToPromoCard(inputPromo, ticket.ticket_addr),
+            apiPromoToPromoCard(inputPromo, ticket.ticket_addr),
           ),
         ],
         [] as Promo[],
@@ -117,15 +119,17 @@ const fetchInfinitePromoCards: QueryFunction<
       signal,
     });
     return {
-      items: res.reduce(
-        (promos, inputPromo) => [
-          ...promos,
-          ...inputPromo.tickets.map((ticket) =>
-            promoToPromoCard(inputPromo, ticket.ticket_addr),
+      items: stream
+        ? res.map((inputPromo) => apiPromoToPromoCard(inputPromo, stream))
+        : res.reduce(
+            (promos, inputPromo) => [
+              ...promos,
+              ...inputPromo.tickets.map((ticket) =>
+                apiPromoToPromoCard(inputPromo, ticket.ticket_addr),
+              ),
+            ],
+            [] as Promo[],
           ),
-        ],
-        [] as Promo[],
-      ),
       cursor: res.length ? pageParam + 1 : null,
     };
   }
