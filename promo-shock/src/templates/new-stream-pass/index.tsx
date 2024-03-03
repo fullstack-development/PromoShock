@@ -242,8 +242,7 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Link to watch stream:"
-                  placeholder="heretowatch.com"
-                  prefix="https://"
+                  placeholder="https://promoshock.metalamp.io/"
                   error={errors.stream_link?.message}
                 />
               )}
@@ -348,8 +347,7 @@ const NewStreamPass: FC = () => {
                 disabled={pending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Link to follow you:"
-                placeholder="heretowatch.com"
-                prefix="https://"
+                placeholder="https://promoshock.metalamp.io/"
                 error={errors.streamer_link?.message}
               />
             )}
