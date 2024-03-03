@@ -329,7 +329,9 @@ class NftIndexer:
             result = await asyncio.to_thread(requests.get, url)
             return result.json()
 
-    async def index_ticket_bought_event(self, from_block, to_block):
+    async def index_ticket_bought_event(
+        self, from_block, to_block: BlockIdentifier = "latest"
+    ):
         tickets: List[Ticket] = self._repository.filter(Ticket, {})
         logger.info(
             f"Indexing TicketBoughtEvent for {len(tickets)} tickets from '{from_block}' to '{to_block}'"
@@ -409,9 +411,7 @@ class NftIndexer:
                 await self._index_ticket(ticket_sale_event.ticket_addr)
                 logger.info(f"Indexed ticket {ticket_sale_event.ticket_addr}")
             elif topic_name == "PromotionCreated":
-                promo_created_event = await self._index_promo_created_event(
-                    log, pattern
-                )
+                await self._index_promo_created_event(log, pattern)
 
         logger.info("Index complete")
 
