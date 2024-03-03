@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { ComponentProps, FC } from "react";
 import { useHover } from "react-use";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import { useAccount } from "wagmi";
 
 import {
@@ -179,7 +179,7 @@ export const Stream: FC<Props> = ({
             }
             loading={loading || pending}
             tokenAddress={paymentTokenAddress}
-            tokenAmount={parseUnits(price.toString(), paymentTokenDecimals)}
+            tokenAmount={BigInt(price)}
             recipientAddress={saleAddress}
             disabled={disabled}
             onClick={handleBuy}

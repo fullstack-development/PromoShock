@@ -16,7 +16,7 @@ const pinJSONToIPFS = async (
   if (pinataOptions) json.pinataOptions = pinataOptions;
   if (pinataMetadata) json.pinataMetadata = pinataMetadata;
 
-  const response = await fetch("/api/pinJSONToIPFS", {
+  const response = await fetch("/next-api/pinJSONToIPFS", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

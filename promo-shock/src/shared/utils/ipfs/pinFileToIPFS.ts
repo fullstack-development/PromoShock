@@ -10,7 +10,7 @@ const pinFIleToIPFS = async (
   if (options) formData.append("pinataOptions", JSON.stringify(options));
   if (metadata) formData.append("pinataMetadata", JSON.stringify(metadata));
 
-  const response = await fetch("/api/pinFileToIPFS", {
+  const response = await fetch("/next-api/pinFileToIPFS", {
     method: "POST",
     body: formData,
   });
