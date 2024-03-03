@@ -175,7 +175,6 @@ const NewStreamPass: FC = () => {
   };
 
   const loading = tokenDecimals.isLoading || pending;
-  console.log(loading);
 
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
