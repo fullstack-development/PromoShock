@@ -321,7 +321,6 @@ const NewPromo: FC = () => {
                 <RangeDateField
                   label="Promotional period"
                   className={classes.column_1_field}
-                  placeholder={["13.12.2024", "24.12.2042"]}
                   error={errors.promo_sale_time?.message}
                   disabled={pending}
                   {...field}

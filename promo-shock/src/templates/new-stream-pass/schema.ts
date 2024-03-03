@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { z } from "zod";
 
 import { zDayjs, zUploadFile } from "@promo-shock/shared/utils/zod";
@@ -33,6 +34,9 @@ const formSchema = z.object({
     })
     .refine(([start, end]) => end.diff(start, "day") <= 30, {
       message: "Sale time must be at most 30 days",
+    })
+    .refine(([start]) => start.isAfter(dayjs().subtract(1, "day")), {
+      message: "Sale cannot be in the past",
     }),
   stream_description: z
     .string({
@@ -50,6 +54,8 @@ const formSchema = z.object({
   }),
   stream_date: zDayjs({
     message: "Date is required",
+  }).refine((date) => date.isAfter(dayjs().subtract(1, "day")), {
+    message: "Stream cannot be in the past",
   }),
   stream_time: z.tuple([zDayjs(), zDayjs()], {
     errorMap: (issue) =>

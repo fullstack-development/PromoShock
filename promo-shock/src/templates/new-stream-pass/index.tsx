@@ -260,7 +260,6 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Date to watch:"
-                  placeholder="13.12.2024"
                   error={errors.stream_date?.message}
                 />
               )}
@@ -282,7 +281,6 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Time to watch:"
-                  placeholder={["13:00", "14:00"]}
                   suffixIcon="UTC time zone"
                   error={errors.stream_time?.message}
                 />
@@ -337,7 +335,6 @@ const NewStreamPass: FC = () => {
                 disabled={pending}
                 className={classNames(classes.col_1, classes.contents)}
                 label="Selling passes period:"
-                placeholder={["13.12.2024", "14.12.2024"]}
                 error={errors.stream_sale_time?.message}
               />
             )}
