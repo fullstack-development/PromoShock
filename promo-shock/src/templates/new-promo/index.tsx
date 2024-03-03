@@ -242,13 +242,12 @@ const NewPromo: FC = () => {
       <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
         <h1 className={classes.title}>New Promo</h1>
         <span className={classes.description}>
-          Target multiple stream viewers with a single ad without needing users
-          wallet address. Just drop the promo. Users will visit your shop,
-          connect their wallet, and make purchases — voilà.{" "}
+          Target multiple stream viewers with a single ad without needing
+          users&apos; wallet addresses. Just drop the promo. Users will visit
+          your shop, connect their wallets, and make purchases — voilà!
           <button type="button" onClick={handleStartOnboarding}>
-            More
+            Show me how
           </button>
-          .
         </span>
         <div className={classes.grid}>
           <div
