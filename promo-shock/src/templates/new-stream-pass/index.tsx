@@ -243,7 +243,6 @@ const NewStreamPass: FC = () => {
                   className={classNames(classes.col_1, classes.contents)}
                   label="Link to watch stream:"
                   placeholder="heretowatch.com"
-                  prefix="https://"
                   error={errors.stream_link?.message}
                 />
               )}
@@ -349,7 +348,6 @@ const NewStreamPass: FC = () => {
                 className={classNames(classes.col_1, classes.contents)}
                 label="Link to follow you:"
                 placeholder="heretowatch.com"
-                prefix="https://"
                 error={errors.streamer_link?.message}
               />
             )}
