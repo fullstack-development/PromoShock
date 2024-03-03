@@ -44,10 +44,13 @@ const RangeDateField: FC<PropsWithClassName<Props>> = forwardRef(
           <RangePicker
             ref={ref}
             className={classes.input}
-            suffixIcon={false}
             separator="—"
             minDate={min}
-            allowClear={false}
+            allowClear={{
+              clearIcon: false,
+            }}
+            popupClassName={classes.picker}
+            suffixIcon={false}
             format="DD.MM.YYYY"
             {...rest}
           />

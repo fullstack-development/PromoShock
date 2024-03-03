@@ -43,8 +43,11 @@ const DateField: FC<PropsWithClassName<Props>> = forwardRef(
             ref={ref}
             className={classes.input}
             suffixIcon={false}
+            allowClear={{
+              clearIcon: false,
+            }}
+            popupClassName={classes.picker}
             minDate={min}
-            allowClear={false}
             format="DD.MM.YYYY"
             {...rest}
           />

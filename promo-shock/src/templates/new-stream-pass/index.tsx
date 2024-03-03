@@ -265,8 +265,6 @@ const NewStreamPass: FC = () => {
                 />
               )}
             />
-
-            <span className={classes.utcLabel}>UTC time zone</span>
           </div>
           <div
             className={classNames(
@@ -284,6 +282,8 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Time to watch:"
+                  placeholder={["13:00", "14:00"]}
+                  suffixIcon="UTC time zone"
                   error={errors.stream_time?.message}
                 />
               )}
