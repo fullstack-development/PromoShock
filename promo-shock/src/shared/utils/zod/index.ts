@@ -11,7 +11,7 @@ const zUploadFile = (params?: RawCreateParams) =>
     {
       originFileObj:
         typeof window === "undefined"
-          ? z.custom(() => true)
+          ? z.custom<File>(() => true)
           : z.instanceof(File),
     },
     params,

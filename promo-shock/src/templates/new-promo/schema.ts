@@ -27,6 +27,8 @@ const formSchema = z.object({
       issue.code === z.ZodIssueCode.invalid_type
         ? { message: "Cover is required" }
         : { message: issue.message || "Invalid value" },
+  }).refine((file) => file.originFileObj.size < 2 * 1024 * 1024, {
+    message: "Cover size must be less than 2MB",
   }),
   promo_name: z.string({
     errorMap: (issue) =>
