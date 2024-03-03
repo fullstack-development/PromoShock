@@ -97,7 +97,7 @@ const NewStreamPass: FC = () => {
             try {
               return apiClient.index_ticket_index_ticket_post(undefined, {
                 queries: {
-                  from_block: Number(log.blockNumber) - 5,
+                  from_block: Number(log.blockNumber) - 50,
                   to_block: Number(log.blockNumber),
                 },
               });

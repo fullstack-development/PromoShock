@@ -128,7 +128,7 @@ const NewPromo: FC = () => {
             try {
               return apiClient.index_promo_index_promo_post(undefined, {
                 queries: {
-                  from_block: Number(log.blockNumber) - 5,
+                  from_block: Number(log.blockNumber) - 50,
                   to_block: Number(log.blockNumber),
                 },
               });
