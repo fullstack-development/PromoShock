@@ -27,6 +27,7 @@ import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance
 // import { api } from "@promo-shock/configs/axios";
 import { apiClient } from "@promo-shock/configs/api";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
+import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
   RangeDateField,
   TextArea,
@@ -106,9 +107,10 @@ const NewPromo: FC = () => {
     ],
   });
   const [pending, setPending] = useState(false);
+  const isCmdCtrlPressed = useCmdCtrlPressed();
 
   useConfirmLeave(
-    isDirty,
+    isDirty && !isCmdCtrlPressed,
     "Are you sure you want to leave the page? Data is not saved",
   );
 
@@ -119,7 +121,7 @@ const NewPromo: FC = () => {
         ? async (logs) => {
             const [log] = logs;
             router.push(
-              `/streams?highlight_address=${log?.args?.promotion?.promoAddr?.toLowerCase()}&filters=owner`,
+              `/promos?highlight_address=${log?.args?.promotion?.promoAddr?.toLowerCase()}&filters=owner`,
             );
             showSuccessMessage(
               "Congratulations! Your promo has been successfully created and will be listed shortly.",

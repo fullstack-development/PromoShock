@@ -26,6 +26,7 @@ import {
 // import { api } from "@promo-shock/configs/axios";
 import { apiClient } from "@promo-shock/configs/api";
 import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
+import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
   Button,
   DateField,
@@ -76,9 +77,10 @@ const NewStreamPass: FC = () => {
       staleTime: Infinity,
     },
   });
+  const isCmdCtrlPressed = useCmdCtrlPressed();
 
   useConfirmLeave(
-    isDirty,
+    isDirty && !isCmdCtrlPressed,
     "Are you sure you want to leave the page? Data is not saved",
   );
 
@@ -173,7 +175,6 @@ const NewStreamPass: FC = () => {
   };
 
   const loading = tokenDecimals.isLoading || pending;
-  console.log(loading);
 
   return (
     <form className={classes.root} onSubmit={handleSubmit(submitHandler)}>
@@ -264,8 +265,6 @@ const NewStreamPass: FC = () => {
                 />
               )}
             />
-
-            <span className={classes.utcLabel}>UTC time zone</span>
           </div>
           <div
             className={classNames(
@@ -283,6 +282,8 @@ const NewStreamPass: FC = () => {
                   disabled={pending}
                   className={classNames(classes.col_1, classes.contents)}
                   label="Time to watch:"
+                  placeholder={["13:00", "14:00"]}
+                  suffixIcon="UTC time zone"
                   error={errors.stream_time?.message}
                 />
               )}
