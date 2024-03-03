@@ -26,7 +26,11 @@ import { withApprove } from "@promo-shock/components/tx-button/with-approve";
 import { withBalanceCheck } from "@promo-shock/components/tx-button/with-balance-check";
 // import { api } from "@promo-shock/configs/axios";
 import { apiClient } from "@promo-shock/configs/api";
-import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
+import {
+  useConfirmLeave,
+  useErrorMessage,
+  useSuccessMessage,
+} from "@promo-shock/services";
 import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
   RangeDateField,
@@ -55,6 +59,7 @@ const NewPromo: FC = () => {
   const addMoreElRef = useRef<HTMLButtonElement | null>(null);
   const fieldsElRef = useRef<HTMLDivElement | null>(null);
   const showSuccessMessage = useSuccessMessage();
+  const showErrorMessage = useErrorMessage();
   const router = useRouter();
   const account = useAccount();
   const config = useConfig();
@@ -142,51 +147,54 @@ const NewPromo: FC = () => {
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     setPending(true);
-    try {
-      const metadataCid = await metadata.mutateAsync({
+    const metadataCid = await metadata
+      .mutateAsync({
         name: data.promo_name,
         description: data.promo_description,
         image: data.promo_cover.originFileObj!,
         shopping_link: data.promo_shopping_link,
+      })
+      .catch(() => {
+        showErrorMessage("Failed to upload metadata");
+        setPending(false);
       });
-      const now = dayjs();
-      const args = [
-        {
-          startTime: BigInt(
-            data.promo_sale_time[0].isBefore(now)
-              ? now.add(5, "minute").utc(false).unix()
-              : data.promo_sale_time[0].utc(false).unix(),
-          ),
-          endTime: BigInt(data.promo_sale_time[1].utc(false).unix()),
-          promoAddr: process.env.NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS,
-          streams: data.promo_stream_addresses.map((address) => address.value),
-          description: data.promo_description,
-        },
-        `https://ipfs.io/ipfs/${metadataCid}`,
-      ] as const;
-      await Promise.all([
-        createPromo.writeContractAsync({
-          args,
-          chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
-        }),
-        (async () => {
-          const simulatedCreateStream = await simulatePromoFactoryCreatePromo(
-            config,
-            {
-              args,
-              chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
-            },
-          );
-          const estimatedGas =
-            client &&
-            (await estimateContractGas(client, simulatedCreateStream.request));
-          setEstimatedGasForCreatePromo(estimatedGas);
-        })(),
-      ]);
-    } catch (error) {
+    const now = dayjs();
+    const args = [
+      {
+        startTime: BigInt(
+          data.promo_sale_time[0].isBefore(now)
+            ? now.add(5, "minute").utc(false).unix()
+            : data.promo_sale_time[0].utc(false).unix(),
+        ),
+        endTime: BigInt(data.promo_sale_time[1].utc(false).unix()),
+        promoAddr: process.env.NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS,
+        streams: data.promo_stream_addresses.map((address) => address.value),
+        description: data.promo_description,
+      },
+      `https://ipfs.io/ipfs/${metadataCid}`,
+    ] as const;
+    await Promise.all([
+      createPromo.writeContractAsync({
+        args,
+        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+      }),
+      (async () => {
+        const simulatedCreateStream = await simulatePromoFactoryCreatePromo(
+          config,
+          {
+            args,
+            chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+          },
+        );
+        const estimatedGas =
+          client &&
+          (await estimateContractGas(client, simulatedCreateStream.request));
+        setEstimatedGasForCreatePromo(estimatedGas);
+      })(),
+    ]).catch(() => {
+      showErrorMessage("Failed to create promo");
       setPending(false);
-      console.error(error);
-    }
+    });
   };
 
   const handleStartOnboarding = () => {

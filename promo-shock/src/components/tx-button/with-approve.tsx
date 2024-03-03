@@ -14,6 +14,7 @@ import {
 import { waitForTransactionReceipt } from "wagmi/actions";
 
 import { web3Config } from "@promo-shock/configs/web3";
+import { useErrorMessage, useSuccessMessage } from "@promo-shock/services";
 import type { Button } from "@promo-shock/ui-kit";
 
 type Props<T extends ComponentProps<typeof Button>> = {
@@ -28,6 +29,8 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
 ) => {
   return forwardRef<HTMLButtonElement, Props<T>>(
     function WithApprove(props, ref) {
+      const showErrorMessage = useErrorMessage();
+      const showSuccessMessage = useSuccessMessage();
       const [pending, setPending] = useState(false);
       const queryClient = useQueryClient();
       const account = useAccount();
@@ -88,9 +91,9 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
             await queryClient.invalidateQueries({
               queryKey: tokenAllowance.queryKey,
             });
-          } catch (e) {
-            // TODO :: handle error
-            console.error(e);
+            showSuccessMessage("Approved");
+          } catch {
+            showErrorMessage("Failed to approve");
           } finally {
             setPending(false);
           }

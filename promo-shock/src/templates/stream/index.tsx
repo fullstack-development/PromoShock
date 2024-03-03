@@ -1,5 +1,9 @@
 "use client";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import cn from "classnames";
 import dayjs from "dayjs";
 import Image from "next/image";
@@ -7,7 +11,7 @@ import { useState } from "react";
 import type { FC } from "react";
 import { useHover } from "react-use";
 import { formatUnits } from "viem";
-import { useAccount, useWatchBlocks } from "wagmi";
+import { useAccount } from "wagmi";
 
 import {
   useReadTicketBalanceOf,
@@ -93,16 +97,11 @@ export const Stream: FC<Props> = ({
   const buy = useWriteTicketSaleBuy();
   const [pending, setPending] = useState(false);
   const [bought, setBought] = useState(false);
+  const queryClient = useQueryClient();
   const account = useAccount();
   const accountTicketBalance = useReadTicketBalanceOf({
     address: ticketAddress,
     args: account.address && [account.address],
-  });
-  useWatchBlocks({
-    onBlock: () => {
-      stream.refetch();
-      promos.refetch();
-    },
   });
 
   const now = dayjs.utc();
@@ -124,6 +123,11 @@ export const Stream: FC<Props> = ({
         address: saleAddress,
         chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
       });
+      queryClient.setQueryData(queryKey, (prev: StreamType) => ({
+        ...prev,
+        reservedAmount: prev.reservedAmount + 1,
+        purchased: true,
+      }));
       setBought(true);
     } catch (e) {
       console.error(e);
