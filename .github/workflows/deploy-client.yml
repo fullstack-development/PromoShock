@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/promoshockclient:$GITHUB_SHA
+  IMAGE_NAME: promoshockclient:$GITHUB_SHA
   NEXT_PUBLIC_BSC_RPC_URL: https://go.getblock.io/08f6675f7e1642f5ac69505ff84235f3
   NEXT_PUBLIC_BSC_CHAIN_ID: "97"
   NEXT_PUBLIC_IS_TESTNET: "true"
@@ -25,7 +25,7 @@ jobs:
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: Build and Publish
       run: |
-        docker build promo-shock --tag ${{ env.IMAGE_NAME }} --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_WC_PROJECT_ID=${{secrets.NEXT_PUBLIC_WC_PROJECT_ID}} --build-arg NEXT_PUBLIC_IS_TESTNET=${{env.NEXT_PUBLIC_IS_TESTNET}} --build-arg NEXT_PUBLIC_BSC_CHAIN_ID=${{env.NEXT_PUBLIC_BSC_CHAIN_ID}} --build-arg NEXT_PUBLIC_BSC_RPC_URL=${{env.NEXT_PUBLIC_BSC_RPC_URL}} --build-arg NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_METADATA_EXTERNAL_LINK=${{secrets.NEXT_PUBLIC_METADATA_EXTERNAL_LINK}} --build-arg PINATA_API_JWT=${{secrets.PINATA_API_JWT}} --build-arg PINATA_API_KEY=${{secrets.PINATA_API_KEY}} --build-arg PINATA_API_SECRET_KEY=${{secrets.PINATA_API_SECRET_KEY}}
+        docker build promo-shock --tag ${{ env.IMAGE_NAME }} --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_WC_PROJECT_ID=${{secrets.NEXT_PUBLIC_WC_PROJECT_ID}} --build-arg NEXT_PUBLIC_IS_TESTNET=${{env.NEXT_PUBLIC_IS_TESTNET}} --build-arg NEXT_PUBLIC_BSC_CHAIN_ID=${{env.NEXT_PUBLIC_BSC_CHAIN_ID}} --build-arg NEXT_PUBLIC_BSC_RPC_URL=${{env.NEXT_PUBLIC_BSC_RPC_URL}} --build-arg NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_TICKET_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PROMO_FACTORY_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS}} --build-arg NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS=${{secrets.NEXT_PUBLIC_BSC_PROMO_TOKEN_ADDRESS}} --build-arg NEXT_PUBLIC_METADATA_EXTERNAL_LINK=${{secrets.NEXT_PUBLIC_METADATA_EXTERNAL_LINK}} --build-arg PINATA_API_JWT=${{secrets.PINATA_API_JWT}} --build-arg PINATA_API_KEY=${{secrets.PINATA_API_KEY}} --build-arg PINATA_API_SECRET_KEY=${{secrets.PINATA_API_SECRET_KEY}}
         docker save ${{ env.IMAGE_NAME }} | ssh -C ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker load && cd ${{ secrets.WORKDIR }} && GIT_COMMIT=$GITHUB_SHA docker-compose up -d && exit" 
     - name: cleanup
       run: rm -rf ~/.ssh

@@ -33,8 +33,6 @@ WORKDIR /app
 COPY . .
 
 RUN npm install
-RUN npm run gen:wagmi
-RUN npm run gen:api
 RUN npm run build
 
 CMD ["npm", "run", "start"]
