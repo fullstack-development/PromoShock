@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { FC } from "react";
 
 import styles from "./card.module.scss";
+import { placeholder_png } from "./images";
 import { Button } from "../button";
 import { Link } from "../link";
 
@@ -53,7 +54,7 @@ export const PromoCard: FC<Props> = ({
             className={cn(styles.image)}
             width={360}
             height={255}
-            src={cover}
+            src={cover || placeholder_png}
             alt="stream cover"
           />
         </Link>

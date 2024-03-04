@@ -10,6 +10,7 @@ import { useReadContracts } from "wagmi";
 import type { Stream } from "@promo-shock/shared/entities";
 
 import styles from "./card.module.scss";
+import { placeholder_png } from "./images";
 import { Button } from "../button";
 import { CopyToClipboard } from "../copy-to-clipboard";
 import { Link } from "../link";
@@ -73,7 +74,7 @@ export const StreamCard: FC<Props> = ({
           className={styles.image}
           fill
           sizes="33vw"
-          src={banner || ""}
+          src={banner || placeholder_png}
           alt="stream banner"
         />
       </Link>
