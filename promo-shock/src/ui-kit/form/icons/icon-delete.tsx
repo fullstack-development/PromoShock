@@ -13,14 +13,14 @@ export const IconDelete = () => (
     <path
       d="M16 19V24"
       stroke="#F759AB"
-      stroke-width="2.5"
-      stroke-linecap="round"
+      strokeWidth="2.5"
+      strokeLinecap="round"
     />
     <path
       d="M21 19V24"
       stroke="#F759AB"
-      stroke-width="2.5"
-      stroke-linecap="round"
+      strokeWidth="2.5"
+      strokeLinecap="round"
     />
   </svg>
 );
