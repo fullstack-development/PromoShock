@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { FC } from "react";
 import { useHover } from "react-use";
-import { formatUnits } from "viem";
+import { BaseError, UserRejectedRequestError, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 
 import {
@@ -24,7 +24,11 @@ import {
   withConnect,
   withSwitchNetwork,
 } from "@promo-shock/components";
-import { useErrorMessage, useSuccessMessage } from "@promo-shock/services";
+import {
+  useErrorMessage,
+  useSuccessMessage,
+  useWarningMessage,
+} from "@promo-shock/services";
 import type { Stream as StreamType } from "@promo-shock/shared/entities";
 import { fetchStreamCard, fetchPromoCards } from "@promo-shock/shared/queries";
 import type { InferQueryKey } from "@promo-shock/shared/types";
@@ -78,6 +82,7 @@ export const Stream: FC<Props> = ({
   } = stream.data as StreamType;
   const showErrorMessage = useErrorMessage();
   const showSuccessMessage = useSuccessMessage();
+  const showWarningMessage = useWarningMessage();
   const [imageElement] = useHover((hovered) => (
     <div className={styles.image_wrap}>
       <div
@@ -137,9 +142,15 @@ export const Stream: FC<Props> = ({
       );
     } catch (e) {
       console.error(e);
-      showErrorMessage(
-        "Oops! Something went wrong while trying to buy a ticket. Please try again later.",
-      );
+      if (e instanceof BaseError) {
+        if (e.walk((err) => err instanceof UserRejectedRequestError)) {
+          showWarningMessage("You've rejected the request :(");
+        } else {
+          showErrorMessage(
+            "Oops! Something went wrong while trying to buy a ticket. Please try again later.",
+          );
+        }
+      }
     } finally {
       setPending(false);
     }

@@ -8,7 +8,12 @@ import { useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { erc20Abi, parseUnits } from "viem";
+import {
+  BaseError,
+  UserRejectedRequestError,
+  erc20Abi,
+  parseUnits,
+} from "viem";
 import { estimateContractGas } from "viem/actions";
 import { useAccount, useClient, useConfig, useReadContract } from "wagmi";
 
@@ -29,6 +34,7 @@ import {
   useConfirmLeave,
   useErrorMessage,
   useSuccessMessage,
+  useWarningMessage,
 } from "@promo-shock/services";
 import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
@@ -52,6 +58,7 @@ const TxButton = withBalanceCheck(withSwitchNetwork(withConnect(Button)));
 const NewStreamPass: FC = () => {
   const showSuccessMessage = useSuccessMessage();
   const showErrorMessage = useErrorMessage();
+  const showWarningMessage = useWarningMessage();
   const {
     control,
     formState: { errors, isDirty },
@@ -175,9 +182,15 @@ const NewStreamPass: FC = () => {
       ]);
     } catch (e) {
       console.error(e);
-      showErrorMessage(
-        "Oops! Something went wrong while creating the stream. Please try again later.",
-      );
+      if (e instanceof BaseError) {
+        if (e.walk((err) => err instanceof UserRejectedRequestError)) {
+          showWarningMessage("You've rejected the request :(");
+        } else {
+          showErrorMessage(
+            "Oops! Something went wrong while creating the stream. Please try again later.",
+          );
+        }
+      }
       setPending(false);
     }
   };

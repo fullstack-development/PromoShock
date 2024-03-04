@@ -40,11 +40,11 @@
 
   &_warning {
     & :global(.ant-message-notice-content) {
-      background-color: #FFF8E6 !important; 
-      border: 1px solid #FFC53D !important;
+      background-color: #FFF0F6 !important; 
+      border: 1px solid #F759AB !important;
 
       span:last-child {
-        color: #FFC53D !important;
+        color: #F759AB !important;
       }
     }
   }

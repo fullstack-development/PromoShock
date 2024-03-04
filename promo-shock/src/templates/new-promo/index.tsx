@@ -8,7 +8,12 @@ import { useRef, useState } from "react";
 import type { FC } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { erc20Abi, formatUnits } from "viem";
+import {
+  BaseError,
+  UserRejectedRequestError,
+  erc20Abi,
+  formatUnits,
+} from "viem";
 import type { Address } from "viem";
 import { estimateContractGas } from "viem/actions";
 import { useAccount, useClient, useConfig, useReadContracts } from "wagmi";
@@ -30,6 +35,7 @@ import {
   useConfirmLeave,
   useErrorMessage,
   useSuccessMessage,
+  useWarningMessage,
 } from "@promo-shock/services";
 import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
@@ -60,6 +66,7 @@ const NewPromo: FC = () => {
   const fieldsElRef = useRef<HTMLDivElement | null>(null);
   const showSuccessMessage = useSuccessMessage();
   const showErrorMessage = useErrorMessage();
+  const showWarningMessage = useWarningMessage();
   const router = useRouter();
   const account = useAccount();
   const config = useConfig();
@@ -190,9 +197,15 @@ const NewPromo: FC = () => {
       ]);
     } catch (e) {
       console.error(e);
-      showErrorMessage(
-        "Oops! Something went wrong while creating the promo. Please try again later.",
-      );
+      if (e instanceof BaseError) {
+        if (e.walk((err) => err instanceof UserRejectedRequestError)) {
+          showWarningMessage("You've rejected the request :(");
+        } else {
+          showErrorMessage(
+            "Oops! Something went wrong while creating the promo. Please try again later.",
+          );
+        }
+      }
       setPending(false);
     }
   };
