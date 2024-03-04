@@ -81,7 +81,7 @@ const formSchema = z.object({
         ? { message: "Banner is required" }
         : { message: issue.message || "Invalid input" },
   }).refine((file) => file.originFileObj.size < 2 * 1024 * 1024, {
-    message: "Banner size must be less than 2MB",
+    message: "Banner size must be less than 1MB",
   }),
   stream_image: zUploadFile({
     errorMap: (issue) =>
@@ -89,7 +89,7 @@ const formSchema = z.object({
         ? { message: "Image is required" }
         : { message: issue.message || "Invalid input" },
   }).refine((file) => file.originFileObj.size < 2 * 1024 * 1024, {
-    message: "Image size must be less than 2MB",
+    message: "Image size must be less than 1MB",
   }),
 });
 
