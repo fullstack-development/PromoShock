@@ -92,7 +92,8 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
               queryKey: tokenAllowance.queryKey,
             });
             showSuccessMessage("Approved");
-          } catch {
+          } catch (e) {
+            console.error(e);
             showErrorMessage("Failed to approve");
           } finally {
             setPending(false);

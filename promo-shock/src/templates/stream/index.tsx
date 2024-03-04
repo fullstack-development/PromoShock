@@ -135,7 +135,8 @@ export const Stream: FC<Props> = ({
       showSuccessMessage(
         "Congratulations! You've successfully secured your ticket!",
       );
-    } catch {
+    } catch (e) {
+      console.error(e);
       showErrorMessage(
         "Oops! Something went wrong while trying to buy a ticket. Please try again later.",
       );

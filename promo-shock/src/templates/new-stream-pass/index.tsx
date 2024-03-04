@@ -25,7 +25,11 @@ import {
 } from "@promo-shock/components";
 // import { api } from "@promo-shock/configs/axios";
 import { apiClient } from "@promo-shock/configs/api";
-import { useConfirmLeave, useSuccessMessage } from "@promo-shock/services";
+import {
+  useConfirmLeave,
+  useErrorMessage,
+  useSuccessMessage,
+} from "@promo-shock/services";
 import { useCmdCtrlPressed } from "@promo-shock/shared/hooks";
 import {
   Button,
@@ -47,7 +51,7 @@ const TxButton = withBalanceCheck(withSwitchNetwork(withConnect(Button)));
 
 const NewStreamPass: FC = () => {
   const showSuccessMessage = useSuccessMessage();
-  const showErrorMessage = useSuccessMessage();
+  const showErrorMessage = useErrorMessage();
   const {
     control,
     formState: { errors, isDirty },
@@ -133,7 +137,8 @@ const NewStreamPass: FC = () => {
         image: data.stream_image.originFileObj!,
         banner: data.stream_banner.originFileObj!,
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error(e);
         showErrorMessage(
           "Oops! Something went wrong while uploading metadata. Please try again later.",
         );
@@ -174,7 +179,8 @@ const NewStreamPass: FC = () => {
           (await estimateContractGas(client, simulatedCreateStream.request));
         setEstimatedGasForCreateStream(estimatedGas);
       })(),
-    ]).catch(() => {
+    ]).catch((e) => {
+      console.error(e);
       showErrorMessage(
         "Oops! Something went wrong while creating the stream. Please try again later.",
       );

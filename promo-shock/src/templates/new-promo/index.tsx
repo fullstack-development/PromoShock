@@ -154,7 +154,8 @@ const NewPromo: FC = () => {
         image: data.promo_cover.originFileObj!,
         shopping_link: data.promo_shopping_link,
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error(e);
         showErrorMessage(
           "Oops! Something went wrong while uploading the metadata. Please try again later.",
         );
@@ -193,7 +194,8 @@ const NewPromo: FC = () => {
           (await estimateContractGas(client, simulatedCreateStream.request));
         setEstimatedGasForCreatePromo(estimatedGas);
       })(),
-    ]).catch(() => {
+    ]).catch((e) => {
+      console.error(e);
       showErrorMessage(
         "Oops! Something went wrong while creating the promo. Please try again later.",
       );
