@@ -2,6 +2,8 @@
 
 PromoShock Backend is a Python project for indexing information stored on BNB for TicketFactory and PromoFactory contracts. Powered by FastAPI and SQLAlchemy.
 
+This indexer can be implemented in the backend of streaming platforms for tracking the availability of NFT tickets for stream access, as well as on the website of any store that runs promotions on our site. For this, both the streaming platform and the store must have the functionality of wallet connection integrated in any convenient implementation for the service.
+
 ## Installation
 
 Use [pipenv](https://pipenv.pypa.io/en/latest/) to run and install the project.
