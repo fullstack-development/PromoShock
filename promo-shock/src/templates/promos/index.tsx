@@ -50,7 +50,7 @@ const Promos: FC<Props> = ({ queryKey }) => {
             { label: "I received", value: "buyer" },
             { label: "I created", value: "owner" },
           ] as const
-        ).filter((item) => item.value === "all" || account.address)}
+        ).filter((item) => item.value === "all" || !!account.address)}
         mapKeysToFilter={(filterKeys) => ({
           owner: filterKeys.includes("owner") ? account.address : undefined,
           buyer: filterKeys.includes("buyer") ? account.address : undefined,
