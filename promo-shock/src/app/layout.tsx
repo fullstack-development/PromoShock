@@ -14,6 +14,7 @@ import { web3Config } from "@promo-shock/configs/web3";
 import { BaseLayout } from "@promo-shock/layouts";
 
 import { RootProvider } from "./provider";
+
 import "./index.css";
 
 const bowlbyOne = Bowlby_One({
@@ -40,11 +41,9 @@ const metadata: Metadata = {
   title: "PromoShock",
 };
 
-const RootLayout: FC<PropsWithChildren> = ({ children }) => {
-  const web3InitialState = cookieToInitialState(
-    web3Config,
-    headers().get("cookie"),
-  );
+const RootLayout: FC<PropsWithChildren> = ({ children }: PropsWithChildren) => {
+  const cookies = headers().get("cookie");
+  const web3InitialState = cookieToInitialState(web3Config, cookies);
   return (
     <html lang="en">
       <body

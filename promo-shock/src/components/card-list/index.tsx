@@ -26,6 +26,7 @@ type Props<
   mapKeysToFilter?: QueryKey extends [string, filters: infer Filters]
     ? (filterKeys: (TFilterKeys | "all")[]) => Filters
     : never;
+  enablePagination?: boolean;
 };
 
 export const CardList = <
@@ -43,6 +44,7 @@ export const CardList = <
   mapKeysToFilter,
   defaultFilterKeys,
   filterOptions,
+  enablePagination = true,
 }: Props<
   TValue,
   TFilters,
@@ -122,7 +124,7 @@ export const CardList = <
         </div>
       )}
       <div className={styles.list}>{cards.data?.map(children)}</div>
-      {cards.hasNextPage && (
+      {cards.hasNextPage && enablePagination && (
         <Button
           text="Get more"
           size="medium"

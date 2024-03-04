@@ -1,9 +1,7 @@
-import { headers } from "next/headers";
-import type { Config } from "wagmi";
-import { cookieToInitialState } from "wagmi";
+import { web3StateContext } from "./web3StateContext";
 
-const getServerAccount = (config: Config) => {
-  const initialState = cookieToInitialState(config, headers().get("cookie"));
+const getServerAccount = () => {
+  const initialState = web3StateContext.get();
   const address = initialState?.current
     ? initialState?.connections.get(initialState.current)?.accounts[0]
     : undefined;
