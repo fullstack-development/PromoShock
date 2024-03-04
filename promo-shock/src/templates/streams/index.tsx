@@ -43,7 +43,12 @@ export const Streams: FC<Props> = ({ queryKey }) => {
         defaultFilterKeys={
           isValidFilterKeys ? searchParamsFilterKeys : undefined
         }
-        emptyStateMessage="Oops, looks like you haven't snagged any tickets yet, so it's kinda empty here!"
+        emptyStateMessage={
+          <>
+            Oops, looks like you haven&apos;t snagged any tickets yet, so
+            it&apos;s kinda empty here!
+          </>
+        }
         filterOptions={(
           [
             { label: "All", value: "all" },

@@ -26,4 +26,14 @@
   font-size: 20px;
   line-height: 32px;
   text-align: center;
+
+  a {
+    color: #9254DE;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #F759AB;
+    }
+  }
 }

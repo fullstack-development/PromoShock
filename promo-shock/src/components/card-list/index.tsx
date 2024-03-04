@@ -3,7 +3,7 @@ import type { InfiniteData, QueryFunction } from "@tanstack/react-query";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import { Button, Tag } from "@promo-shock/ui-kit";
 
@@ -19,7 +19,7 @@ type Props<
 > = {
   queryFn: QueryFn;
   queryKey: QueryKey;
-  emptyStateMessage?: string;
+  emptyStateMessage?: ReactNode;
   children: (item: TValue, idx: number) => ReactElement;
   initialData?: InfiniteData<QueryValue, number>;
   filterOptions?: { label: string; value: TFilterKeys | "all" }[];

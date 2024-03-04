@@ -7,7 +7,7 @@ import { CardList } from "@promo-shock/components";
 import type { Promo } from "@promo-shock/shared/entities";
 import { fetchInfinitePromoCards } from "@promo-shock/shared/queries";
 import type { InferQueryKey } from "@promo-shock/shared/types";
-import { Button, PromoCard } from "@promo-shock/ui-kit";
+import { Button, Link, PromoCard } from "@promo-shock/ui-kit";
 
 import styles from "./promos.module.scss";
 
@@ -40,7 +40,13 @@ const Promos: FC<Props> = ({ queryKey }) => {
       <CardList
         queryKey={queryKey}
         queryFn={fetchInfinitePromoCards}
-        emptyStateMessage="Oops, you don't have any promos yet. Grab a ticket to the stream to check out the promos available!"
+        emptyStateMessage={
+          <>
+            Oops, you don&apos;t have any promos yet.{" "}
+            <Link href="/streams?filters=all">Grab a ticket to the stream</Link>{" "}
+            to check out the promos available!
+          </>
+        }
         defaultFilterKeys={
           isValidFilterKeys ? searchParamsFilterKeys : undefined
         }
