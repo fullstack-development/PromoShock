@@ -10,6 +10,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   BaseError,
+  InsufficientFundsError,
   UserRejectedRequestError,
   erc20Abi,
   formatUnits,
@@ -200,6 +201,8 @@ const NewPromo: FC = () => {
       if (e instanceof BaseError) {
         if (e.walk((err) => err instanceof UserRejectedRequestError)) {
           showWarningMessage("You've rejected the request :(");
+        } else if (e.walk((e) => e instanceof InsufficientFundsError)) {
+          showErrorMessage("Insufficient funds to cover the gas fee");
         } else {
           showErrorMessage(
             "Oops! Something went wrong while creating the promo. Please try again later.",

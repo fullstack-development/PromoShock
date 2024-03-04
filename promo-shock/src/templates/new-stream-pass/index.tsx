@@ -10,6 +10,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import {
   BaseError,
+  InsufficientFundsError,
   UserRejectedRequestError,
   erc20Abi,
   parseUnits,
@@ -185,6 +186,8 @@ const NewStreamPass: FC = () => {
       if (e instanceof BaseError) {
         if (e.walk((err) => err instanceof UserRejectedRequestError)) {
           showWarningMessage("You've rejected the request :(");
+        } else if (e.walk((e) => e instanceof InsufficientFundsError)) {
+          showErrorMessage("Insufficient funds to cover the gas fee");
         } else {
           showErrorMessage(
             "Oops! Something went wrong while creating the stream. Please try again later.",

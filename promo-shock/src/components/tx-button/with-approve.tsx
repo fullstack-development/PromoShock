@@ -2,7 +2,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { forwardRef, useState } from "react";
 import type { ComponentProps, FC, MouseEventHandler } from "react";
-import { erc20Abi, formatUnits } from "viem";
+import {
+  BaseError,
+  InsufficientFundsError,
+  UserRejectedRequestError,
+  erc20Abi,
+  formatUnits,
+} from "viem";
 import type { Address } from "viem";
 import {
   useAccount,
@@ -14,7 +20,11 @@ import {
 import { waitForTransactionReceipt } from "wagmi/actions";
 
 import { web3Config } from "@promo-shock/configs/web3";
-import { useErrorMessage, useSuccessMessage } from "@promo-shock/services";
+import {
+  useErrorMessage,
+  useSuccessMessage,
+  useWarningMessage,
+} from "@promo-shock/services";
 import type { Button } from "@promo-shock/ui-kit";
 
 type Props<T extends ComponentProps<typeof Button>> = {
@@ -31,6 +41,7 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
     function WithApprove(props, ref) {
       const showErrorMessage = useErrorMessage();
       const showSuccessMessage = useSuccessMessage();
+      const showWarningMessage = useWarningMessage();
       const [pending, setPending] = useState(false);
       const queryClient = useQueryClient();
       const account = useAccount();
@@ -94,7 +105,15 @@ const withApprove = <T extends ComponentProps<typeof Button>>(
             showSuccessMessage("Approved");
           } catch (e) {
             console.error(e);
-            showErrorMessage("Failed to approve");
+            if (e instanceof BaseError) {
+              if (e.walk((err) => err instanceof UserRejectedRequestError)) {
+                showWarningMessage("You've rejected the request :(");
+              } else if (e.walk((e) => e instanceof InsufficientFundsError)) {
+                showErrorMessage("Insufficient funds to cover the gas fee");
+              } else {
+                showErrorMessage("Failed to approve");
+              }
+            }
           } finally {
             setPending(false);
           }

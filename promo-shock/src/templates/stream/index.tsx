@@ -10,7 +10,12 @@ import Image from "next/image";
 import { useState } from "react";
 import type { FC } from "react";
 import { useHover } from "react-use";
-import { BaseError, UserRejectedRequestError, formatUnits } from "viem";
+import {
+  BaseError,
+  InsufficientFundsError,
+  UserRejectedRequestError,
+  formatUnits,
+} from "viem";
 import { useAccount } from "wagmi";
 
 import {
@@ -145,6 +150,8 @@ export const Stream: FC<Props> = ({
       if (e instanceof BaseError) {
         if (e.walk((err) => err instanceof UserRejectedRequestError)) {
           showWarningMessage("You've rejected the request :(");
+        } else if (e.walk((e) => e instanceof InsufficientFundsError)) {
+          showErrorMessage("Insufficient funds to cover the gas fee");
         } else {
           showErrorMessage(
             "Oops! Something went wrong while trying to buy a ticket. Please try again later.",
