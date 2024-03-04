@@ -31,7 +31,10 @@ const georama = Georama({
   subsets: ["latin"],
   variable: "--font-georama",
 });
-const W95FA = localFont({ src: "../../public/fonts/W95FA.otf" });
+const W95FA = localFont({
+  src: "../../public/fonts/W95FA.otf",
+  variable: "--font-w95fa",
+});
 
 const metadata: Metadata = {
   title: "PromoShock",
@@ -47,6 +50,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => {
       <body
         className={cn(
           W95FA.className,
+          W95FA.variable,
           bowlbyOne.variable,
           bowlbyOneSC.variable,
           georama.variable,

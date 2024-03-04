@@ -1,4 +1,6 @@
+"use client";
 import { message } from "antd";
+import classNames from "classnames";
 import type { FC, PropsWithChildren } from "react";
 import { createContext, useContext } from "react";
 
@@ -21,13 +23,29 @@ const MessageProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const messageApiWithStyle = {
     success: (str: string) =>
-      messageApi.success({ className: styles.root, content: str }),
+      messageApi.success({
+        icon: null,
+        className: classNames(styles.root, styles.root_success),
+        content: str,
+      }),
     error: (str: string) =>
-      messageApi.error({ className: styles.root, content: str }),
+      messageApi.error({
+        icon: null,
+        className: classNames(styles.root, styles.root_error),
+        content: str,
+      }),
     info: (str: string) =>
-      messageApi.info({ className: styles.root, content: str }),
+      messageApi.info({
+        icon: null,
+        className: classNames(styles.root, styles.root_info),
+        content: str,
+      }),
     warning: (str: string) =>
-      messageApi.warning({ className: styles.root, content: str }),
+      messageApi.warning({
+        icon: null,
+        className: classNames(styles.root, styles.root_warning),
+        content: str,
+      }),
   };
 
   return (
