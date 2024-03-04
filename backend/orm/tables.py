@@ -15,7 +15,7 @@ from domain.ticket import Ticket, TicketBoughtEvent, TicketSale, TicketSaleCreat
 
 metadata = MetaData()
 mapper = registry()
-engine = create_engine(get_postgres_uri())
+engine = create_engine(get_postgres_uri(), pool_size=10, max_overflow=20)
 get_session = sessionmaker(bind=engine)
 
 ticket_sale_created_table = Table(
