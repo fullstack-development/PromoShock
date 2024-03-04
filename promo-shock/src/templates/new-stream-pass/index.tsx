@@ -116,8 +116,8 @@ const NewStreamPass: FC = () => {
   const submitHandler: SubmitHandler<FormData> = async (data, e) => {
     e?.preventDefault();
     setPending(true);
-    const metadataCid = await metadata
-      .mutateAsync({
+    try {
+      const metadataCid = await metadata.mutateAsync({
         name: data.stream_name,
         description: data.stream_description,
         start_time: data.stream_date
@@ -136,56 +136,50 @@ const NewStreamPass: FC = () => {
         streamer_link: data.streamer_link,
         image: data.stream_image.originFileObj!,
         banner: data.stream_banner.originFileObj!,
-      })
-      .catch((e) => {
-        console.error(e);
-        showErrorMessage(
-          "Oops! Something went wrong while uploading metadata. Please try again later.",
-        );
-        setPending(false);
       });
-    const now = dayjs();
-    const args = [
-      {
-        startTime: BigInt(
-          data.stream_sale_time[0].isBefore(now)
-            ? now.utc(false).add(5, "minute").unix()
-            : data.stream_sale_time[0].utc(false).unix(),
-        ),
-        endTime: BigInt(data.stream_sale_time[1].utc(false).unix()),
-        price: parseUnits(data.stream_price.toString(), tokenDecimals.data!),
-        paymentToken: process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS,
-      },
-      {
-        name: data.stream_name,
-        symbol: data.stream_symbol,
-        baseUri: `https://ipfs.io/ipfs/${metadataCid}`,
-        cap: data.stream_cap,
-      },
-    ] as const;
-    await Promise.all([
-      createStream.writeContractAsync({
-        args,
-        chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
-      }),
-      (async () => {
-        const simulatedCreateStream =
-          await simulateTicketFactoryCreateTicketSale(config, {
-            args,
-            chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
-          });
-        const estimatedGas =
-          client &&
-          (await estimateContractGas(client, simulatedCreateStream.request));
-        setEstimatedGasForCreateStream(estimatedGas);
-      })(),
-    ]).catch((e) => {
+      const now = dayjs();
+      const args = [
+        {
+          startTime: BigInt(
+            data.stream_sale_time[0].isBefore(now)
+              ? now.utc(false).add(5, "minute").unix()
+              : data.stream_sale_time[0].utc(false).unix(),
+          ),
+          endTime: BigInt(data.stream_sale_time[1].utc(false).unix()),
+          price: parseUnits(data.stream_price.toString(), tokenDecimals.data!),
+          paymentToken: process.env.NEXT_PUBLIC_BSC_PAYMENT_TOKEN_ADDRESS,
+        },
+        {
+          name: data.stream_name,
+          symbol: data.stream_symbol,
+          baseUri: `https://ipfs.io/ipfs/${metadataCid}`,
+          cap: data.stream_cap,
+        },
+      ] as const;
+      await Promise.all([
+        createStream.writeContractAsync({
+          args,
+          chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+        }),
+        (async () => {
+          const simulatedCreateStream =
+            await simulateTicketFactoryCreateTicketSale(config, {
+              args,
+              chainId: Number(process.env.NEXT_PUBLIC_BSC_CHAIN_ID),
+            });
+          const estimatedGas =
+            client &&
+            (await estimateContractGas(client, simulatedCreateStream.request));
+          setEstimatedGasForCreateStream(estimatedGas);
+        })(),
+      ]);
+    } catch (e) {
       console.error(e);
       showErrorMessage(
         "Oops! Something went wrong while creating the stream. Please try again later.",
       );
       setPending(false);
-    });
+    }
   };
 
   const loading = tokenDecimals.isLoading || pending;
