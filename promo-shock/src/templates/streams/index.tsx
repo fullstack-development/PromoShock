@@ -43,13 +43,14 @@ export const Streams: FC<Props> = ({ queryKey }) => {
         defaultFilterKeys={
           isValidFilterKeys ? searchParamsFilterKeys : undefined
         }
-        filterOptions={
+        emptyStateMessage="Oops, looks like you haven't snagged any tickets yet, so it's kinda empty here!"
+        filterOptions={(
           [
             { label: "All", value: "all" },
             { label: "I bought", value: "buyer" },
             { label: "I created", value: "owner" },
           ] as const
-        }
+        ).filter((item) => item.value === "all" || account.address)}
         mapKeysToFilter={(filterKeys) => ({
           owner: filterKeys.includes("owner") ? account.address : undefined,
           buyer: filterKeys.includes("buyer") ? account.address : undefined,

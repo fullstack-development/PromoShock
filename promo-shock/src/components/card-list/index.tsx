@@ -19,6 +19,7 @@ type Props<
 > = {
   queryFn: QueryFn;
   queryKey: QueryKey;
+  emptyStateMessage?: string;
   children: (item: TValue, idx: number) => ReactElement;
   initialData?: InfiniteData<QueryValue, number>;
   filterOptions?: { label: string; value: TFilterKeys | "all" }[];
@@ -36,6 +37,7 @@ export const CardList = <
   QueryKey extends [string, TFilters],
   QueryFn extends QueryFunction<QueryValue, QueryKey, number>,
 >({
+  emptyStateMessage = "No items found",
   children,
   queryFn,
   queryKey,
@@ -121,16 +123,20 @@ export const CardList = <
           /> */}
         </div>
       )}
-      <div className={styles.list}>{cards.data?.map(children)}</div>
-      {cards.hasNextPage && (
-        <Button
-          text="Get more"
-          size="medium"
-          theme="tertiary"
-          loading={cards.isFetchingNextPage}
-          onClick={handleGetMore}
-        />
+      {!!cards.data?.length ? (
+        <div className={styles.list}>{cards.data?.map(children)}</div>
+      ) : (
+        <span className={styles.caption}>{emptyStateMessage}</span>
       )}
+
+      <Button
+        text={cards.hasNextPage ? "Get more" : "Seems like that's all!"}
+        size="medium"
+        theme="tertiary"
+        loading={cards.isFetchingNextPage}
+        disabled={!cards.hasNextPage}
+        onClick={handleGetMore}
+      />
     </div>
   );
 };
