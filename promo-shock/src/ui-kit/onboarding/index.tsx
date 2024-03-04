@@ -1,6 +1,8 @@
 import { Tour } from "antd";
 import type { FC, ReactNode } from "react";
 
+import styles from "./onboarding.module.scss";
+
 type Props = {
   open?: boolean;
   steps: Array<{
@@ -20,6 +22,7 @@ const Onboarding: FC<Props> = ({ steps, open, onClose, onFinish }) => {
       steps={steps}
       onClose={onClose}
       onFinish={onFinish}
+      rootClassName={styles.root}
       disabledInteraction
     />
   );

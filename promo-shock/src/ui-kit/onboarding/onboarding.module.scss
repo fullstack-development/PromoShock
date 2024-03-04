@@ -1,0 +1,63 @@
+.root {
+  display: block;
+
+  & :global(.ant-tour-description),
+  & :global(.ant-tour-title) {
+    font-family: var(--font-georama) !important;
+  }
+
+  & :global(.ant-btn) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 16px !important;
+    width: max-content !important;
+    height: max-content !important;
+    padding: 4px 12px !important;
+    font-family: var(--font-w95fa) !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 20px !important;
+    transition: border-color 0.3s, color 0.3s, background-color 0.3s !important;
+  }
+
+  & :global(.ant-tour-prev-btn) {
+    color: #9254DE !important;
+    border: 2px solid #9254DE !important;
+    background-color: #F9F0FF !important;
+    &:hover {
+      background-color: #eed6ff !important;
+      border: 2px solid #9254DE !important;
+    }
+
+    &.disabled {
+      color: #BFBFBF !important;
+      background-color: #F0F0F0 !important;
+      border: 2px solid #BFBFBF !important;
+    }
+  }
+
+  & :global(.ant-tour-next-btn) {
+    background-color: #F759AB !important;
+    &:hover {
+      background-color: #EB2F96 !important;
+    }
+
+    &.disabled {
+      color: #BFBFBF !important;
+      background-color: #F0F0F0 !important;
+    }
+  }
+
+  & :global(.ant-tour-indicators) {
+    & > :global(.ant-tour-indicator) {
+      border-radius: 0 !important;
+      background-color: #F0F0F0 !important;
+    }
+
+    & > :global(.ant-tour-indicator-active) {
+      border-radius: 0 !important;
+      background-color: #F759AB !important;
+    }
+  }
+}
